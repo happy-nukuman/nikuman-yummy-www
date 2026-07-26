@@ -1,20 +1,17 @@
 # Japan Disaster Relief API
 
-基于 Cloudflare Workers、Hono 和 TypeScript 的后端 API。
-
-## 本地开发
+Cloudflare Workers、Hono、TypeScript 后端。依赖由仓库根目录 npm workspace 管理。
 
 ```bash
-npm install
-npm run dev
+# Repository root
+npm ci
+npm run dev:backend
+npm run lint --workspace japan-disaster-relief-api
+npm run typecheck --workspace japan-disaster-relief-api
+npm run test --workspace japan-disaster-relief-api
+npm run build --workspace japan-disaster-relief-api
 ```
 
-Wrangler 默认监听 `http://localhost:8787`，与前端默认的 `NEXT_PUBLIC_API_BASE_URL` 一致。
+`build` 使用 `wrangler deploy --dry-run`，不会部署。真实部署只由受控 GitHub Actions job 或明确的人工操作执行。
 
-## 部署
-
-配置 Cloudflare 凭据后运行：
-
-```bash
-npm run deploy
-```
+主要职责见 [`DOCS/FOLDER_STRUCTURE.md`](../../DOCS/FOLDER_STRUCTURE.md)，接口见 [`DOCS/API.md`](../../DOCS/API.md)。

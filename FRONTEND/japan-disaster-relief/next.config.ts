@@ -1,7 +1,9 @@
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
-	/* config options here */
+	// The shared workspace publishes TypeScript source so both runtimes consume
+	// one contract without a generated-file synchronization step.
+	transpilePackages: ["@nikuman-yummy/shared"],
 };
 
 export default nextConfig;

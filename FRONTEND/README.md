@@ -1,7 +1,7 @@
 # Frontend
 
-日本灾害救援 Web 应用的前端目录。
+Next.js 应用位于 [`japan-disaster-relief/`](japan-disaster-relief/)。依赖与命令由仓库根目录 npm workspaces 管理。
 
-- [`tech-stack.md`](tech-stack.md) — 前端技术选型说明（选了什么、为什么选） 
-- [`japan-disaster-relief/`](japan-disaster-relief/) — 前端应用本体（Next.js），开发和部署方式见其 [README](japan-disaster-relief/README.md)
-CI/CD deployment test.
+- [Frontend workspace README](japan-disaster-relief/README.md)
+- [Actual tech stack](tech-stack.md)
+- [Folder structure](../DOCS/FOLDER_STRUCTURE.md)
