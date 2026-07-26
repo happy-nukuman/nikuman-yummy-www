@@ -10,6 +10,7 @@ on:
       - "DATA/**"
       - "package.json"
       - "package-lock.json"
+      - ".nvmrc"
       - ".github/workflows/backend.yml"
   push:
     branches:
@@ -20,6 +21,7 @@ on:
       - "DATA/**"
       - "package.json"
       - "package-lock.json"
+      - ".nvmrc"
       - ".github/workflows/backend.yml"
 
 jobs:
@@ -31,9 +33,15 @@ jobs:
 
       - uses: actions/setup-node@v4
         with:
-          node-version: 22
+          node-version-file: .nvmrc
           cache: npm
           cache-dependency-path: package-lock.json
+
+      - name: Pin Node and npm versions
+        run: |
+          npm install --global npm@11.16.0
+          node --version
+          npm --version
 
       - name: Install dependencies
         run: npm ci
@@ -71,9 +79,15 @@ jobs:
 
       - uses: actions/setup-node@v4
         with:
-          node-version: 22
+          node-version-file: .nvmrc
           cache: npm
           cache-dependency-path: package-lock.json
+
+      - name: Pin Node and npm versions
+        run: |
+          npm install --global npm@11.16.0
+          node --version
+          npm --version
 
       - name: Install dependencies
         run: npm ci
