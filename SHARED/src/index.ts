@@ -2,3 +2,8 @@ export * from "./api";
 export * from "./disaster";
 export * from "./localization";
 export * from "./shelter";
+export * from "./geo";
+export * from "./facility";
+export * from "./rules";
+export * from "./alerts";
+export * from "./i18n-labels";

@@ -10,6 +10,14 @@
 	"compatibility_flags": [
 		"nodejs_compat"
 	],
+	"d1_databases": [
+		{
+			"binding": "DB",
+			"database_name": "japan-disaster-relief-db",
+			"database_id": "0571713b-a816-43e1-9a76-36c3cb8f0ef7", // real remote DB (created 2026-07-26, region APAC); you still work local-only
+			"migrations_dir": "migrations"
+		}
+	],
 	"observability": {
 		"enabled": true
 	}
