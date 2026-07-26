@@ -7,12 +7,16 @@ on:
     paths:
       - "FRONTEND/japan-disaster-relief/**"
       - "BACKEND/japan-disaster-relief-api/**"
+      - "SHARED/**"
+      - "DATA/scripts/**"
   push:
     branches:
       - develop
     paths:
       - "FRONTEND/japan-disaster-relief/**"
       - "BACKEND/japan-disaster-relief-api/**"
+      - "SHARED/**"
+      - "DATA/scripts/**"
 
 jobs:
   analyze:
@@ -29,6 +33,10 @@ jobs:
             path: FRONTEND/japan-disaster-relief
           - component: backend
             path: BACKEND/japan-disaster-relief-api
+          - component: shared
+            path: SHARED
+          - component: data-scripts
+            path: DATA/scripts
     steps:
       - uses: actions/checkout@v4
 

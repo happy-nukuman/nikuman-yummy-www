@@ -1,33 +1,86 @@
-/**
- * Minimal REST client for the backend API (see /DOCS/API.md).
- *
- * While the backend is not available, set NEXT_PUBLIC_API_MOCK=true
- * (the default) to serve canned responses from `mocks` below instead
- * of hitting the network.
- */
+import { API_BASE_URL, DEFAULT_REQUEST_TIMEOUT_MS, USE_API_MOCK } from "./config";
+import { getMockResponse } from "./mock";
 
-const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL ?? "http://localhost:8787";
+export type ApiClientErrorCode =
+	| "HTTP_ERROR"
+	| "INVALID_RESPONSE"
+	| "NETWORK_ERROR"
+	| "REQUEST_ABORTED"
+	| "REQUEST_TIMEOUT";
 
-const USE_MOCK = process.env.NEXT_PUBLIC_API_MOCK !== "false";
+export class ApiClientError extends Error {
+	constructor(
+		readonly code: ApiClientErrorCode,
+		message: string,
+		readonly status?: number,
+	) {
+		super(message);
+		this.name = "ApiClientError";
+	}
+}
 
-const mocks: Record<string, unknown> = {
-	"GET /api/hello": { message: "hello world!" },
+type ApiGetOptions = {
+	signal?: AbortSignal;
+	timeoutMs?: number;
 };
 
-export async function apiGet<T>(path: string): Promise<T> {
-	if (USE_MOCK) {
-		const mock = mocks[`GET ${path}`];
-		if (mock === undefined) {
-			throw new Error(`No mock registered for GET ${path}`);
-		}
-		// Simulate network latency so loading states are visible in dev.
-		await new Promise((resolve) => setTimeout(resolve, 300));
-		return mock as T;
+export async function apiGet<T>(path: string, options: ApiGetOptions = {}): Promise<T> {
+	const timeoutMs = options.timeoutMs ?? DEFAULT_REQUEST_TIMEOUT_MS;
+	const controller = new AbortController();
+	let didTimeout = false;
+
+	const handleExternalAbort = () => controller.abort(options.signal?.reason);
+	if (options.signal?.aborted) {
+		handleExternalAbort();
+	} else {
+		options.signal?.addEventListener("abort", handleExternalAbort, { once: true });
 	}
 
-	const res = await fetch(`${API_BASE_URL}${path}`);
-	if (!res.ok) {
-		throw new Error(`GET ${path} failed: ${res.status} ${res.statusText}`);
+	const timeoutId = globalThis.setTimeout(() => {
+		didTimeout = true;
+		controller.abort();
+	}, timeoutMs);
+
+	try {
+		if (USE_API_MOCK) {
+			return await getMockResponse<T>("GET", path, controller.signal);
+		}
+
+		const response = await fetch(`${API_BASE_URL}${path}`, {
+			headers: {
+				Accept: "application/json",
+			},
+			signal: controller.signal,
+		});
+
+		if (!response.ok) {
+			throw new ApiClientError(
+				"HTTP_ERROR",
+				`GET ${path} returned HTTP ${response.status}.`,
+				response.status,
+			);
+		}
+
+		try {
+			return (await response.json()) as T;
+		} catch {
+			throw new ApiClientError("INVALID_RESPONSE", `GET ${path} returned invalid JSON.`);
+		}
+	} catch (error) {
+		if (error instanceof ApiClientError) {
+			throw error;
+		}
+
+		if (controller.signal.aborted) {
+			throw new ApiClientError(
+				didTimeout ? "REQUEST_TIMEOUT" : "REQUEST_ABORTED",
+				didTimeout ? `GET ${path} timed out.` : `GET ${path} was aborted.`,
+			);
+		}
+
+		throw new ApiClientError("NETWORK_ERROR", `GET ${path} failed before receiving a response.`);
+	} finally {
+		globalThis.clearTimeout(timeoutId);
+		options.signal?.removeEventListener("abort", handleExternalAbort);
 	}
-	return (await res.json()) as T;
 }
