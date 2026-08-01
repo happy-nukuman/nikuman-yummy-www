@@ -1,10 +1,14 @@
-import { SystemStatus } from "@/features/system-status/components/system-status";
+import type { Metadata, Viewport } from "next";
+import { DemoApp } from "@/features/demo/components/demo-app";
+
+export const metadata: Metadata = {
+	title: "Tokyo Safe First",
+};
+
+export const viewport: Viewport = {
+	themeColor: "#123B68",
+};
 
 export default function Home() {
-	return (
-		<main className="flex min-h-screen flex-col items-center justify-center gap-4 p-8">
-			<h1 className="text-2xl font-bold">Japan Disaster Relief</h1>
-			<SystemStatus />
-		</main>
-	);
+	return <DemoApp />;
 }
