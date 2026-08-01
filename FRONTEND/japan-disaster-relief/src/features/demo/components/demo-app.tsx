@@ -50,6 +50,9 @@ export function DemoApp() {
 		environment: null,
 	});
 	const [phrase, setPhrase] = useState(0);
+	const [phrasePickerOpen, setPhrasePickerOpen] = useState(false);
+	// Screen to go back to when leaving the communication card.
+	const [commReturn, setCommReturn] = useState<ScreenName>("mode");
 	const [action, setAction] = useState<ActionCard>(INITIAL_ACTION);
 	const [toast, setToast] = useState({ msg: "", show: false });
 	const toastTimer = useRef<number | undefined>(undefined);
@@ -134,6 +137,18 @@ export function DemoApp() {
 		setScreen("action");
 	}
 
+	function openCommunication() {
+		if (screen !== "communication") setCommReturn(screen);
+		setPhrasePickerOpen(false);
+		setScreen("communication");
+	}
+
+	function pickPhrase(index: number) {
+		if ("speechSynthesis" in window) speechSynthesis.cancel();
+		setPhrase(index);
+		setPhrasePickerOpen(false);
+	}
+
 	function speak() {
 		if ("speechSynthesis" in window) {
 			speechSynthesis.cancel();
@@ -194,7 +209,7 @@ export function DemoApp() {
 							type="button"
 							className="icon-btn"
 							aria-label="沟通卡"
-							onClick={() => setScreen("communication")}
+							onClick={openCommunication}
 						>
 							译
 						</button>
@@ -325,7 +340,7 @@ export function DemoApp() {
 							<button
 								type="button"
 								className="btn secondary"
-								onClick={() => setScreen("communication")}
+								onClick={openCommunication}
 							>
 								{t(lang, "我做不到 / 需要帮助")}
 							</button>
@@ -364,7 +379,7 @@ export function DemoApp() {
 							<button
 								type="button"
 								className="btn secondary"
-								onClick={() => setScreen("communication")}
+								onClick={openCommunication}
 							>
 								{t(lang, "我做不到 / 需要帮助")}
 							</button>
@@ -424,7 +439,7 @@ export function DemoApp() {
 							<button
 								type="button"
 								className="btn secondary"
-								onClick={() => setScreen("communication")}
+								onClick={openCommunication}
 							>
 								{t(lang, "我做不到")}
 							</button>
@@ -516,7 +531,7 @@ export function DemoApp() {
 							<button
 								type="button"
 								className="btn secondary"
-								onClick={() => setScreen("communication")}
+								onClick={openCommunication}
 							>
 								{t(lang, "打开沟通卡")}
 							</button>
@@ -542,18 +557,38 @@ export function DemoApp() {
 								<button
 									type="button"
 									className="btn secondary"
-									onClick={() => setPhrase((prev) => (prev + 1) % PHRASES.length)}
+									onClick={() => setPhrasePickerOpen((prev) => !prev)}
 								>
-									{t(lang, "切换其他沟通卡")}
+									{t(lang, phrasePickerOpen ? "收起列表" : "切换其他沟通卡")}
 								</button>
-								<button
-									type="button"
-									className="btn ghost"
-									style={{ color: "#fff", borderColor: "#6d8caf", background: "transparent" }}
-									onClick={() => setScreen("facilities")}
-								>
-									{t(lang, "返回")}
-								</button>
+								{phrasePickerOpen && (
+									<div className="phrase-list">
+										<div className="phrase-list-title">{t(lang, "选择要展示的沟通卡")}</div>
+										{PHRASE_TEXT[lang].map((text, i) => (
+											<button
+												key={text}
+												type="button"
+												className={`phrase-option${i === phrase ? " selected" : ""}`}
+												onClick={() => pickPhrase(i)}
+											>
+												<span className="phrase-native">{text}</span>
+												{lang !== "ja" && <span className="phrase-jp">{PHRASES[i][2]}</span>}
+											</button>
+										))}
+									</div>
+								)}
+								<div className="comm-nav">
+									<button
+										type="button"
+										className="btn ghost"
+										onClick={() => setScreen(commReturn)}
+									>
+										{t(lang, "返回")}
+									</button>
+									<button type="button" className="btn ghost" onClick={() => setScreen("mode")}>
+										{t(lang, "返回主页")}
+									</button>
+								</div>
 								<div className="privacy" style={{ background: "#244f7e", color: "#d8e6f5" }}>
 									{t(lang, "固定审核翻译 · 核心功能不依赖 AI")}
 								</div>
