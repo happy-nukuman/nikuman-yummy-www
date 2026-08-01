@@ -215,7 +215,10 @@ export const FULL_I18N: Record<"en" | "ja", Record<string, string>> = {
 		请把屏幕给对方看: "Show this screen to the other person",
 		"🔊 朗读日语": "🔊 Speak Japanese",
 		切换其他沟通卡: "Switch phrase",
+		选择要展示的沟通卡: "Choose a card to show",
+		收起列表: "Hide list",
 		返回: "Back",
+		返回主页: "Back to home",
 		"固定审核翻译 · 核心功能不依赖 AI": "Reviewed fixed translations · Core functions do not depend on AI",
 		当前服务受限: "Service currently limited",
 		"无法获取最新设施数据。请确认现场广播、工作人员和官方信息。":
@@ -296,7 +299,10 @@ export const FULL_I18N: Record<"en" | "ja", Record<string, string>> = {
 		请把屏幕给对方看: "相手にこの画面を見せてください",
 		"🔊 朗读日语": "🔊 日本語を読み上げる",
 		切换其他沟通卡: "別のカードに切り替える",
+		选择要展示的沟通卡: "表示するカードを選択",
+		收起列表: "リストを閉じる",
 		返回: "戻る",
+		返回主页: "ホームに戻る",
 		"固定审核翻译 · 核心功能不依赖 AI": "確認済み固定翻訳 · コア機能はAIに依存しません",
 		当前服务受限: "現在サービスが制限されています",
 		"无法获取最新设施数据。请确认现场广播、工作人员和官方信息。":
