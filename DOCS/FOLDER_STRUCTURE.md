@@ -5,12 +5,10 @@
 | 路径 | 职责 | 是否已实现 |
 | --- | --- | --- |
 | `FRONTEND/japan-disaster-relief/src/app` | Next.js 路由与页面组合 | 是 |
-| `FRONTEND/japan-disaster-relief/src/features` | 按业务功能组织 | 部分；system-status 可运行，其余为职责说明 |
-| `FRONTEND/japan-disaster-relief/src/components` | 通用 UI 和反馈组件 | 部分；已实现 feedback |
+| `FRONTEND/japan-disaster-relief/src/features` | 按业务功能组织 | 部分；demo 可运行，其余为职责说明 |
 | `FRONTEND/japan-disaster-relief/src/lib/api` | API Client、mock、timeout 与错误边界 | 是 |
 | `FRONTEND/japan-disaster-relief/src/lib/geo` | 地理计算 | 基础；距离函数与测试 |
 | `FRONTEND/japan-disaster-relief/src/lib/i18n` | locale 与 fallback | 基础；未实现语言切换 |
-| `FRONTEND/japan-disaster-relief/src/types` | Shared Contract 的前端出口 | 是 |
 | `BACKEND/japan-disaster-relief-api/src/routes` | Hono 路由 | 是 |
 | `BACKEND/japan-disaster-relief-api/src/services` | 用例与业务逻辑 | 基础；system status |
 | `BACKEND/japan-disaster-relief-api/src/repositories` | 数据访问抽象 | 基础；只有 ShelterRepository interface |
@@ -27,18 +25,16 @@
 ```text
 src/
 ├── app/                       路由、layout、Provider
-├── components/feedback/       Loading/Error/Empty
 ├── features/
-│   ├── system-status/         当前可运行连通性示例
+│   ├── demo/                  当前可运行的交互演示
 │   ├── language/              计划职责说明
 │   ├── location/              计划职责说明
 │   ├── disaster/              计划职责说明
 │   └── shelter/               计划职责说明
-├── lib/
-│   ├── api/                   通用 HTTP/mock
-│   ├── geo/                   纯函数
-│   └── i18n/                  locale/fallback
-└── types/                     Contract re-export
+└── lib/
+    ├── api/                   通用 HTTP/mock
+    ├── geo/                   纯函数
+    └── i18n/                  locale/fallback
 ```
 
 新增业务应从 Feature 入口组合 API、状态和 UI；`app/page.tsx` 不承载业务规则。
