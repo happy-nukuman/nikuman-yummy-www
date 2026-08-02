@@ -2,6 +2,8 @@
 
 面向前端联调的实践指南：按 PRD 主流程说明每一步调哪个接口、传什么、如何处理响应与降级。接口 Contract（字段、类型名、错误表）以 [API.md](API.md) 为准；多语言字段与枚举键的显示约定以 [I18N.md](I18N.md) 为准。本文不重复定义字段形状，所有请求/响应类型都从 `@nikuman-yummy/shared` `import type` 引用，不得在前端重新声明。
 
+东京都厅周边避难所 Demo 的完整调用示例、POST helper、TanStack Query hook、UI 映射和验收清单见 [DEMO_SHELTER_FRONTEND_GUIDE.md](DEMO_SHELTER_FRONTEND_GUIDE.md)。
+
 ## 0. 客户端约定（沿用现有实现，不新造）
 
 - Base URL：`NEXT_PUBLIC_API_BASE_URL` 环境变量，缺省 `http://localhost:8787`（`src/lib/api/config.ts`）。各环境取值见 [API.md](API.md)「Base URL」。
