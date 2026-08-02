@@ -15,6 +15,7 @@ import "../demo.css";
 
 type ScreenName =
 	| "welcome"
+	| "location"
 	| "mode"
 	| "event"
 	| "daily"
@@ -39,6 +40,8 @@ interface NavSnapshot {
 export function DemoApp() {
 	const [screen, setScreen] = useState<ScreenName>("welcome");
 	const [lang, setLang] = useState<DemoLang>("zh");
+	// 位置许可：demo 版允许后位置写死为“东京市新宿区”。
+	const [locPermission, setLocPermission] = useState<"unknown" | "granted" | "denied">("unknown");
 	// 事象确认卡：灾害模式自动识别推荐地震并高亮，日常应急为手动选择。
 	const [eventChoice, setEventChoice] = useState("earthquake");
 	const [dailyChoice, setDailyChoice] = useState<string | null>(null);
@@ -93,6 +96,14 @@ export function DemoApp() {
 		const picked = next as DemoLang;
 		setLang(picked);
 		notify(WELCOME_COPY[picked].toast);
+		pushHistory();
+		// 首次进入先询问位置许可；已作出选择的用户直接进入模式选择。
+		setScreen(locPermission === "unknown" ? "location" : "mode");
+	}
+
+	function decideLocation(allow: boolean) {
+		setLocPermission(allow ? "granted" : "denied");
+		notify(t(lang, allow ? "已获取当前位置：东京市新宿区" : "已跳过，将不使用位置信息"));
 		pushHistory();
 		setScreen("mode");
 	}
@@ -214,6 +225,12 @@ export function DemoApp() {
 
 	const actionCard = flowNode?.type === "action" ? flowNode.cards[cardIndex] : null;
 
+	// 许可后在语言/许可页之外的页面顶部常驻显示获取到的位置。
+	const showLocBar =
+		locPermission === "granted" &&
+		!["welcome", "location", "communication", "offline"].includes(screen);
+	const locText = `${t(lang, "东京市新宿区")} · ${t(lang, "仅本次使用")}`;
+
 	return (
 		<div className="app-shell">
 			<div className="phone">
@@ -240,6 +257,7 @@ export function DemoApp() {
 					</div>
 				</header>
 				<main className="main">
+					{showLocBar && <div className="loc-bar">📍 {locText}</div>}
 					<section className={screenClass("welcome")} data-screen="welcome">
 						<div className="hero-mark">🛡️</div>
 						<div className="eyebrow">Emergency guidance</div>
@@ -276,6 +294,45 @@ export function DemoApp() {
 						</div>
 						<div className="actions">
 							<div className="privacy">{welcome.privacy}</div>
+						</div>
+					</section>
+
+					<section className={screenClass("location")} data-screen="location">
+						<div className="hero-mark">📍</div>
+						<div className="eyebrow">{t(lang, "位置许可")}</div>
+						<h1 className="hero-title">{t(lang, "是否允许获取你的实时位置？")}</h1>
+						<p className="lead">
+							{t(lang, "用于确认所在区和附近避难设施，仅本次使用，不保存位置历史。")}
+						</p>
+						<div className="panel tint">
+							<div className="panel-row">
+								<div className="panel-icon">🔒</div>
+								<div>
+									<div className="panel-title">{t(lang, "隐私说明")}</div>
+									<div className="panel-copy">
+										{t(lang, "不收集姓名、住址或在留资格，位置信息不会被保存。")}
+									</div>
+								</div>
+							</div>
+						</div>
+						<div className="actions">
+							<button
+								type="button"
+								className="btn primary"
+								onClick={() => decideLocation(true)}
+							>
+								{t(lang, "允许获取位置")}
+							</button>
+							<button
+								type="button"
+								className="btn secondary"
+								onClick={() => decideLocation(false)}
+							>
+								{t(lang, "暂不允许")}
+							</button>
+							<button type="button" className="btn ghost" onClick={goBack}>
+								{t(lang, "返回上一步")}
+							</button>
 						</div>
 					</section>
 
@@ -483,7 +540,9 @@ export function DemoApp() {
 								<div className="panel-icon">📍</div>
 								<div>
 									<div className="panel-title">{t(lang, "当前位置")}</div>
-									<div className="panel-copy">{t(lang, "東京都新宿区附近 · 仅本次使用")}</div>
+									<div className="panel-copy">
+										{locPermission === "granted" ? locText : t(lang, "東京都新宿区附近 · 仅本次使用")}
+									</div>
 								</div>
 							</div>
 						</div>
