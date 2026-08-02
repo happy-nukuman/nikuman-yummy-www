@@ -291,6 +291,29 @@ export const FULL_I18N: Record<"en" | "ja", Record<string, string>> = {
 		"未获得位置许可，无法继续下一步": "Location permission is required to continue.",
 		东京市新宿区: "Shinjuku, Tokyo",
 		仅本次使用: "This session only",
+		// Demo shelter candidates & route reference
+		"正在获取附近的避难所候选…": "Loading nearby shelter candidates…",
+		"根据本次位置查询官方开放数据快照。":
+			"Searching a snapshot of official open data using your current session location.",
+		避难所: "Shelter",
+		候选: "Candidate",
+		"当前开放状态：无法确认": "Current open status: cannot be confirmed",
+		选择并查看路线: "Select and view route",
+		"在 Google 地图中查看位置": "View location on Google Maps",
+		"附近 3 公里内暂无可显示的候选设施": "No candidate facilities within 3 km",
+		"请确认现场广播、工作人员和官方信息，不要依赖本页面。":
+			"Check on-site announcements, staff instructions, and official information. Do not rely on this page.",
+		数据出典: "Data source",
+		更新日: "Updated",
+		"非实时信息。附近设施不代表安全或已开放。直线距离不代表路线可通行。":
+			"Not real-time information. A nearby facility is not necessarily safe or open. Straight-line distance does not mean the route is passable.",
+		前往设施的路线参考: "Route reference to the facility",
+		"路线仅供参考，是否可通行需要现场确认。无法确认设施当前是否开放。":
+			"The route is for reference only; check on site whether it is passable. Whether the facility is currently open cannot be confirmed.",
+		路线参考地图: "Route reference map",
+		"地图无法加载时，请使用下方按钮打开 Google 地图。":
+			"If the map does not load, use the button below to open Google Maps.",
+		"在 Google 地图中打开路线": "Open route in Google Maps",
 	},
 	ja: {
 		"Choose mode": "モードを選択",
@@ -442,6 +465,29 @@ export const FULL_I18N: Record<"en" | "ja", Record<string, string>> = {
 		"未获得位置许可，无法继续下一步": "位置情報の許可がないため、先に進めません。",
 		东京市新宿区: "東京都新宿区",
 		仅本次使用: "今回のみ使用",
+		// Demo shelter candidates & route reference
+		"正在获取附近的避难所候选…": "近くの避難所候補を取得しています…",
+		"根据本次位置查询官方开放数据快照。":
+			"今回の位置情報をもとに、公式オープンデータのスナップショットを検索します。",
+		避难所: "避難所",
+		候选: "候補",
+		"当前开放状态：无法确认": "現在の開設状況：確認できません",
+		选择并查看路线: "選択して経路を見る",
+		"在 Google 地图中查看位置": "Google マップで位置を確認",
+		"附近 3 公里内暂无可显示的候选设施": "3km以内に表示できる候補施設がありません",
+		"请确认现场广播、工作人员和官方信息，不要依赖本页面。":
+			"現場放送、係員、公式情報を確認してください。このページだけに頼らないでください。",
+		数据出典: "データ出典",
+		更新日: "更新日",
+		"非实时信息。附近设施不代表安全或已开放。直线距离不代表路线可通行。":
+			"リアルタイム情報ではありません。近い施設が安全または開設中とは限りません。直線距離は経路の通行可能性を示しません。",
+		前往设施的路线参考: "施設までの経路の参考",
+		"路线仅供参考，是否可通行需要现场确认。无法确认设施当前是否开放。":
+			"経路は参考情報です。通行可能かは現場で確認してください。施設が現在開設中かは確認できません。",
+		路线参考地图: "経路参考マップ",
+		"地图无法加载时，请使用下方按钮打开 Google 地图。":
+			"地図が表示されない場合は、下のボタンから Google マップを開いてください。",
+		"在 Google 地图中打开路线": "Google マップで経路を開く",
 	},
 };
 
