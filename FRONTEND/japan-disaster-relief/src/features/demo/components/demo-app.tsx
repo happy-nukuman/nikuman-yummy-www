@@ -289,7 +289,9 @@ export function DemoApp() {
 			<div className="phone">
 				<header className="topbar">
 					<div className="brand">
-						<div className="logo">盾</div>
+						<div className="logo">
+							<img src="/logo.png" alt="Tokyo Safe First" />
+						</div>
 						<div>
 							<div className="brand-text">Tokyo Safe First</div>
 							<div className="brand-sub">{headerSub}</div>
@@ -302,7 +304,7 @@ export function DemoApp() {
 							aria-label={t(lang, "沟通卡")}
 							onClick={openCommunication}
 						>
-							译
+							<img className="icon-btn-img" src="/communication-card.png" alt="" />
 						</button>
 						<select
 							className="lang-select"
