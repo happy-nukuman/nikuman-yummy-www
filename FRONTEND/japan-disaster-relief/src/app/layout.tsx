@@ -37,6 +37,9 @@ const notoSansJP = Noto_Sans_JP({
 export const metadata: Metadata = {
 	title: "Japan Disaster Relief",
 	description: "Japan disaster relief web application",
+	// 防止 iOS 把文案中的 110 / 119 等数字自动渲染成电话链接。
+	formatDetection: { telephone: false },
+	appleWebApp: { capable: true, title: "Tokyo Safe First", statusBarStyle: "default" },
 };
 
 export default function RootLayout({
