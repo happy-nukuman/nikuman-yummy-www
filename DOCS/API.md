@@ -174,6 +174,64 @@ CORS 只应用于 `/api/*`（`/health` 不带 CORS 中间件，供运维探活�
 
 与 PRD §10.1 的逻辑示例相比，`municipalityName` 使用 Shared Contract 的 `LocalizedText`，而不是 plain string。
 
+### POST `/api/demo/shelters/nearby`
+
+- 用途：比赛 Demo 中，前端提交东京都厅附近的 WGS84 经纬度，返回 3 公里内按直线距离排序的避难所候选。
+- 分类：Demo 专用；不依赖 D1，可在本地和比赛环境稳定演示。
+- 数据：新宿区「避難所情報」的固定快照，设施名称保持官方日文原文。
+
+Request body：
+
+```json
+{
+  "latitude": 35.6896342,
+  "longitude": 139.6917418,
+  "limit": 5
+}
+```
+
+`latitude` 与 `longitude` 必填，须为合法 WGS84 有限数值。`limit` 可省略，默认 5，范围为 1–10 的整数。
+
+成功响应：HTTP 200。
+
+```json
+{
+  "dataStatus": "not_realtime",
+  "origin": {
+    "latitude": 35.6896342,
+    "longitude": 139.6917418
+  },
+  "searchRadiusMeters": 3000,
+  "source": {
+    "name": "新宿区の避難所情報",
+    "url": "https://catalog.data.metro.tokyo.lg.jp/dataset/t131041d0000000055",
+    "updatedAt": "2025-12-12",
+    "realtime": false
+  },
+  "facilities": [
+    {
+      "facilityId": "demo-shinjuku-nishi-shinjuku-elementary",
+      "nameJa": "西新宿小学校",
+      "addressJa": "東京都新宿区西新宿4-35-5",
+      "latitude": 35.68602,
+      "longitude": 139.68748,
+      "distanceMeters": 556,
+      "googleMapsUrl": "https://www.google.com/maps/search/?api=1&query=35.68602%2C139.68748"
+    }
+  ],
+  "limitations": {
+    "openStatus": "unknown",
+    "routeStatus": "unknown"
+  }
+}
+```
+
+距离采用 Haversine 直线距离并四舍五入为整数米；Google Maps URL 只定位设施坐标，不表示路线安全或可通行。设施数据不是实时开放信息。3 公里内没有候选时返回空数组，不虚构结果。
+
+| 条件 | HTTP status | error.code |
+|---|---:|---|
+| body 不是合法 JSON、坐标缺失/越界、`limit` 不是 1–10 的整数 | 400 | `BAD_REQUEST` |
+
 ### POST `/api/facilities/search`
 
 - 用途：按区市町村、设施类型和无障碍需求返回最多 20 个设施候选，同时返回目录来源与「地区内残留地区」指定信息（PRD §10.2、FR-11、FR-12）。
