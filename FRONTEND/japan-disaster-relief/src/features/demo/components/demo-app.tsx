@@ -589,7 +589,7 @@ export function DemoApp() {
 										{t(lang, "返回主页")}
 									</button>
 								</div>
-								<div className="privacy" style={{ background: "#244f7e", color: "#d8e6f5" }}>
+								<div className="privacy trust">
 									{t(lang, "固定审核翻译 · 核心功能不依赖 AI")}
 								</div>
 							</div>
