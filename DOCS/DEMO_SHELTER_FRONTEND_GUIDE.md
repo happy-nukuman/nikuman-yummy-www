@@ -94,7 +94,7 @@ Accept: application/json
 }
 ```
 
-示例坐标为东京都厅附近，仅用于 Demo。实际调用应传入浏览器在用户主动授权后取得的本次坐标。
+Demo 版不调用浏览器定位。前端固定使用东京都新宿区（东京都厅附近）的演示坐标 `35.6896342, 139.6917418`，即 `demo-app.tsx` 中的 `DEMO_ORIGIN` 常量。
 
 | 字段 | 类型 | 必填 | 规则 |
 |---|---|---:|---|
@@ -317,7 +317,7 @@ export function getDemoShelters(
 
 ### 8.2 TanStack Query mutation
 
-定位由用户动作触发，建议使用 mutation：
+查询由用户动作触发，建议使用 mutation：
 
 ```ts
 import { useMutation } from "@tanstack/react-query";
@@ -349,35 +349,34 @@ function search(latitude: number, longitude: number) {
 </button>
 ```
 
-## 9. 浏览器定位接入
+## 9. Demo 固定坐标（不接入浏览器定位）
 
-必须先向用户说明用途，再由用户点击按钮触发定位请求。不要在页面打开时自动弹出权限请求。
+Demo 版不调用 `navigator.geolocation`，也不请求真实位置权限。语言选择后的“位置许可”弹窗只是演示交互：用户点击“允许”后，前端直接使用固定的新宿区演示坐标发起请求。
 
 ```ts
-function requestCurrentPosition() {
-  navigator.geolocation.getCurrentPosition(
-    ({ coords }) => {
-      search(coords.latitude, coords.longitude);
-    },
-    () => {
-      // 显示“定位失败/拒绝”，提供重试或手动流程。
-    },
-    {
-      enableHighAccuracy: false,
-      timeout: 8_000,
-      maximumAge: 0,
-    },
-  );
+// Demo 固定“现在地”（东京都新宿区·东京都厅附近）。
+const DEMO_ORIGIN = { latitude: 35.6896342, longitude: 139.6917418 };
+
+function searchShelters() {
+  shelters.mutate({
+    latitude: DEMO_ORIGIN.latitude,
+    longitude: DEMO_ORIGIN.longitude,
+    limit: 5,
+  });
 }
 ```
 
-隐私要求：
+这样做的目的：
 
-- 只在当前流程内存中保存坐标；
+- 无需 HTTPS 或浏览器权限即可演示完整流程；
+- 候选列表始终命中新宿区数据快照，演示结果稳定可复现；
+- 用户在弹窗中选择“不允许”时，停留在语言选择页，不阻断沟通卡等固定功能。
+
+注意事项：
+
+- 固定坐标只写在 `DEMO_ORIGIN` 一处，请求与路线页共用同一常量；
 - 不写入 `localStorage`、cookie、分析平台或前端日志；
-- 不把完整坐标写入错误监控；
-- 切换语言时可以保留当前响应，但离开流程后应释放；
-- 用户拒绝定位时不得阻断其他固定行动卡和沟通卡。
+- 切换语言时可以保留当前响应，但离开流程后应释放。
 
 ## 10. UI 展示规范
 
@@ -437,8 +436,7 @@ Google Maps 链接只用于显示设施坐标，不能把按钮写成“开始�
 
 | 状态 | 判断方式 | UI 行为 |
 |---|---|---|
-| 初始 | mutation 尚未调用 | 显示定位用途及授权按钮 |
-| 定位中 | 浏览器定位尚未返回 | 显示定位中，8 秒后允许重试 |
+| 初始 | mutation 尚未调用 | 显示位置说明；进入候选页时用 `DEMO_ORIGIN` 发起请求 |
 | 请求中 | `isPending` | 显示骨架或加载状态，禁用重复请求 |
 | 成功有结果 | `facilities.length > 0` | 按后端顺序展示候选 |
 | 成功无结果 | `facilities.length === 0` | 显示 3 公里内无 Demo 数据，不虚构候选 |
@@ -499,7 +497,7 @@ Invoke-RestMethod `
 ## 14. 前端验收清单
 
 - [ ] `.env.local` 使用正确的 API Base URL，并设置 `NEXT_PUBLIC_API_MOCK=false`；
-- [ ] 用户点击后才请求位置权限；
+- [ ] 不调用 `navigator.geolocation`，请求坐标固定为 `DEMO_ORIGIN`（新宿区演示坐标）；
 - [ ] 请求体坐标为 `number`，不是字符串；
 - [ ] 请求期间按钮不可重复点击；
 - [ ] 候选顺序直接使用后端返回顺序，不在前端重新按名称排序；
@@ -514,7 +512,7 @@ Invoke-RestMethod `
 - [ ] 覆盖 loading、success、empty、400、timeout、network error；
 - [ ] 不在浏览器存储、日志或监控中保留精确坐标；
 - [ ] 中文、英文、日文切换不会改变候选事实字段；
-- [ ] 返回上一步重新定位后，用新坐标重新请求。
+- [ ] 返回上一步后再次进入候选页时，重新发起请求（坐标仍为 `DEMO_ORIGIN`）。
 
 ## 15. 后端验证状态
 

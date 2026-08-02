@@ -1,6 +1,12 @@
 "use client";
 
 import { Fragment, useEffect, useRef, useState } from "react";
+import type { DemoShelterCandidate } from "@nikuman-yummy/shared";
+import type { GeoPoint } from "../../../lib/geo/calculate-distance";
+import { useDemoShelters } from "../../shelter/hooks/use-demo-shelters";
+import { ShelterCandidateList } from "../../shelter/components/shelter-candidate-list";
+import { ShelterRouteMap } from "../../shelter/components/shelter-route-map";
+import { formatApproxDistance } from "../../shelter/format";
 import {
 	type DemoLang,
 	HEADER_LABELS,
@@ -21,8 +27,15 @@ type ScreenName =
 	| "flow"
 	| "shelter"
 	| "facilities"
+	| "navigate"
 	| "communication"
 	| "offline";
+
+// Demo 固定“现在地”（东京都厅附近）：demo 版不调用浏览器定位，
+// 保证候选列表始终命中新宿区数据快照。
+const DEMO_ORIGIN: GeoPoint = { latitude: 35.6896342, longitude: 139.6917418 };
+
+const DEMO_SHELTER_LIMIT = 5;
 
 interface FlowPosition {
 	flowId: FlowId;
@@ -39,8 +52,11 @@ interface NavSnapshot {
 export function DemoApp() {
 	const [screen, setScreen] = useState<ScreenName>("welcome");
 	const [lang, setLang] = useState<DemoLang>("zh");
-	// 位置许可：demo 版允许后位置写死为“东京市新宿区”。
+	// 位置许可：demo 版允许后固定使用东京都厅演示坐标（DEMO_ORIGIN）。
 	const [locPermission, setLocPermission] = useState<"unknown" | "granted" | "denied">("unknown");
+	// 用户在候选列表中选择的避难设施（路线页的目的地）。
+	const [selectedShelter, setSelectedShelter] = useState<DemoShelterCandidate | null>(null);
+	const shelters = useDemoShelters();
 	// 选完语言后以弹窗形式询问位置许可；不允许则停留在语言页无法继续。
 	const [locDialogOpen, setLocDialogOpen] = useState(false);
 	// 事象确认卡：灾害模式自动识别推荐地震并高亮，日常应急为手动选择。
@@ -119,6 +135,22 @@ export function DemoApp() {
 		}
 	}
 
+	// 进入“附近设施候选”页时用演示坐标请求 Demo 避难所列表。
+	function searchShelters() {
+		shelters.mutate({
+			latitude: DEMO_ORIGIN.latitude,
+			longitude: DEMO_ORIGIN.longitude,
+			limit: DEMO_SHELTER_LIMIT,
+		});
+	}
+
+	// 在候选列表中选择设施后，进入路线参考页。
+	function navigateToShelter(facility: DemoShelterCandidate) {
+		pushHistory();
+		setSelectedShelter(facility);
+		setScreen("navigate");
+	}
+
 	function openCommunication() {
 		if (screen !== "communication") setCommReturn(screen);
 		setPhrasePickerOpen(false);
@@ -135,8 +167,10 @@ export function DemoApp() {
 		setCardIndex(0);
 		// 避难确认卡和导航卡有专属画面，其余节点在 flow 画面内渲染。
 		if (node.type === "evacuation") setScreen("shelter");
-		else if (node.type === "navigation") setScreen("facilities");
-		else setScreen("flow");
+		else if (node.type === "navigation") {
+			setScreen("facilities");
+			searchShelters();
+		} else setScreen("flow");
 	}
 
 	// 前进到流程节点：沟通卡有自己的返回逻辑，其余目标先压栈再跳转。
@@ -199,6 +233,7 @@ export function DemoApp() {
 		if (need) {
 			pushHistory();
 			setScreen("facilities");
+			searchShelters();
 		} else {
 			openCommunication();
 		}
@@ -541,46 +576,94 @@ export function DemoApp() {
 					<section className={screenClass("facilities")} data-screen="facilities">
 						{progress(5)}
 						<h1 className="hero-title">{t(lang, "附近设施候选")}</h1>
-						<div className="map">
-							<div className="river" />
-							<div className="pin p1">📍</div>
-							<div className="pin p2">📍</div>
-							<div className="pin me">🔵</div>
-						</div>
-						<div className="facility">
-							<div className="facility-head">
-								<div>
-									<div className="facility-name">新宿区立 ○○小学校</div>
-									<div className="facility-meta">{t(lang, "指定避难所 · 约 620m")}</div>
+						{shelters.isPending && (
+							<div className="panel">
+								<div className="panel-row">
+									<div className="panel-icon">⏳</div>
+									<div>
+										<div className="panel-title">{t(lang, "正在获取附近的避难所候选…")}</div>
+										<div className="panel-copy">
+											{t(lang, "根据本次位置查询官方开放数据快照。")}
+										</div>
+									</div>
 								</div>
-								<span className="tag">{t(lang, "候选 1")}</span>
 							</div>
-							<div className="facility-meta">
-								{t(lang, "开放状态：无法确认｜数据更新：2026-07-20")}
-							</div>
+						)}
+						{shelters.isError && (
+							<>
+								<div className="panel amber">
+									<div className="panel-title">{t(lang, "当前服务受限")}</div>
+									<div className="panel-copy">
+										{t(lang, "无法获取最新设施数据。请确认现场广播、工作人员和官方信息。")}
+									</div>
+								</div>
+								<div className="actions">
+									<button type="button" className="btn primary" onClick={searchShelters}>
+										{t(lang, "重新尝试")}
+									</button>
+								</div>
+							</>
+						)}
+						{shelters.isSuccess && (
+							<ShelterCandidateList
+								response={shelters.data}
+								lang={lang}
+								onNavigate={navigateToShelter}
+							/>
+						)}
+						<div className="actions">
 							<button
 								type="button"
-								className="btn primary"
-								onClick={() => notify("比赛原型：打开外部地图")}
+								className="btn secondary"
+								onClick={openCommunication}
 							>
-								{t(lang, "在地图中查看")}
+								{t(lang, "打开沟通卡")}
+							</button>
+							<button type="button" className="btn ghost" onClick={goBack}>
+								{t(lang, "返回上一步")}
 							</button>
 						</div>
-						<div className="facility">
-							<div className="facility-head">
-								<div>
-									<div className="facility-name">○○地域センター</div>
-									<div className="facility-meta">{t(lang, "避难设施 · 约 940m")}</div>
+					</section>
+
+					<section className={screenClass("navigate")} data-screen="navigate">
+						{progress(5)}
+						<h1 className="hero-title">{t(lang, "前往设施的路线参考")}</h1>
+						{selectedShelter && (
+							<>
+								<div className="panel">
+									<div className="panel-row">
+										<div className="panel-icon">📍</div>
+										<div>
+											<div className="panel-title">{t(lang, "当前位置")}</div>
+											<div className="panel-copy">{locText}</div>
+										</div>
+									</div>
+									<div className="panel-row">
+										<div className="panel-icon">🏫</div>
+										<div>
+											<div className="panel-title" lang="ja">
+												{selectedShelter.nameJa}
+											</div>
+											<div className="panel-copy">
+												<span lang="ja">{selectedShelter.addressJa}</span>
+												{` · ${formatApproxDistance(lang, selectedShelter.distanceMeters)}`}
+											</div>
+										</div>
+									</div>
 								</div>
-								<span className="tag">{t(lang, "候选 2")}</span>
-							</div>
-							<div className="facility-meta">
-								{t(lang, "开放状态：非实时｜数据更新：2026-07-18")}
-							</div>
-						</div>
-						<div className="source">
-							{t(lang, "来源：东京都 / 新宿区开放数据。距离最短不代表路线可通行。")}
-						</div>
+								<ShelterRouteMap
+									origin={DEMO_ORIGIN}
+									destination={selectedShelter}
+									lang={lang}
+								/>
+								<div className="panel amber">
+									<div className="panel-title">{t(lang, "重要说明")}</div>
+									<div className="panel-copy">
+										{t(lang, "路线仅供参考，是否可通行需要现场确认。无法确认设施当前是否开放。")}
+									</div>
+								</div>
+							</>
+						)}
 						<div className="actions">
 							<button
 								type="button"
