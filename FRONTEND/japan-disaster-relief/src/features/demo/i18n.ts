@@ -140,7 +140,15 @@ export const ACTION_I18N: Record<"en" | "ja", ActionI18n> = {
 // Static-text translations keyed by the original Chinese copy, exactly as in the demo.
 export const FULL_I18N: Record<"en" | "ja", Record<string, string>> = {
 	en: {
-		"Choose mode": "CHOOSE MODE",
+		选择模式: "CHOOSE MODE",
+		更多语言: "More languages",
+		更多语言将在后续版本开放: "More languages will be available in a future version",
+		本版本先提供地震流程: "This version provides the earthquake flow first",
+		该应急类型即将开放: "This emergency type will be available soon",
+		当前浏览器不支持朗读: "This browser does not support speech playback",
+		沟通卡: "Communication card",
+		"若仍处于建筑倒塌、火灾或其他直接危险中，请立即撤离并听从现场人员指示。":
+			"If you are still in immediate danger such as a collapsing building or fire, evacuate now and follow on-site staff instructions.",
 		"你现在需要哪种帮助？": "What kind of help do you need now?",
 		"每次只完成一个判断，系统再给出下一步。":
 			"Answer one simple question at a time. We will then show the next action.",
@@ -316,7 +324,15 @@ export const FULL_I18N: Record<"en" | "ja", Record<string, string>> = {
 		"在 Google 地图中打开路线": "Open route in Google Maps",
 	},
 	ja: {
-		"Choose mode": "モードを選択",
+		选择模式: "モードを選択",
+		更多语言: "その他の言語",
+		更多语言将在后续版本开放: "その他の言語は今後のバージョンで対応予定です",
+		本版本先提供地震流程: "このバージョンではまず地震のフローを提供します",
+		该应急类型即将开放: "この緊急タイプは近日対応予定です",
+		当前浏览器不支持朗读: "このブラウザは読み上げに対応していません",
+		沟通卡: "コミュニケーションカード",
+		"若仍处于建筑倒塌、火灾或其他直接危险中，请立即撤离并听从现场人员指示。":
+			"建物の倒壊や火災など差し迫った危険が続いている場合は、直ちに避難し、現場の係員の指示に従ってください。",
 		"你现在需要哪种帮助？": "今、どのような助けが必要ですか？",
 		"每次只完成一个判断，系统再给出下一步。": "一度に一つだけ確認し、その後に次の行動を表示します。",
 		灾害模式: "災害モード",

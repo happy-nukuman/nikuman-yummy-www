@@ -7,10 +7,10 @@ import { useDemoShelters } from "../../shelter/hooks/use-demo-shelters";
 import { ShelterCandidateList } from "../../shelter/components/shelter-candidate-list";
 import { ShelterRouteMap } from "../../shelter/components/shelter-route-map";
 import { formatApproxDistance } from "../../shelter/format";
+import { shelterDisplayAddress, shelterDisplayName } from "../../shelter/localization";
 import {
 	type DemoLang,
 	HEADER_LABELS,
-	LANG_QUICK_LABEL,
 	PHRASES,
 	PHRASE_TEXT,
 	t,
@@ -105,9 +105,16 @@ export function DemoApp() {
 		setScreen(prev.screen);
 	}
 
+	// 顶栏下拉框：随时切换语言，停留在当前页面，不重走首页流程。
+	function switchLanguage(next: DemoLang) {
+		if (next === lang) return;
+		setLang(next);
+		notify(WELCOME_COPY[next].toast);
+	}
+
 	function pickLanguage(next: string) {
 		if (next === "more") {
-			notify("更多语言将在后续版本开放");
+			notify(t(lang, "更多语言将在后续版本开放"));
 			return;
 		}
 		const picked = next as DemoLang;
@@ -187,7 +194,7 @@ export function DemoApp() {
 	function selectEvent(value: string) {
 		setEventChoice(value);
 		if (value !== "earthquake") {
-			notify("本版本先提供地震流程");
+			notify(t(lang, "本版本先提供地震流程"));
 			return;
 		}
 		startFlow("earthquake");
@@ -196,7 +203,7 @@ export function DemoApp() {
 	function selectDaily(value: string) {
 		setDailyChoice(value);
 		if (value !== "gas") {
-			notify("该应急类型即将开放");
+			notify(t(lang, "该应急类型即将开放"));
 			return;
 		}
 		startFlow("gas-leak");
@@ -239,10 +246,11 @@ export function DemoApp() {
 		}
 	}
 
+	// 选择后保持列表展开：立即收起会让整页高度骤变、滚动位置跳回顶部，看起来像重新加载了页面。
 	function pickPhrase(index: number) {
 		if ("speechSynthesis" in window) speechSynthesis.cancel();
 		setPhrase(index);
-		setPhrasePickerOpen(false);
+		window.scrollTo({ top: 0, behavior: "smooth" });
 	}
 
 	function speak() {
@@ -252,7 +260,7 @@ export function DemoApp() {
 			u.lang = "ja-JP";
 			speechSynthesis.speak(u);
 		} else {
-			notify("当前浏览器不支持朗读");
+			notify(t(lang, "当前浏览器不支持朗读"));
 		}
 	}
 
@@ -291,21 +299,28 @@ export function DemoApp() {
 						<button
 							type="button"
 							className="icon-btn"
-							aria-label="沟通卡"
+							aria-label={t(lang, "沟通卡")}
 							onClick={openCommunication}
 						>
 							译
 						</button>
-						<button type="button" className="icon-btn" onClick={() => setScreen("welcome")}>
-							{LANG_QUICK_LABEL[lang]}
-						</button>
+						<select
+							className="lang-select"
+							aria-label={welcome.prompt}
+							value={lang}
+							onChange={(event) => switchLanguage(event.target.value as DemoLang)}
+						>
+							<option value="zh">中文</option>
+							<option value="en">English</option>
+							<option value="ja">日本語</option>
+						</select>
 					</div>
 				</header>
 				<main className="main">
 					{showLocBar && <div className="loc-bar">📍 {locText}</div>}
 					<section className={screenClass("welcome")} data-screen="welcome">
 						<div className="hero-mark">🛡️</div>
-						<div className="eyebrow">Emergency guidance</div>
+						<div className="eyebrow">{welcome.sub}</div>
 						<h1 className="hero-title">{welcome.title}</h1>
 						<p className="lead">{welcome.lead}</p>
 						<h3>{welcome.prompt}</h3>
@@ -324,7 +339,7 @@ export function DemoApp() {
 									className={`lang-btn${lang === value ? " active" : ""}`}
 									onClick={() => pickLanguage(value)}
 								>
-									{label}
+									{value === "more" ? t(lang, label) : label}
 								</button>
 							))}
 						</div>
@@ -343,7 +358,7 @@ export function DemoApp() {
 					</section>
 
 					<section className={screenClass("mode")} data-screen="mode">
-						<div className="eyebrow">{t(lang, "Choose mode")}</div>
+						<div className="eyebrow">{t(lang, "选择模式")}</div>
 						<h1 className="hero-title">{t(lang, "你现在需要哪种帮助？")}</h1>
 						<p className="lead">{t(lang, "每次只完成一个判断，系统再给出下一步。")}</p>
 						<div className="mode-card">
@@ -375,7 +390,7 @@ export function DemoApp() {
 							</button>
 						</div>
 						<div className="safe-banner">
-							⚠️ 若仍处于建筑倒塌、火灾或其他直接危险中，请立即撤离并听从现场人员指示。
+							⚠️ {t(lang, "若仍处于建筑倒塌、火灾或其他直接危险中，请立即撤离并听从现场人员指示。")}
 						</div>
 						<div className="actions">
 							<button type="button" className="btn ghost" onClick={() => setScreen("welcome")}>
@@ -641,11 +656,16 @@ export function DemoApp() {
 									<div className="panel-row">
 										<div className="panel-icon">🏫</div>
 										<div>
-											<div className="panel-title" lang="ja">
-												{selectedShelter.nameJa}
+											<div
+												className="panel-title"
+												lang={shelterDisplayName(lang, selectedShelter).lang}
+											>
+												{shelterDisplayName(lang, selectedShelter).text}
 											</div>
 											<div className="panel-copy">
-												<span lang="ja">{selectedShelter.addressJa}</span>
+												<span lang={shelterDisplayAddress(lang, selectedShelter).lang}>
+													{shelterDisplayAddress(lang, selectedShelter).text}
+												</span>
 												{` · ${formatApproxDistance(lang, selectedShelter.distanceMeters)}`}
 											</div>
 										</div>

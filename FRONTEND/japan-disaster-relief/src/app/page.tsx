@@ -6,7 +6,12 @@ export const metadata: Metadata = {
 };
 
 export const viewport: Viewport = {
-	themeColor: "#123B68",
+	// 浅色主题色与毛玻璃顶栏（aurora 渐变上端）保持一致。
+	themeColor: "#eef5ff",
+	width: "device-width",
+	initialScale: 1,
+	// 全屏铺满刘海屏，配合 demo.css 中的 env(safe-area-inset-*)。
+	viewportFit: "cover",
 };
 
 export default function Home() {
