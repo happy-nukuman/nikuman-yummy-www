@@ -4,6 +4,7 @@ import { handleError, handleNotFound } from "./middleware/error-handler";
 import { requestIdMiddleware } from "./middleware/request-id";
 import { registerAlertRoutes } from "./routes/alerts";
 import { registerDemoAlertRoutes } from "./routes/demo-alerts";
+import { registerDemoShelterRoutes } from "./routes/demo-shelters";
 import { registerFacilityRoutes } from "./routes/facilities";
 import { registerHealthRoutes } from "./routes/health";
 import { registerMunicipalityRoutes } from "./routes/municipalities";
@@ -24,6 +25,7 @@ export function createApp(): Hono<AppEnv> {
 	registerRulesRoutes(app);
 	registerAlertRoutes(app);
 	registerDemoAlertRoutes(app);
+	registerDemoShelterRoutes(app);
 
 	app.notFound(handleNotFound);
 	app.onError(handleError);
