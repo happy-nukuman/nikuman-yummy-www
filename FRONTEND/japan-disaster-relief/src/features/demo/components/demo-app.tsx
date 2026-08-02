@@ -29,6 +29,13 @@ interface FlowPosition {
 	nodeId: string;
 }
 
+// 选项点选后立即跳转，跳转前把当前画面压栈，供“返回上一步”恢复。
+interface NavSnapshot {
+	screen: ScreenName;
+	flowPos: FlowPosition | null;
+	cardIndex: number;
+}
+
 export function DemoApp() {
 	const [screen, setScreen] = useState<ScreenName>("welcome");
 	const [lang, setLang] = useState<DemoLang>("zh");
@@ -42,6 +49,7 @@ export function DemoApp() {
 	const [phrasePickerOpen, setPhrasePickerOpen] = useState(false);
 	// Screen to go back to when leaving the communication card.
 	const [commReturn, setCommReturn] = useState<ScreenName>("mode");
+	const [history, setHistory] = useState<NavSnapshot[]>([]);
 	const [toast, setToast] = useState({ msg: "", show: false });
 	const toastTimer = useRef<number | undefined>(undefined);
 
@@ -64,6 +72,19 @@ export function DemoApp() {
 		);
 	}
 
+	function pushHistory() {
+		setHistory((prev) => [...prev, { screen, flowPos, cardIndex }]);
+	}
+
+	function goBack() {
+		const prev = history[history.length - 1];
+		if (!prev) return;
+		setHistory(history.slice(0, -1));
+		setFlowPos(prev.flowPos);
+		setCardIndex(prev.cardIndex);
+		setScreen(prev.screen);
+	}
+
 	function pickLanguage(next: string) {
 		if (next === "more") {
 			notify("更多语言将在后续版本开放");
@@ -72,6 +93,8 @@ export function DemoApp() {
 		const picked = next as DemoLang;
 		setLang(picked);
 		notify(WELCOME_COPY[picked].toast);
+		pushHistory();
+		setScreen("mode");
 	}
 
 	function openCommunication() {
@@ -94,22 +117,30 @@ export function DemoApp() {
 		else setScreen("flow");
 	}
 
-	function startFlow(flowId: FlowId) {
-		setFlowAnswers({});
-		goToNode(flowId, FLOWS[flowId].start);
+	// 前进到流程节点：沟通卡有自己的返回逻辑，其余目标先压栈再跳转。
+	function advanceTo(flowId: FlowId, nodeId: string) {
+		if (getNode(FLOWS[flowId], nodeId).type !== "communication") pushHistory();
+		goToNode(flowId, nodeId);
 	}
 
-	function confirmEvent() {
-		if (eventChoice !== "earthquake") {
+	function startFlow(flowId: FlowId) {
+		setFlowAnswers({});
+		advanceTo(flowId, FLOWS[flowId].start);
+	}
+
+	function selectEvent(value: string) {
+		setEventChoice(value);
+		if (value !== "earthquake") {
 			notify("本版本先提供地震流程");
 			return;
 		}
 		startFlow("earthquake");
 	}
 
-	function confirmDaily() {
-		if (dailyChoice !== "gas") {
-			notify(dailyChoice ? "该应急类型即将开放" : "请先选择应急类型");
+	function selectDaily(value: string) {
+		setDailyChoice(value);
+		if (value !== "gas") {
+			notify("该应急类型即将开放");
 			return;
 		}
 		startFlow("gas-leak");
@@ -117,32 +148,38 @@ export function DemoApp() {
 
 	const flowNode = flowPos ? getNode(FLOWS[flowPos.flowId], flowPos.nodeId) : null;
 
-	function continueQuestion() {
+	function answerQuestion(value: string) {
 		if (!flowPos || flowNode?.type !== "question") return;
-		const value = flowAnswers[flowNode.id];
-		if (!value) {
-			notify("请先选择一个选项");
-			return;
-		}
-		goToNode(flowPos.flowId, resolveOption(flowNode, value));
+		setFlowAnswers((prev) => ({ ...prev, [flowNode.id]: value }));
+		advanceTo(flowPos.flowId, resolveOption(flowNode, value));
 	}
 
 	function nextActionCard() {
 		if (!flowPos || flowNode?.type !== "action") return;
 		if (cardIndex + 1 < flowNode.cards.length) setCardIndex((i) => i + 1);
-		else goToNode(flowPos.flowId, flowNode.next);
+		else advanceTo(flowPos.flowId, flowNode.next);
+	}
+
+	// 行动卡内部先逐张回退，退到第一张后再返回上一个画面。
+	function backFromAction() {
+		if (cardIndex > 0) setCardIndex((i) => i - 1);
+		else goBack();
 	}
 
 	function answerEvacuation(need: boolean) {
 		if (flowPos) {
 			const node = getNode(FLOWS[flowPos.flowId], flowPos.nodeId);
 			if (node.type === "evacuation") {
-				goToNode(flowPos.flowId, need ? node.yesNext : node.noNext);
+				advanceTo(flowPos.flowId, need ? node.yesNext : node.noNext);
 				return;
 			}
 		}
-		if (need) setScreen("facilities");
-		else openCommunication();
+		if (need) {
+			pushHistory();
+			setScreen("facilities");
+		} else {
+			openCommunication();
+		}
 	}
 
 	function pickPhrase(index: number) {
@@ -238,9 +275,6 @@ export function DemoApp() {
 							</div>
 						</div>
 						<div className="actions">
-							<button type="button" className="btn primary" onClick={() => setScreen("mode")}>
-								{welcome.continue}
-							</button>
 							<div className="privacy">{welcome.privacy}</div>
 						</div>
 					</section>
@@ -280,6 +314,11 @@ export function DemoApp() {
 						<div className="safe-banner">
 							⚠️ 若仍处于建筑倒塌、火灾或其他直接危险中，请立即撤离并听从现场人员指示。
 						</div>
+						<div className="actions">
+							<button type="button" className="btn ghost" onClick={() => setScreen("welcome")}>
+								{t(lang, "返回上一步")}
+							</button>
+						</div>
 					</section>
 
 					<section className={screenClass("event")} data-screen="event">
@@ -300,7 +339,7 @@ export function DemoApp() {
 									key={value}
 									type="button"
 									className={`choice${eventChoice === value ? " selected" : ""}`}
-									onClick={() => setEventChoice(value)}
+									onClick={() => selectEvent(value)}
 								>
 									<span className="choice-icon">{icon}</span>
 									<span>
@@ -311,9 +350,6 @@ export function DemoApp() {
 							))}
 						</div>
 						<div className="actions">
-							<button type="button" className="btn primary" onClick={confirmEvent}>
-								{t(lang, "确认并继续")}
-							</button>
 							<button type="button" className="btn secondary" onClick={() => setScreen("mode")}>
 								{t(lang, "返回")}
 							</button>
@@ -337,7 +373,7 @@ export function DemoApp() {
 									key={value}
 									type="button"
 									className={`choice${dailyChoice === value ? " selected" : ""}`}
-									onClick={() => setDailyChoice(value)}
+									onClick={() => selectDaily(value)}
 								>
 									<span className="choice-icon">{icon}</span>
 									<span>{t(lang, label)}</span>
@@ -345,9 +381,6 @@ export function DemoApp() {
 							))}
 						</div>
 						<div className="actions">
-							<button type="button" className="btn primary" onClick={confirmDaily}>
-								{t(lang, "确认并继续")}
-							</button>
 							<button type="button" className="btn secondary" onClick={() => setScreen("mode")}>
 								{t(lang, "返回")}
 							</button>
@@ -367,9 +400,7 @@ export function DemoApp() {
 											key={option.value}
 											type="button"
 											className={`choice${flowAnswers[flowNode.id] === option.value ? " selected" : ""}`}
-											onClick={() =>
-												setFlowAnswers((prev) => ({ ...prev, [flowNode.id]: option.value }))
-											}
+											onClick={() => answerQuestion(option.value)}
 										>
 											<span className="choice-icon">{option.icon}</span>
 											<span>{t(lang, option.label)}</span>
@@ -377,15 +408,15 @@ export function DemoApp() {
 									))}
 								</div>
 								<div className="actions">
-									<button type="button" className="btn primary" onClick={continueQuestion}>
-										{t(lang, "继续")}
-									</button>
 									<button
 										type="button"
 										className="btn secondary"
 										onClick={openCommunication}
 									>
 										{t(lang, "我做不到 / 需要帮助")}
+									</button>
+									<button type="button" className="btn ghost" onClick={goBack}>
+										{t(lang, "返回上一步")}
 									</button>
 								</div>
 							</>
@@ -428,6 +459,9 @@ export function DemoApp() {
 									>
 										{t(lang, "我做不到")}
 									</button>
+									<button type="button" className="btn ghost" onClick={backFromAction}>
+										{t(lang, "返回上一步")}
+									</button>
 								</div>
 							</>
 						)}
@@ -467,6 +501,9 @@ export function DemoApp() {
 								onClick={() => answerEvacuation(false)}
 							>
 								{t(lang, "暂时不需要")}
+							</button>
+							<button type="button" className="btn ghost" onClick={goBack}>
+								{t(lang, "返回上一步")}
 							</button>
 						</div>
 					</section>
@@ -521,6 +558,9 @@ export function DemoApp() {
 								onClick={openCommunication}
 							>
 								{t(lang, "打开沟通卡")}
+							</button>
+							<button type="button" className="btn ghost" onClick={goBack}>
+								{t(lang, "返回上一步")}
 							</button>
 						</div>
 					</section>
