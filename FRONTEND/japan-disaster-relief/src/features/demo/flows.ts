@@ -183,10 +183,9 @@ export const GAS_LEAK_FLOW: Flow = {
 				{ kind: "do", title: "立刻停止使用燃气", detail: "别点火、抽烟。" },
 				{ kind: "dont", title: "不要开关灯、排风扇", detail: "也不要触碰电器或插头。" },
 			],
-			next: "evac",
+			next: "comm",
 		},
-		evac: { type: "evacuation", id: "evac", yesNext: "nav", noNext: "comm" },
-		nav: { type: "navigation", id: "nav", next: "comm" },
+		// 日常应急类不经过避难所环节，行动卡结束后直接进入沟通卡。
 		comm: { type: "communication", id: "comm" },
 	},
 };
