@@ -281,18 +281,14 @@ export const FULL_I18N: Record<"en" | "ja", Record<string, string>> = {
 		"别点火、抽烟。": "Do not light flames or smoke.",
 		"不要开关灯、排风扇": "Do not switch lights or exhaust fans",
 		"也不要触碰电器或插头。": "Do not touch electrical appliances or plugs either.",
-		// Location permission screen (demo: the location itself is hardcoded)
-		位置许可: "Location access",
+		// Location permission dialog (demo: the location itself is hardcoded)
 		"是否允许获取你的实时位置？": "Allow access to your current location?",
 		"用于确认所在区和附近避难设施，仅本次使用，不保存位置历史。":
 			"Used to identify your area and nearby evacuation facilities. Used only for this session; location history is not saved.",
-		隐私说明: "Privacy",
-		"不收集姓名、住址或在留资格，位置信息不会被保存。":
-			"No name, address, or residence status is collected. Your location is not stored.",
 		允许获取位置: "Allow location access",
-		暂不允许: "Not now",
+		不允许: "Don't allow",
 		"已获取当前位置：东京市新宿区": "Location acquired: Shinjuku, Tokyo",
-		"已跳过，将不使用位置信息": "Skipped. Location will not be used.",
+		"未获得位置许可，无法继续下一步": "Location permission is required to continue.",
 		东京市新宿区: "Shinjuku, Tokyo",
 		仅本次使用: "This session only",
 	},
@@ -436,18 +432,14 @@ export const FULL_I18N: Record<"en" | "ja", Record<string, string>> = {
 		"别点火、抽烟。": "火をつけたり、たばこを吸ったりしないでください。",
 		"不要开关灯、排风扇": "照明や換気扇のスイッチに触れない",
 		"也不要触碰电器或插头。": "電気機器やプラグにも触れないでください。",
-		// Location permission screen (demo: the location itself is hardcoded)
-		位置许可: "位置情報の利用",
+		// Location permission dialog (demo: the location itself is hardcoded)
 		"是否允许获取你的实时位置？": "現在地の取得を許可しますか？",
 		"用于确认所在区和附近避难设施，仅本次使用，不保存位置历史。":
 			"現在地の区市町村と近隣の避難施設の確認に使用します。今回のみ使用し、位置履歴は保存しません。",
-		隐私说明: "プライバシー",
-		"不收集姓名、住址或在留资格，位置信息不会被保存。":
-			"氏名・住所・在留資格は収集せず、位置情報は保存されません。",
 		允许获取位置: "位置情報を許可する",
-		暂不允许: "今は許可しない",
+		不允许: "許可しない",
 		"已获取当前位置：东京市新宿区": "現在地を取得しました：東京都新宿区",
-		"已跳过，将不使用位置信息": "スキップしました。位置情報は使用しません。",
+		"未获得位置许可，无法继续下一步": "位置情報の許可がないため、先に進めません。",
 		东京市新宿区: "東京都新宿区",
 		仅本次使用: "今回のみ使用",
 	},

@@ -15,7 +15,6 @@ import "../demo.css";
 
 type ScreenName =
 	| "welcome"
-	| "location"
 	| "mode"
 	| "event"
 	| "daily"
@@ -42,6 +41,8 @@ export function DemoApp() {
 	const [lang, setLang] = useState<DemoLang>("zh");
 	// 位置许可：demo 版允许后位置写死为“东京市新宿区”。
 	const [locPermission, setLocPermission] = useState<"unknown" | "granted" | "denied">("unknown");
+	// 选完语言后以弹窗形式询问位置许可；不允许则停留在语言页无法继续。
+	const [locDialogOpen, setLocDialogOpen] = useState(false);
 	// 事象确认卡：灾害模式自动识别推荐地震并高亮，日常应急为手动选择。
 	const [eventChoice, setEventChoice] = useState("earthquake");
 	const [dailyChoice, setDailyChoice] = useState<string | null>(null);
@@ -96,16 +97,26 @@ export function DemoApp() {
 		const picked = next as DemoLang;
 		setLang(picked);
 		notify(WELCOME_COPY[picked].toast);
-		pushHistory();
-		// 首次进入先询问位置许可；已作出选择的用户直接进入模式选择。
-		setScreen(locPermission === "unknown" ? "location" : "mode");
+		// 已允许过则直接进入下一页；否则（含之前拒绝过）弹窗询问位置许可。
+		if (locPermission === "granted") {
+			pushHistory();
+			setScreen("mode");
+		} else {
+			setLocDialogOpen(true);
+		}
 	}
 
 	function decideLocation(allow: boolean) {
 		setLocPermission(allow ? "granted" : "denied");
-		notify(t(lang, allow ? "已获取当前位置：东京市新宿区" : "已跳过，将不使用位置信息"));
-		pushHistory();
-		setScreen("mode");
+		setLocDialogOpen(false);
+		if (allow) {
+			notify(t(lang, "已获取当前位置：东京市新宿区"));
+			pushHistory();
+			setScreen("mode");
+		} else {
+			// 拒绝后停留在语言选择页，不能继续；重新选择语言可再次弹窗。
+			notify(t(lang, "未获得位置许可，无法继续下一步"));
+		}
 	}
 
 	function openCommunication() {
@@ -225,10 +236,9 @@ export function DemoApp() {
 
 	const actionCard = flowNode?.type === "action" ? flowNode.cards[cardIndex] : null;
 
-	// 许可后在语言/许可页之外的页面顶部常驻显示获取到的位置。
+	// 许可后在语言页之外的页面顶部常驻显示获取到的位置。
 	const showLocBar =
-		locPermission === "granted" &&
-		!["welcome", "location", "communication", "offline"].includes(screen);
+		locPermission === "granted" && !["welcome", "communication", "offline"].includes(screen);
 	const locText = `${t(lang, "东京市新宿区")} · ${t(lang, "仅本次使用")}`;
 
 	return (
@@ -294,45 +304,6 @@ export function DemoApp() {
 						</div>
 						<div className="actions">
 							<div className="privacy">{welcome.privacy}</div>
-						</div>
-					</section>
-
-					<section className={screenClass("location")} data-screen="location">
-						<div className="hero-mark">📍</div>
-						<div className="eyebrow">{t(lang, "位置许可")}</div>
-						<h1 className="hero-title">{t(lang, "是否允许获取你的实时位置？")}</h1>
-						<p className="lead">
-							{t(lang, "用于确认所在区和附近避难设施，仅本次使用，不保存位置历史。")}
-						</p>
-						<div className="panel tint">
-							<div className="panel-row">
-								<div className="panel-icon">🔒</div>
-								<div>
-									<div className="panel-title">{t(lang, "隐私说明")}</div>
-									<div className="panel-copy">
-										{t(lang, "不收集姓名、住址或在留资格，位置信息不会被保存。")}
-									</div>
-								</div>
-							</div>
-						</div>
-						<div className="actions">
-							<button
-								type="button"
-								className="btn primary"
-								onClick={() => decideLocation(true)}
-							>
-								{t(lang, "允许获取位置")}
-							</button>
-							<button
-								type="button"
-								className="btn secondary"
-								onClick={() => decideLocation(false)}
-							>
-								{t(lang, "暂不允许")}
-							</button>
-							<button type="button" className="btn ghost" onClick={goBack}>
-								{t(lang, "返回上一步")}
-							</button>
 						</div>
 					</section>
 
@@ -697,6 +668,38 @@ export function DemoApp() {
 						</div>
 					</section>
 				</main>
+				{locDialogOpen && (
+					<div className="modal-backdrop">
+						<div
+							className="modal"
+							role="dialog"
+							aria-modal="true"
+							aria-label={t(lang, "是否允许获取你的实时位置？")}
+						>
+							<div className="modal-icon">📍</div>
+							<h2 className="modal-title">{t(lang, "是否允许获取你的实时位置？")}</h2>
+							<p className="modal-copy">
+								{t(lang, "用于确认所在区和附近避难设施，仅本次使用，不保存位置历史。")}
+							</p>
+							<div className="modal-actions">
+								<button
+									type="button"
+									className="btn primary"
+									onClick={() => decideLocation(true)}
+								>
+									{t(lang, "允许获取位置")}
+								</button>
+								<button
+									type="button"
+									className="btn secondary"
+									onClick={() => decideLocation(false)}
+								>
+									{t(lang, "不允许")}
+								</button>
+							</div>
+						</div>
+					</div>
+				)}
 			</div>
 			<div className={`toast${toast.show ? " show" : ""}`}>{toast.msg}</div>
 		</div>
