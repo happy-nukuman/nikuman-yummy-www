@@ -1,5 +1,5 @@
 import type { DemoShelterCandidate } from "@nikuman-yummy/shared";
-import type { DemoLang } from "../demo/i18n";
+import type { DemoLang } from "@/features/demo/i18n";
 
 type LocalizedShelterText = {
 	name: { en: string; zh: string };

@@ -1,9 +1,9 @@
 "use client";
 
 import type { DemoShelterCandidate } from "@nikuman-yummy/shared";
-import { type DemoLang, t } from "../../demo/i18n";
-import { formatApproxDistance } from "../format";
-import { shelterDisplayAddress, shelterDisplayName } from "../localization";
+import { type DemoLang, t } from "@/features/demo/i18n";
+import { formatApproxDistance } from "@/features/shelter/format";
+import { shelterDisplayAddress, shelterDisplayName } from "@/features/shelter/localization";
 
 interface ShelterCandidateCardProps {
 	facility: DemoShelterCandidate;
@@ -41,14 +41,6 @@ export function ShelterCandidateCard({
 				<button type="button" className="btn primary" onClick={() => onNavigate(facility)}>
 					{t(lang, "选择并查看路线")}
 				</button>
-				<a
-					className="btn secondary"
-					href={facility.googleMapsUrl}
-					target="_blank"
-					rel="noopener noreferrer"
-				>
-					{t(lang, "在 Google 地图中查看位置")}
-				</a>
 			</div>
 		</div>
 	);
