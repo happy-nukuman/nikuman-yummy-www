@@ -2,7 +2,6 @@
 
 import { Fragment, useEffect, useRef, useState } from "react";
 import {
-	ACTION_I18N,
 	type DemoLang,
 	HEADER_LABELS,
 	LANG_QUICK_LABEL,
@@ -11,49 +10,38 @@ import {
 	t,
 	WELCOME_COPY,
 } from "../i18n";
+import { FLOWS, type FlowId, getNode, resolveOption } from "../flows";
 import "../demo.css";
 
 type ScreenName =
 	| "welcome"
 	| "mode"
 	| "event"
-	| "danger"
-	| "injury"
-	| "environment"
-	| "action"
+	| "daily"
+	| "flow"
 	| "shelter"
 	| "facilities"
 	| "communication"
 	| "offline";
 
-type ChoiceGroup = "event" | "danger" | "injury" | "environment";
-
-interface ActionCard {
-	title: string;
-	copy: string;
-	dont: string;
+interface FlowPosition {
+	flowId: FlowId;
+	nodeId: string;
 }
-
-const INITIAL_ACTION: ActionCard = {
-	title: "先留在空旷、安全的位置",
-	copy: "远离玻璃、外墙、招牌、电线杆和可能掉落的物体。",
-	dont: "不要急着进入受损建筑；不要使用电梯；不要仅凭距离判断路线安全。",
-};
 
 export function DemoApp() {
 	const [screen, setScreen] = useState<ScreenName>("welcome");
 	const [lang, setLang] = useState<DemoLang>("zh");
-	const [choices, setChoices] = useState<Record<ChoiceGroup, string | null>>({
-		event: "earthquake",
-		danger: null,
-		injury: null,
-		environment: null,
-	});
+	// 事象确认卡：灾害模式自动识别推荐地震并高亮，日常应急为手动选择。
+	const [eventChoice, setEventChoice] = useState("earthquake");
+	const [dailyChoice, setDailyChoice] = useState<string | null>(null);
+	const [flowPos, setFlowPos] = useState<FlowPosition | null>(null);
+	const [flowAnswers, setFlowAnswers] = useState<Record<string, string>>({});
+	const [cardIndex, setCardIndex] = useState(0);
 	const [phrase, setPhrase] = useState(0);
 	const [phrasePickerOpen, setPhrasePickerOpen] = useState(false);
 	// Screen to go back to when leaving the communication card.
 	const [commReturn, setCommReturn] = useState<ScreenName>("mode");
-	const [action, setAction] = useState<ActionCard>(INITIAL_ACTION);
 	const [toast, setToast] = useState({ msg: "", show: false });
 	const toastTimer = useRef<number | undefined>(undefined);
 
@@ -76,10 +64,6 @@ export function DemoApp() {
 		);
 	}
 
-	function selectChoice(group: ChoiceGroup, value: string) {
-		setChoices((prev) => ({ ...prev, [group]: value }));
-	}
-
 	function pickLanguage(next: string) {
 		if (next === "more") {
 			notify("更多语言将在后续版本开放");
@@ -90,57 +74,75 @@ export function DemoApp() {
 		notify(WELCOME_COPY[picked].toast);
 	}
 
-	function calculateAction() {
-		if (!choices.environment) {
-			notify(lang === "zh" ? "请先选择当前环境" : ACTION_I18N[lang].select);
-			return;
-		}
-		if (lang === "zh") {
-			// Same as the demo: the indoor/default branches keep the previous "don't" copy.
-			if (choices.danger === "yes") {
-				setAction({
-					title: "立即离开直接危险区域并求助",
-					copy: "停止复杂操作，优先撤离，并向现场工作人员或周围人员出示沟通卡。",
-					dont: "不要停留拍摄；不要返回取物；不要等待系统进一步判断。",
-				});
-			} else if (choices.injury === "yes") {
-				setAction({
-					title: "立即向周围人员求助并呼叫救护车",
-					copy: "保持当前位置可被发现，使用沟通卡说明需要救护车。",
-					dont: "不要自行进行复杂医疗判断；不要让严重伤者独自移动。",
-				});
-			} else if (choices.environment === "indoor") {
-				setAction((prev) => ({
-					...prev,
-					title: "确认出口安全后，按现场指示移动",
-					copy: "远离玻璃与可能掉落物，不使用电梯，先听从工作人员和广播。",
-				}));
-			} else {
-				setAction((prev) => ({
-					...prev,
-					title: "先留在空旷、安全的位置",
-					copy: "远离玻璃、外墙、招牌、电线杆和可能掉落的物体。",
-				}));
-			}
-		} else {
-			const a = ACTION_I18N[lang];
-			const x =
-				choices.danger === "yes"
-					? a.danger
-					: choices.injury === "yes"
-						? a.injury
-						: choices.environment === "indoor"
-							? a.indoor
-							: a.default;
-			setAction({ title: x[0], copy: x[1], dont: x[2] });
-		}
-		setScreen("action");
-	}
-
 	function openCommunication() {
 		if (screen !== "communication") setCommReturn(screen);
 		setPhrasePickerOpen(false);
 		setScreen("communication");
+	}
+
+	function goToNode(flowId: FlowId, nodeId: string) {
+		const node = getNode(FLOWS[flowId], nodeId);
+		if (node.type === "communication") {
+			openCommunication();
+			return;
+		}
+		setFlowPos({ flowId, nodeId });
+		setCardIndex(0);
+		// 避难确认卡和导航卡有专属画面，其余节点在 flow 画面内渲染。
+		if (node.type === "evacuation") setScreen("shelter");
+		else if (node.type === "navigation") setScreen("facilities");
+		else setScreen("flow");
+	}
+
+	function startFlow(flowId: FlowId) {
+		setFlowAnswers({});
+		goToNode(flowId, FLOWS[flowId].start);
+	}
+
+	function confirmEvent() {
+		if (eventChoice !== "earthquake") {
+			notify("本版本先提供地震流程");
+			return;
+		}
+		startFlow("earthquake");
+	}
+
+	function confirmDaily() {
+		if (dailyChoice !== "gas") {
+			notify(dailyChoice ? "该应急类型即将开放" : "请先选择应急类型");
+			return;
+		}
+		startFlow("gas-leak");
+	}
+
+	const flowNode = flowPos ? getNode(FLOWS[flowPos.flowId], flowPos.nodeId) : null;
+
+	function continueQuestion() {
+		if (!flowPos || flowNode?.type !== "question") return;
+		const value = flowAnswers[flowNode.id];
+		if (!value) {
+			notify("请先选择一个选项");
+			return;
+		}
+		goToNode(flowPos.flowId, resolveOption(flowNode, value));
+	}
+
+	function nextActionCard() {
+		if (!flowPos || flowNode?.type !== "action") return;
+		if (cardIndex + 1 < flowNode.cards.length) setCardIndex((i) => i + 1);
+		else goToNode(flowPos.flowId, flowNode.next);
+	}
+
+	function answerEvacuation(need: boolean) {
+		if (flowPos) {
+			const node = getNode(FLOWS[flowPos.flowId], flowPos.nodeId);
+			if (node.type === "evacuation") {
+				goToNode(flowPos.flowId, need ? node.yesNext : node.noNext);
+				return;
+			}
+		}
+		if (need) setScreen("facilities");
+		else openCommunication();
 	}
 
 	function pickPhrase(index: number) {
@@ -173,25 +175,7 @@ export function DemoApp() {
 		</div>
 	);
 
-	const choice = (
-		group: ChoiceGroup,
-		value: string,
-		icon: string,
-		label: string,
-		meta?: string,
-	) => (
-		<button
-			type="button"
-			className={`choice${choices[group] === value ? " selected" : ""}`}
-			onClick={() => selectChoice(group, value)}
-		>
-			<span className="choice-icon">{icon}</span>
-			<span>
-				{label}
-				{meta !== undefined && <div className="choice-meta">{meta}</div>}
-			</span>
-		</button>
-	);
+	const actionCard = flowNode?.type === "action" ? flowNode.cards[cardIndex] : null;
 
 	return (
 		<div className="app-shell">
@@ -284,15 +268,13 @@ export function DemoApp() {
 								<div className="mode-icon">🩹</div>
 								<div>
 									<div className="mode-title">{t(lang, "日常应急")}</div>
-									<div className="mode-copy">{t(lang, "迷路、身体不适、需要警察或医疗帮助。")}</div>
+									<div className="mode-copy">
+										{t(lang, "煤气泄漏、迷路、身体不适等紧急状况。")}
+									</div>
 								</div>
 							</div>
-							<button
-								type="button"
-								className="btn ghost"
-								onClick={() => notify("比赛版先展示入口说明")}
-							>
-								{t(lang, "查看功能说明")}
+							<button type="button" className="btn ghost" onClick={() => setScreen("daily")}>
+								{t(lang, "进入日常应急")}
 							</button>
 						</div>
 						<div className="safe-banner">
@@ -302,17 +284,34 @@ export function DemoApp() {
 
 					<section className={screenClass("event")} data-screen="event">
 						{progress(1)}
-						<div className="eyebrow">{t(lang, "第 1 步")}</div>
-						<h1 className="hero-title">{t(lang, "刚才发生了什么？")}</h1>
+						<div className="eyebrow">{t(lang, "事象确认")}</div>
+						<h1 className="hero-title">{t(lang, "现在发生了什么？")}</h1>
 						<p className="lead">{t(lang, "系统根据公开信息推荐“地震”，请你确认。")}</p>
 						<div className="choice-list">
-							{choice("event", "earthquake", "🌎", t(lang, "地震"), t(lang, "系统推荐 · 请确认"))}
-							{choice("event", "fire", "🔥", t(lang, "火灾"))}
-							{choice("event", "flood", "🌊", t(lang, "水灾 / 海啸"))}
-							{choice("event", "unknown", "❓", t(lang, "不确定"))}
+							{(
+								[
+									["earthquake", "🌎", "地震", "系统推荐 · 请确认"],
+									["fire", "🔥", "火灾", undefined],
+									["flood", "🌊", "水灾 / 海啸", undefined],
+									["unknown", "❓", "不确定", undefined],
+								] as const
+							).map(([value, icon, label, meta]) => (
+								<button
+									key={value}
+									type="button"
+									className={`choice${eventChoice === value ? " selected" : ""}`}
+									onClick={() => setEventChoice(value)}
+								>
+									<span className="choice-icon">{icon}</span>
+									<span>
+										{t(lang, label)}
+										{meta !== undefined && <div className="choice-meta">{t(lang, meta)}</div>}
+									</span>
+								</button>
+							))}
 						</div>
 						<div className="actions">
-							<button type="button" className="btn primary" onClick={() => setScreen("danger")}>
+							<button type="button" className="btn primary" onClick={confirmEvent}>
 								{t(lang, "确认并继续")}
 							</button>
 							<button type="button" className="btn secondary" onClick={() => setScreen("mode")}>
@@ -321,135 +320,123 @@ export function DemoApp() {
 						</div>
 					</section>
 
-					<section className={screenClass("danger")} data-screen="danger">
-						{progress(2)}
-						<div className="question-count">{t(lang, "问题 1 / 3")}</div>
-						<h1 className="hero-title">{t(lang, "你现在仍处于直接危险中吗？")}</h1>
-						<p className="lead">
-							{t(lang, "例如建筑正在倒塌、附近有火、玻璃持续掉落或必须立即撤离。")}
-						</p>
+					<section className={screenClass("daily")} data-screen="daily">
+						{progress(1)}
+						<div className="eyebrow">{t(lang, "事象确认")}</div>
+						<h1 className="hero-title">{t(lang, "现在发生了什么？")}</h1>
+						<p className="lead">{t(lang, "请手动选择日常应急类型。")}</p>
 						<div className="choice-list">
-							{choice("danger", "no", "✅", t(lang, "没有"))}
-							{choice("danger", "yes", "🆘", t(lang, "有"))}
-							{choice("danger", "unknown", "❔", t(lang, "不确定"))}
+							{(
+								[
+									["gas", "🔥", "煤气泄漏"],
+									["lost", "🧭", "迷路"],
+									["unwell", "🤒", "身体不适"],
+								] as const
+							).map(([value, icon, label]) => (
+								<button
+									key={value}
+									type="button"
+									className={`choice${dailyChoice === value ? " selected" : ""}`}
+									onClick={() => setDailyChoice(value)}
+								>
+									<span className="choice-icon">{icon}</span>
+									<span>{t(lang, label)}</span>
+								</button>
+							))}
 						</div>
 						<div className="actions">
-							<button type="button" className="btn primary" onClick={() => setScreen("injury")}>
-								{t(lang, "继续")}
+							<button type="button" className="btn primary" onClick={confirmDaily}>
+								{t(lang, "确认并继续")}
 							</button>
-							<button
-								type="button"
-								className="btn secondary"
-								onClick={openCommunication}
-							>
-								{t(lang, "我做不到 / 需要帮助")}
+							<button type="button" className="btn secondary" onClick={() => setScreen("mode")}>
+								{t(lang, "返回")}
 							</button>
 						</div>
 					</section>
 
-					<section className={screenClass("injury")} data-screen="injury">
-						{progress(2)}
-						<div className="question-count">{t(lang, "问题 2 / 3")}</div>
-						<h1 className="hero-title">{t(lang, "你或身边的人是否严重受伤？")}</h1>
-						<p className="lead">{t(lang, "例如大量出血、无法呼吸、失去意识或无法移动。")}</p>
-						<div className="choice-list">
-							{choice("injury", "no", "✅", t(lang, "没有"))}
-							{choice("injury", "yes", "🆘", t(lang, "有"))}
-							{choice("injury", "unknown", "❔", t(lang, "不确定"))}
-						</div>
-						<div className="panel amber">
-							<div className="panel-row">
-								<div className="panel-icon">⚠️</div>
-								<div>
-									<div className="panel-title">{t(lang, "无法判断也没关系")}</div>
-									<div className="panel-copy">
-										{t(lang, "选择“不确定”后会进入更保守的固定规则分支。")}
+					<section className={screenClass("flow")} data-screen="flow">
+						{flowNode?.type === "question" && (
+							<>
+								{progress(2)}
+								<div className="question-count">{t(lang, "状态确认")}</div>
+								<h1 className="hero-title">{t(lang, flowNode.title)}</h1>
+								<p className="lead">{t(lang, flowNode.lead)}</p>
+								<div className="choice-list">
+									{flowNode.options.map((option) => (
+										<button
+											key={option.value}
+											type="button"
+											className={`choice${flowAnswers[flowNode.id] === option.value ? " selected" : ""}`}
+											onClick={() =>
+												setFlowAnswers((prev) => ({ ...prev, [flowNode.id]: option.value }))
+											}
+										>
+											<span className="choice-icon">{option.icon}</span>
+											<span>{t(lang, option.label)}</span>
+										</button>
+									))}
+								</div>
+								<div className="actions">
+									<button type="button" className="btn primary" onClick={continueQuestion}>
+										{t(lang, "继续")}
+									</button>
+									<button
+										type="button"
+										className="btn secondary"
+										onClick={openCommunication}
+									>
+										{t(lang, "我做不到 / 需要帮助")}
+									</button>
+								</div>
+							</>
+						)}
+						{flowNode?.type === "action" && actionCard && (
+							<>
+								{progress(3)}
+								<div className="question-count">
+									{`${t(lang, "行动")} ${cardIndex + 1} / ${flowNode.cards.length}`}
+								</div>
+								<div className={`action-hero${actionCard.kind === "dont" ? " dont" : ""}`}>
+									<div className="eyebrow">
+										{t(lang, actionCard.kind === "dont" ? "现在不要做" : "现在应该做")}
+									</div>
+									<h2>{t(lang, actionCard.title)}</h2>
+									<p className="lead">{t(lang, actionCard.detail)}</p>
+								</div>
+								<div className="panel green">
+									<div className="panel-row">
+										<div className="panel-icon">👂</div>
+										<div>
+											<div className="panel-title">{t(lang, "同时确认现场信息")}</div>
+											<div className="panel-copy">
+												{t(lang, "听从工作人员、现场广播和官方发布。")}
+											</div>
+										</div>
 									</div>
 								</div>
-							</div>
-						</div>
-						<div className="actions">
-							<button
-								type="button"
-								className="btn primary"
-								onClick={() => setScreen("environment")}
-							>
-								{t(lang, "继续")}
-							</button>
-							<button
-								type="button"
-								className="btn secondary"
-								onClick={openCommunication}
-							>
-								{t(lang, "我做不到 / 需要帮助")}
-							</button>
-						</div>
-					</section>
-
-					<section className={screenClass("environment")} data-screen="environment">
-						{progress(2)}
-						<div className="question-count">{t(lang, "问题 3 / 3")}</div>
-						<h1 className="hero-title">{t(lang, "你现在在哪里？")}</h1>
-						<p className="lead">{t(lang, "选择最接近的环境，用于匹配固定行动规则。")}</p>
-						<div className="choice-list">
-							{choice("environment", "outdoor", "🌳", t(lang, "室外 / 空旷处"))}
-							{choice("environment", "indoor", "🏢", t(lang, "建筑物内"))}
-							{choice("environment", "transit", "🚇", t(lang, "车站 / 交通工具内"))}
-							{choice("environment", "unknown", "❔", t(lang, "不确定"))}
-						</div>
-						<div className="actions">
-							<button type="button" className="btn primary" onClick={calculateAction}>
-								{t(lang, "生成下一步行动")}
-							</button>
-						</div>
-					</section>
-
-					<section className={screenClass("action")} data-screen="action">
-						{progress(3)}
-						<div className="action-hero">
-							<div className="eyebrow">{t(lang, "现在只做这一件事")}</div>
-							<h2>{action.title}</h2>
-							<p className="lead">{action.copy}</p>
-						</div>
-						<div className="panel red">
-							<div className="panel-row">
-								<div className="panel-icon">✋</div>
-								<div>
-									<div className="panel-title">{t(lang, "现在不要做")}</div>
-									<div className="panel-copy">{action.dont}</div>
+								<div className="source">
+									{t(lang, "规则来源：东京都防灾相关官方资料｜规则版本 v1.0｜非专业建筑或医疗判断")}
 								</div>
-							</div>
-						</div>
-						<div className="panel green">
-							<div className="panel-row">
-								<div className="panel-icon">👂</div>
-								<div>
-									<div className="panel-title">{t(lang, "同时确认现场信息")}</div>
-									<div className="panel-copy">{t(lang, "听从工作人员、现场广播和官方发布。")}</div>
+								<div className="actions">
+									<button type="button" className="btn primary" onClick={nextActionCard}>
+										{t(lang, "下一步")}
+									</button>
+									<button
+										type="button"
+										className="btn secondary"
+										onClick={openCommunication}
+									>
+										{t(lang, "我做不到")}
+									</button>
 								</div>
-							</div>
-						</div>
-						<div className="source">
-							{t(lang, "规则来源：东京都防灾相关官方资料｜规则版本 v1.0｜非专业建筑或医疗判断")}
-						</div>
-						<div className="actions">
-							<button type="button" className="btn primary" onClick={() => setScreen("shelter")}>
-								{t(lang, "我已完成，查看附近设施")}
-							</button>
-							<button
-								type="button"
-								className="btn secondary"
-								onClick={openCommunication}
-							>
-								{t(lang, "我做不到")}
-							</button>
-						</div>
+							</>
+						)}
 					</section>
 
 					<section className={screenClass("shelter")} data-screen="shelter">
 						{progress(4)}
 						<div className="hero-mark">🏫</div>
-						<h1 className="hero-title">{t(lang, "需要查看附近的避难设施吗？")}</h1>
+						<h1 className="hero-title">{t(lang, "是否需要避难？")}</h1>
 						<p className="lead">{t(lang, "系统会根据本次位置和官方开放数据列出候选设施。")}</p>
 						<div className="panel amber">
 							<div className="panel-title">{t(lang, "重要说明")}</div>
@@ -470,14 +457,14 @@ export function DemoApp() {
 							<button
 								type="button"
 								className="btn primary"
-								onClick={() => setScreen("facilities")}
+								onClick={() => answerEvacuation(true)}
 							>
-								{t(lang, "查看设施候选")}
+								{t(lang, "需要，导航到避难地点")}
 							</button>
 							<button
 								type="button"
 								className="btn secondary"
-								onClick={() => notify("已保留当前行动卡")}
+								onClick={() => answerEvacuation(false)}
 							>
 								{t(lang, "暂时不需要")}
 							</button>
