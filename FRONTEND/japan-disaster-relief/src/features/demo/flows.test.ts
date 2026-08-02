@@ -126,14 +126,14 @@ describe("gas leak flow (DOCS/卡片・灾害定义.xlsm 日常应急_煤气泄�
 		]);
 	});
 
-	it("action cards lead to the evacuation check, then navigation/communication", () => {
+	it("action cards lead straight to the communication card (no shelter step)", () => {
 		const start = action(flow, flow.start);
-		const evac = getNode(flow, start.next);
-		if (evac.type !== "evacuation") throw new Error("next is not an evacuation node");
-		const nav = getNode(flow, evac.yesNext);
-		if (nav.type !== "navigation") throw new Error("yesNext is not a navigation node");
-		expect(getNode(flow, nav.next).type).toBe("communication");
-		expect(getNode(flow, evac.noNext).type).toBe("communication");
+		expect(getNode(flow, start.next).type).toBe("communication");
+		expect(
+			Object.values(flow.nodes).filter(
+				(node) => node.type === "evacuation" || node.type === "navigation",
+			),
+		).toEqual([]);
 	});
 });
 
