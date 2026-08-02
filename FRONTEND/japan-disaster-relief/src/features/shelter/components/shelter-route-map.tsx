@@ -1,8 +1,8 @@
 "use client";
 
 import type { DemoShelterCandidate } from "@nikuman-yummy/shared";
-import type { GeoPoint } from "../../../lib/geo/calculate-distance";
-import { type DemoLang, t } from "../../demo/i18n";
+import type { GeoPoint } from "@/lib/geo/calculate-distance";
+import { type DemoLang, t } from "@/features/demo/i18n";
 
 interface ShelterRouteMapProps {
 	origin: GeoPoint;

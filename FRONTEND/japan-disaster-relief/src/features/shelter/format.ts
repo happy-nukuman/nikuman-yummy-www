@@ -1,4 +1,4 @@
-import type { DemoLang } from "../demo/i18n";
+import type { DemoLang } from "@/features/demo/i18n";
 
 /** "約 556 m" — always an approximate straight-line distance, never a route. */
 export function formatApproxDistance(lang: DemoLang, distanceMeters: number): string {

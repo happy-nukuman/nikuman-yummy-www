@@ -1,7 +1,7 @@
 "use client";
 
 import type { DemoShelterCandidate, DemoShelterNearbyResponse } from "@nikuman-yummy/shared";
-import { type DemoLang, t } from "../../demo/i18n";
+import { type DemoLang, t } from "@/features/demo/i18n";
 import { ShelterCandidateCard } from "./shelter-candidate-card";
 
 interface ShelterCandidateListProps {
