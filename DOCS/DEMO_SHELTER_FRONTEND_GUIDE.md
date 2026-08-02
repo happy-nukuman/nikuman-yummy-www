@@ -2,10 +2,10 @@
 
 本文面向前端开发人员，说明如何在比赛 Demo 中调用后端避难所查询接口，并正确展示东京都厅周边的新宿区避难所候选。
 
-> 实现分支：`backgroud`  
-> API 状态：Demo 专用、已实现、无需 D1  
-> 后端入口：`POST /api/demo/shelters/nearby`  
-> 数据性质：新宿区官方开放数据的固定快照，不是实时开放状态
+> - 实现分支：`backgroud`
+> - API 状态：Demo 专用、已实现、无需 D1
+> - 后端入口：`POST /api/demo/shelters/nearby`
+> - 数据性质：新宿区官方开放数据的固定快照，不是实时开放状态
 
 ## 1. 接口能力与边界
 
@@ -542,4 +542,3 @@ Invoke-RestMethod `
 | Service 测试 | `BACKEND/japan-disaster-relief-api/src/services/demo-shelter-service.test.ts` |
 | 完整 API 文档 | `DOCS/API.md` |
 | 通用前端联调指南 | `DOCS/FRONTEND_INTEGRATION.md` |
-
