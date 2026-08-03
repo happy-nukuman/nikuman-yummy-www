@@ -15,6 +15,8 @@ interface NavigateScreenProps {
 	shelter: DemoShelterCandidate | null;
 	/** Location line shown in the current-location panel. */
 	locationLabel: string;
+	/** Continues the flow to the communication card. */
+	onOpenCommunication: () => void;
 	onBack: () => void;
 }
 
@@ -25,6 +27,7 @@ export function NavigateScreen({
 	origin,
 	shelter,
 	locationLabel,
+	onOpenCommunication,
 	onBack,
 }: NavigateScreenProps) {
 	const name = shelter ? shelterDisplayName(lang, shelter) : null;
@@ -66,7 +69,11 @@ export function NavigateScreen({
 					</div>
 				</>
 			)}
+			<div className="source">{t(lang, "到达后或需要求助时，向身边的人展示。")}</div>
 			<div className="actions">
+				<button type="button" className="btn primary" onClick={onOpenCommunication}>
+					{t(lang, "打开沟通卡")}
+				</button>
 				<button type="button" className="btn ghost" onClick={onBack}>
 					{t(lang, "返回上一步")}
 				</button>
