@@ -3,6 +3,31 @@
 
 export type DemoLang = "zh" | "en" | "ja";
 
+// 按浏览器语言偏好顺序匹配 demo 支持的语言；中日英之外默认英语。
+export function detectDemoLang(languages: readonly string[]): DemoLang {
+	for (const tag of languages) {
+		const primary = tag.toLowerCase().split("-")[0];
+		if (primary === "zh" || primary === "en" || primary === "ja") return primary;
+	}
+	return "en";
+}
+
+// 把 Accept-Language 头解析成按 q 值降序的语言标签列表（q 相同保持原顺序）。
+export function parseAcceptLanguage(header: string | null): string[] {
+	if (!header) return [];
+	return header
+		.split(",")
+		.map((part) => {
+			const [tag, ...params] = part.trim().split(";");
+			const qParam = params.map((p) => p.trim()).find((p) => p.startsWith("q="));
+			const q = qParam ? Number.parseFloat(qParam.slice(2)) : 1;
+			return { tag: tag.trim(), q: Number.isNaN(q) ? 0 : q };
+		})
+		.filter((entry) => entry.tag !== "" && entry.tag !== "*")
+		.sort((a, b) => b.q - a.q)
+		.map((entry) => entry.tag);
+}
+
 export interface WelcomeCopy {
 	sub: string;
 	title: string;
