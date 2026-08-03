@@ -66,9 +66,14 @@ interface NavSnapshot {
 	cardIndex: number;
 }
 
-export function DemoApp() {
+interface DemoAppProps {
+	// 服务端根据 Accept-Language 解析出的初始语言，保证首帧渲染即为用户语言。
+	initialLang: DemoLang;
+}
+
+export function DemoApp({ initialLang }: DemoAppProps) {
 	const [screen, setScreen] = useState<ScreenName>("welcome");
-	const [lang, setLang] = useState<DemoLang>("zh");
+	const [lang, setLang] = useState<DemoLang>(initialLang);
 	// 位置许可：demo 版允许后固定使用东京都厅演示坐标（DEMO_ORIGIN）。
 	const [locPermission, setLocPermission] = useState<"unknown" | "granted" | "denied">("unknown");
 	// 用户在候选列表中选择的避难设施（路线页的目的地）。
