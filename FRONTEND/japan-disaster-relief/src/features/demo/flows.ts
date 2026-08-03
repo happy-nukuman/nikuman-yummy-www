@@ -4,7 +4,11 @@
 //
 // Card types (sheet 流程和卡片定义): 事象确认卡 (event confirmation, rendered by
 // the event/daily screens), 状态确认卡 (question nodes), 动作卡 (action nodes),
-// 避难确认卡 (evacuation nodes), 导航卡 (navigation nodes), 沟通卡 (communication).
+// 避难确认卡 (evacuation nodes), 导航卡 (navigation nodes), SOS卡 (sos nodes,
+// 被困时的 119 求助画面), 沟通卡 (communication).
+//
+// 两张流程图（xlsm 的 灾害_地震流程 / 日常应急_煤气泄露 sheet）已随本文件同步
+// 重新生成：v1.1 · 2026-08-03。改流程时请连同 xlsm 一起更新。
 
 export type FlowId = "earthquake" | "gas-leak";
 
@@ -22,6 +26,8 @@ export interface QuestionNode {
 	title: string;
 	lead: string;
 	options: FlowOption[];
+	/** Progress-bar step; defaults to the question step when omitted. */
+	stage?: number;
 }
 
 export interface FlowActionCard {
@@ -29,6 +35,8 @@ export interface FlowActionCard {
 	kind: "do" | "dont";
 	title: string;
 	detail: string;
+	/** Phone number rendered as a tel: call button on this card. */
+	tel?: string;
 }
 
 export interface ActionNode {
@@ -36,6 +44,10 @@ export interface ActionNode {
 	id: string;
 	cards: FlowActionCard[];
 	next: string;
+	/** Label of the next button on the last card; defaults to 下一步. */
+	nextLabel?: string;
+	/** Progress-bar step; defaults to the action step when omitted. */
+	stage?: number;
 }
 
 export interface EvacuationNode {
@@ -51,6 +63,13 @@ export interface NavigationNode {
 	next: string;
 }
 
+/** 被困/无法移动时的紧急求助画面（拨打 119 + 等待救援指引）。 */
+export interface SosNode {
+	type: "sos";
+	id: string;
+	next: string;
+}
+
 export interface CommunicationNode {
 	type: "communication";
 	id: string;
@@ -61,6 +80,7 @@ export type FlowNode =
 	| ActionNode
 	| EvacuationNode
 	| NavigationNode
+	| SosNode
 	| CommunicationNode;
 
 export interface Flow {
@@ -86,6 +106,7 @@ export const EARTHQUAKE_FLOW: Flow = {
 				{ value: "shaking", label: "还在摇晃", icon: "⚠️", next: "act-protect" },
 			],
 		},
+		// 摇晃中的防护卡结束后直接进入受伤确认，不回到 q-shaking（避免流程成环）。
 		"act-protect": {
 			type: "action",
 			id: "act-protect",
@@ -96,7 +117,9 @@ export const EARTHQUAKE_FLOW: Flow = {
 					detail: "就近进入较安全空间，远离玻璃、高柜、吊物和围墙。等待摇晃停止。",
 				},
 			],
-			next: "q-shaking",
+			next: "q-injury",
+			nextLabel: "摇晃停止了，继续",
+			stage: 2,
 		},
 		"q-injury": {
 			type: "question",
@@ -105,8 +128,13 @@ export const EARTHQUAKE_FLOW: Flow = {
 			lead: "根据受伤情况，系统会给出不同的行动指引。",
 			options: [
 				{ value: "none", label: "没有受伤", icon: "✅", next: "q-location" },
-				{ value: "minor", label: "受到轻伤，不影响移动", icon: "🩹", next: "q-location" },
-				{ value: "trapped", label: "被建筑物压住", icon: "🆘", next: "act-trapped" },
+				{ value: "minor", label: "受轻伤，可以移动", icon: "🩹", next: "q-location" },
+				{
+					value: "trapped",
+					label: "被困住或无法移动（被压 / 重伤）",
+					icon: "🆘",
+					next: "act-trapped",
+				},
 			],
 		},
 		"act-trapped": {
@@ -114,12 +142,16 @@ export const EARTHQUAKE_FLOW: Flow = {
 			id: "act-trapped",
 			cards: [
 				{ kind: "dont", title: "不要强行挣脱", detail: "避免二次受伤。" },
-				{ kind: "do", title: "大声呼救", detail: "或敲击墙壁、管道发出规律声音。" },
-				{ kind: "do", title: "如手机有信号，拨打119", detail: "或发送求救信息。" },
-				{ kind: "do", title: "等待救援", detail: "节省体力和电量。" },
+				{
+					kind: "do",
+					title: "用敲击代替呼喊",
+					detail: "有规律地敲击墙壁或管道。节省体力，避免吸入粉尘。",
+				},
 			],
-			next: "comm",
+			next: "sos",
 		},
+		// 被困时身边通常没有可以看屏幕的人，先进 SOS 画面拨打 119，再按需展示沟通卡。
+		sos: { type: "sos", id: "sos", next: "comm" },
 		"q-location": {
 			type: "question",
 			id: "q-location",
@@ -140,9 +172,12 @@ export const EARTHQUAKE_FLOW: Flow = {
 			type: "action",
 			id: "act-home",
 			cards: [
-				{ kind: "do", title: "穿鞋或厚底拖鞋", detail: "避免踩到玻璃和碎片。" },
-				{ kind: "do", title: "不取行李，不乘电梯", detail: "沿可见安全出口向开阔处移动。" },
-				{ kind: "dont", title: "不点火，不开关电器", detail: "离开该区域后再求助。" },
+				{ kind: "do", title: "穿上鞋保护双脚", detail: "避免踩到玻璃和碎片。" },
+				{
+					kind: "do",
+					title: "不取行李，不乘电梯",
+					detail: "沿安全出口向开阔处移动，途中不要点火、不开关电器。",
+				},
 			],
 			next: "evac",
 		},
@@ -152,20 +187,46 @@ export const EARTHQUAKE_FLOW: Flow = {
 			title: "是否寻找到工作人员？",
 			lead: "优先听从现场工作人员的指示。",
 			options: [
-				{ value: "yes", label: "找到了", icon: "✅", next: "evac" },
+				{ value: "yes", label: "找到了", icon: "✅", next: "act-follow" },
 				{ value: "no", label: "没有找到", icon: "❌", next: "act-building" },
 			],
+		},
+		"act-follow": {
+			type: "action",
+			id: "act-follow",
+			cards: [
+				{
+					kind: "do",
+					title: "听从工作人员指示",
+					detail: "按现场引导行动，不要擅自返回建筑内。",
+				},
+			],
+			next: "evac",
 		},
 		"act-building": {
 			type: "action",
 			id: "act-building",
 			cards: [
-				{ kind: "do", title: "不取行李，不乘电梯", detail: "沿可见安全出口向开阔处移动。" },
-				{ kind: "do", title: "如手机有信号，拨打119", detail: "或发送求救信息。" },
+				{
+					kind: "do",
+					title: "从安全出口离开",
+					detail: "不取行李，不乘电梯，向开阔处移动。",
+				},
 			],
 			next: "evac",
 		},
-		evac: { type: "evacuation", id: "evac", yesNext: "nav", noNext: "comm" },
+		evac: { type: "evacuation", id: "evac", yesNext: "nav", noNext: "act-standby" },
+		// 暂不避难时给出待命指引，进度停在第 4 段，避免进度条回退。
+		"act-standby": {
+			type: "action",
+			id: "act-standby",
+			cards: [
+				{ kind: "do", title: "警惕余震", detail: "穿好鞋，远离高柜、玻璃窗和悬挂物。" },
+				{ kind: "do", title: "关注官方信息", detail: "留意 NHK、气象厅和自治体的官方发布。" },
+			],
+			next: "comm",
+			stage: 4,
+		},
 		nav: { type: "navigation", id: "nav", next: "comm" },
 		comm: { type: "communication", id: "comm" },
 	},
@@ -180,10 +241,59 @@ export const GAS_LEAK_FLOW: Flow = {
 			type: "action",
 			id: "act-gas",
 			cards: [
-				{ kind: "do", title: "立刻停止使用燃气", detail: "别点火、抽烟。" },
-				{ kind: "dont", title: "不要开关灯、排风扇", detail: "也不要触碰电器或插头。" },
+				{ kind: "do", title: "立刻停止使用燃气", detail: "关火并停止使用所有燃气器具。" },
+				{
+					kind: "dont",
+					title: "不要使用明火和电器开关",
+					detail: "不点火、不抽烟；不开关灯和排风扇，避免产生火花。",
+				},
+				{
+					kind: "do",
+					title: "开窗通风，关闭燃气总阀",
+					detail: "如能安全操作，打开门窗通风，并关闭燃气总阀。",
+				},
+			],
+			next: "q-symptom",
+			stage: 2,
+		},
+		"q-symptom": {
+			type: "question",
+			id: "q-symptom",
+			title: "是否有人感到头晕、恶心或不适？",
+			lead: "吸入燃气可能引起不适，请先确认现场所有人的状态。",
+			options: [
+				{ value: "yes", label: "有人不适", icon: "🤢", next: "act-gas-med" },
+				{ value: "no", label: "没有人不适", icon: "✅", next: "act-gas-report" },
+			],
+			stage: 3,
+		},
+		"act-gas-med": {
+			type: "action",
+			id: "act-gas-med",
+			cards: [
+				{ kind: "do", title: "转移到空气新鲜处", detail: "搀扶不适者到室外或通风良好处休息。" },
+				{
+					kind: "do",
+					title: "拨打 119",
+					detail: "说明燃气泄漏情况和身体不适症状。",
+					tel: "119",
+				},
 			],
 			next: "comm",
+			stage: 4,
+		},
+		"act-gas-report": {
+			type: "action",
+			id: "act-gas-report",
+			cards: [
+				{
+					kind: "do",
+					title: "联系燃气公司抢修电话",
+					detail: "到室外安全处再拨打；抢修人员确认安全前，不要返回使用火和电器。",
+				},
+			],
+			next: "comm",
+			stage: 4,
 		},
 		// 日常应急类不经过避难所环节，行动卡结束后直接进入沟通卡。
 		comm: { type: "communication", id: "comm" },
@@ -218,15 +328,57 @@ function nextIds(node: FlowNode): string[] {
 			return [node.yesNext, node.noNext];
 		case "navigation":
 			return [node.next];
+		case "sos":
+			return [node.next];
 		case "communication":
 			return [];
 	}
 }
 
 /**
+ * 迭代式 DFS 三色标记（未访问 / grey 在当前路径上 / black 已完成）：
+ * 指向 grey 节点的边就是回边，说明流程里存在环。
+ */
+function detectCycles(flow: Flow): string[] {
+	const errors: string[] = [];
+	const state = new Map<string, "grey" | "black">();
+
+	for (const rootId of Object.keys(flow.nodes)) {
+		if (state.has(rootId)) continue;
+		state.set(rootId, "grey");
+		// 栈帧记录当前节点和已经处理到第几个后继。
+		const stack: { id: string; index: number }[] = [{ id: rootId, index: 0 }];
+		while (stack.length > 0) {
+			const frame = stack[stack.length - 1];
+			const node = flow.nodes[frame.id];
+			const next = node ? nextIds(node) : [];
+			if (frame.index >= next.length) {
+				state.set(frame.id, "black");
+				stack.pop();
+				continue;
+			}
+			const childId = next[frame.index];
+			frame.index += 1;
+			// 缺失节点由引用检查单独报错，这里跳过即可。
+			if (!flow.nodes[childId]) continue;
+			const childState = state.get(childId);
+			if (childState === "grey") {
+				errors.push(`cycle detected involving node "${childId}"`);
+			} else if (childState === undefined) {
+				state.set(childId, "grey");
+				stack.push({ id: childId, index: 0 });
+			}
+		}
+	}
+
+	return errors;
+}
+
+/**
  * Structural validation used by tests: every referenced node exists, every
- * node is reachable from the start, and every path can reach the
- * communication card (the terminal card of both flows in the spec).
+ * node is reachable from the start, the graph has no cycles, and every path
+ * can reach the communication card (the terminal card of both flows in the
+ * spec).
  */
 export function validateFlow(flow: Flow): string[] {
 	const errors: string[] = [];
@@ -250,6 +402,8 @@ export function validateFlow(flow: Flow): string[] {
 	for (const id of Object.keys(flow.nodes)) {
 		if (!reachable.has(id)) errors.push(`node "${id}" is unreachable from start`);
 	}
+
+	errors.push(...detectCycles(flow));
 
 	const hasTerminal = Object.values(flow.nodes).some(
 		(node) => node.type === "communication" && reachable.has(node.id),

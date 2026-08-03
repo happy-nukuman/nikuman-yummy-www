@@ -19,6 +19,7 @@ import { FlowScreen } from "@/features/demo/components/screens/flow-screen";
 import { EvacuationScreen } from "@/features/demo/components/screens/evacuation-screen";
 import { FacilitiesScreen } from "@/features/demo/components/screens/facilities-screen";
 import { NavigateScreen } from "@/features/demo/components/screens/navigate-screen";
+import { SosScreen } from "@/features/demo/components/screens/sos-screen";
 import { CommunicationScreen } from "@/features/demo/components/screens/communication-screen";
 import "../demo.css";
 
@@ -31,6 +32,7 @@ type ScreenName =
 	| "shelter"
 	| "facilities"
 	| "navigate"
+	| "sos"
 	| "communication";
 
 // Demo 固定“现在地”（东京都厅附近）：demo 版不调用浏览器定位，
@@ -60,10 +62,12 @@ interface FlowPosition {
 }
 
 // 选项点选后立即跳转，跳转前把当前画面压栈，供“返回上一步”恢复。
+// 一并快照作答记录：返回到问题页时该题恢复为未作答，避免旧答案继续高亮。
 interface NavSnapshot {
 	screen: ScreenName;
 	flowPos: FlowPosition | null;
 	cardIndex: number;
+	flowAnswers: Record<string, string>;
 }
 
 interface DemoAppProps {
@@ -79,7 +83,7 @@ export function DemoApp({ initialLang }: DemoAppProps) {
 	// 用户在候选列表中选择的避难设施（路线页的目的地）。
 	const [selectedShelter, setSelectedShelter] = useState<DemoShelterCandidate | null>(null);
 	const shelters = useDemoShelters();
-	// 选完语言后以弹窗形式询问位置许可；不允许则停留在语言页无法继续。
+	// 选完语言后以弹窗形式询问位置许可；拒绝也能继续，只是改用默认位置。
 	const [locDialogOpen, setLocDialogOpen] = useState(false);
 	// 事象确认卡：灾害模式自动识别推荐地震并高亮，日常应急为手动选择。
 	const [eventChoice, setEventChoice] = useState("earthquake");
@@ -89,8 +93,6 @@ export function DemoApp({ initialLang }: DemoAppProps) {
 	const [cardIndex, setCardIndex] = useState(0);
 	const [phrase, setPhrase] = useState(0);
 	const [phrasePickerOpen, setPhrasePickerOpen] = useState(false);
-	// Screen to go back to when leaving the communication card.
-	const [commReturn, setCommReturn] = useState<ScreenName>("mode");
 	const [history, setHistory] = useState<NavSnapshot[]>([]);
 	const { toast, notify } = useToast();
 
@@ -103,7 +105,7 @@ export function DemoApp({ initialLang }: DemoAppProps) {
 	}, [screen]);
 
 	function pushHistory() {
-		setHistory((prev) => [...prev, { screen, flowPos, cardIndex }]);
+		setHistory((prev) => [...prev, { screen, flowPos, cardIndex, flowAnswers }]);
 	}
 
 	function goBack() {
@@ -112,6 +114,7 @@ export function DemoApp({ initialLang }: DemoAppProps) {
 		setHistory(history.slice(0, -1));
 		setFlowPos(prev.flowPos);
 		setCardIndex(prev.cardIndex);
+		setFlowAnswers(prev.flowAnswers);
 		setScreen(prev.screen);
 	}
 
@@ -144,12 +147,12 @@ export function DemoApp({ initialLang }: DemoAppProps) {
 		setLocDialogOpen(false);
 		if (allow) {
 			notify(t(lang, "已获取当前位置：东京市新宿区"));
-			pushHistory();
-			setScreen("mode");
 		} else {
-			// 拒绝后停留在语言选择页，不能继续；重新选择语言可再次弹窗。
-			notify(t(lang, "未获得位置许可，无法继续下一步"));
+			// 拒绝也要能走完全部流程：避难所检索本来就用写死的演示坐标。
+			notify(t(lang, "未获得定位权限，将使用默认位置提供参考"));
 		}
+		pushHistory();
+		setScreen("mode");
 	}
 
 	// 进入“附近设施候选”页时用演示坐标请求 Demo 避难所列表。
@@ -168,37 +171,60 @@ export function DemoApp({ initialLang }: DemoAppProps) {
 		setScreen("navigate");
 	}
 
-	function openCommunication() {
-		if (screen !== "communication") setCommReturn(screen);
+	// 只负责切到沟通卡画面，压栈由调用方决定。
+	function showCommunication() {
 		setPhrasePickerOpen(false);
 		setScreen("communication");
 	}
 
+	// 顶栏沟通卡按钮：已经在沟通卡上时不做任何事，避免把自己压进历史栈。
+	function openCommunication() {
+		if (screen === "communication") return;
+		pushHistory();
+		showCommunication();
+	}
+
 	function goToNode(flowId: FlowId, nodeId: string) {
 		const node = getNode(FLOWS[flowId], nodeId);
+		// 沟通卡不更新 flowPos：返回后 SOS / 导航页的前进判断仍指向原节点。
 		if (node.type === "communication") {
-			openCommunication();
+			showCommunication();
 			return;
 		}
 		setFlowPos({ flowId, nodeId });
 		setCardIndex(0);
-		// 避难确认卡和导航卡有专属画面，其余节点在 flow 画面内渲染。
+		// 避难确认卡、导航卡和 SOS 卡有专属画面，其余节点在 flow 画面内渲染。
 		if (node.type === "evacuation") setScreen("shelter");
 		else if (node.type === "navigation") {
 			setScreen("facilities");
 			searchShelters();
-		} else setScreen("flow");
+		} else if (node.type === "sos") setScreen("sos");
+		else setScreen("flow");
 	}
 
-	// 前进到流程节点：沟通卡有自己的返回逻辑，其余目标先压栈再跳转。
+	// 前进到流程节点：先把当前画面压栈，再跳转（沟通卡同样走历史栈）。
 	function advanceTo(flowId: FlowId, nodeId: string) {
-		if (getNode(FLOWS[flowId], nodeId).type !== "communication") pushHistory();
+		pushHistory();
 		goToNode(flowId, nodeId);
 	}
 
 	function startFlow(flowId: FlowId) {
+		// 重新开始一条流程：清空作答、卡片位置和历史栈。
 		setFlowAnswers({});
+		setCardIndex(0);
+		setHistory([]);
+		setFlowPos(null);
 		advanceTo(flowId, FLOWS[flowId].start);
+	}
+
+	// 沟通卡的“返回主页”：清空流程状态后回到模式选择页。
+	function goHome() {
+		setFlowPos(null);
+		setFlowAnswers({});
+		setCardIndex(0);
+		setHistory([]);
+		setSelectedShelter(null);
+		setScreen("mode");
 	}
 
 	function selectEvent(value: string) {
@@ -240,20 +266,18 @@ export function DemoApp({ initialLang }: DemoAppProps) {
 	}
 
 	function answerEvacuation(need: boolean) {
-		if (flowPos) {
-			const node = getNode(FLOWS[flowPos.flowId], flowPos.nodeId);
-			if (node.type === "evacuation") {
-				advanceTo(flowPos.flowId, need ? node.yesNext : node.noNext);
-				return;
-			}
-		}
-		if (need) {
-			pushHistory();
-			setScreen("facilities");
-			searchShelters();
-		} else {
-			openCommunication();
-		}
+		if (!flowPos || flowNode?.type !== "evacuation") return;
+		advanceTo(flowPos.flowId, need ? flowNode.yesNext : flowNode.noNext);
+	}
+
+	// 路线页“打开沟通卡”：沿导航节点的 next 前进，让流程真正走完。
+	function proceedFromNavigate() {
+		if (flowPos && flowNode?.type === "navigation") advanceTo(flowPos.flowId, flowNode.next);
+	}
+
+	// SOS 页“有人靠近时，展示沟通卡”：沿 SOS 节点的 next 前进。
+	function proceedFromSos() {
+		if (flowPos && flowNode?.type === "sos") advanceTo(flowPos.flowId, flowNode.next);
 	}
 
 	// 选择后保持列表展开：立即收起会让整页高度骤变、滚动位置跳回顶部，看起来像重新加载了页面。
@@ -355,6 +379,13 @@ export function DemoApp({ initialLang }: DemoAppProps) {
 						origin={DEMO_ORIGIN}
 						shelter={selectedShelter}
 						locationLabel={locText}
+						onOpenCommunication={proceedFromNavigate}
+						onBack={goBack}
+					/>
+					<SosScreen
+						active={screen === "sos"}
+						lang={lang}
+						onShowCommunication={proceedFromSos}
 						onBack={goBack}
 					/>
 					<CommunicationScreen
@@ -365,8 +396,8 @@ export function DemoApp({ initialLang }: DemoAppProps) {
 						onSpeak={speak}
 						onTogglePicker={() => setPhrasePickerOpen((prev) => !prev)}
 						onPickPhrase={pickPhrase}
-						onReturn={() => setScreen(commReturn)}
-						onHome={() => setScreen("mode")}
+						onReturn={goBack}
+						onHome={goHome}
 					/>
 				</main>
 				{locDialogOpen && <LocationDialog lang={lang} onDecide={decideLocation} />}

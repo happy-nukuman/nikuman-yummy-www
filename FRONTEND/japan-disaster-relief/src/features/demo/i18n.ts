@@ -87,17 +87,39 @@ export const PHRASES: ReadonlyArray<readonly [string[], string, string]> = [
 	[["助けてください。"], "请帮帮我。", "助けてください。"],
 	[["救急車を呼んでください。"], "请帮我叫救护车。", "救急車を呼んでください。"],
 	[["日本語が話せません。"], "我不会说日语。", "日本語が話せません。"],
+	[["家族に無事を", "伝えたいです。"], "我想向家人报平安。", "家族に無事を伝えたいです。"],
+	[
+		["この薬が必要です。", "アレルギーがあります。"],
+		"我需要这个药。我有过敏。",
+		"この薬が必要です。アレルギーがあります。",
+	],
 ];
 
 export const PHRASE_TEXT: Record<DemoLang, string[]> = {
-	zh: ["请告诉我避难地点。", "请帮帮我。", "请帮我叫救护车。", "我不会说日语。"],
+	zh: [
+		"请告诉我避难地点。",
+		"请帮帮我。",
+		"请帮我叫救护车。",
+		"我不会说日语。",
+		"我想向家人报平安。",
+		"我需要这个药。我有过敏。",
+	],
 	en: [
 		"Please tell me where the evacuation site is.",
 		"Please help me.",
 		"Please call an ambulance for me.",
 		"I do not speak Japanese.",
+		"I want to tell my family that I am safe.",
+		"I need this medicine. I have allergies.",
 	],
-	ja: ["避難場所を教えてください。", "助けてください。", "救急車を呼んでください。", "日本語が話せません。"],
+	ja: [
+		"避難場所を教えてください。",
+		"助けてください。",
+		"救急車を呼んでください。",
+		"日本語が話せません。",
+		"家族に無事を伝えたいです。",
+		"この薬が必要です。アレルギーがあります。",
+	],
 };
 
 // Static-text translations keyed by the original Chinese copy.
@@ -186,8 +208,8 @@ export const FULL_I18N: Record<"en" | "ja", Record<string, string>> = {
 		"根据受伤情况，系统会给出不同的行动指引。":
 			"The next actions depend on whether you are injured.",
 		没有受伤: "Not injured",
-		"受到轻伤，不影响移动": "Minor injury, can still move",
-		被建筑物压住: "Trapped under a building or furniture",
+		"受轻伤，可以移动": "Minor injury, can still move",
+		"被困住或无法移动（被压 / 重伤）": "Trapped or unable to move (pinned / seriously injured)",
 		自宅: "At home",
 		"公司、学校、商场等建筑内": "In an office, school, shopping mall, etc.",
 		其他: "Other",
@@ -200,22 +222,57 @@ export const FULL_I18N: Record<"en" | "ja", Record<string, string>> = {
 			"Move to a safer spot nearby, away from glass, tall cabinets, hanging objects, and walls. Wait for the shaking to stop.",
 		不要强行挣脱: "Do not force yourself free",
 		"避免二次受伤。": "This avoids further injury.",
-		大声呼救: "Call out loudly for help",
-		"或敲击墙壁、管道发出规律声音。": "Or knock on walls or pipes in a regular rhythm.",
-		"如手机有信号，拨打119": "If your phone has signal, call 119",
-		"或发送求救信息。": "Or send a distress message.",
-		等待救援: "Wait for rescue",
-		"节省体力和电量。": "Save your strength and phone battery.",
-		穿鞋或厚底拖鞋: "Put on shoes or thick-soled slippers",
+		"摇晃停止了，继续": "The shaking has stopped — continue",
+		用敲击代替呼喊: "Knock instead of shouting",
+		"有规律地敲击墙壁或管道。节省体力，避免吸入粉尘。":
+			"Tap on a wall or pipe in a steady rhythm. It saves your strength and keeps you from breathing in dust.",
+		穿上鞋保护双脚: "Put on shoes to protect your feet",
 		"避免踩到玻璃和碎片。": "Avoid stepping on glass and debris.",
 		"不取行李，不乘电梯": "Do not take luggage or use elevators",
-		"沿可见安全出口向开阔处移动。": "Move toward an open area via visible safety exits.",
-		"不点火，不开关电器": "Do not light flames or switch electrical devices",
-		"离开该区域后再求助。": "Ask for help after leaving the area.",
+		"沿安全出口向开阔处移动，途中不要点火、不开关电器。":
+			"Move toward an open area via a safety exit. Do not light flames or switch electrical devices on the way.",
+		听从工作人员指示: "Follow the staff instructions",
+		"按现场引导行动，不要擅自返回建筑内。":
+			"Act as directed on site and do not go back into the building on your own.",
+		从安全出口离开: "Leave through a safety exit",
+		"不取行李，不乘电梯，向开阔处移动。":
+			"Do not take luggage or use elevators. Move toward an open area.",
+		警惕余震: "Stay alert for aftershocks",
+		"穿好鞋，远离高柜、玻璃窗和悬挂物。":
+			"Keep your shoes on and stay away from tall furniture, glass windows, and hanging objects.",
+		关注官方信息: "Keep checking official information",
+		"留意 NHK、气象厅和自治体的官方发布。":
+			"Follow announcements from NHK, the Japan Meteorological Agency, and your local government.",
 		立刻停止使用燃气: "Stop using gas immediately",
-		"别点火、抽烟。": "Do not light flames or smoke.",
-		"不要开关灯、排风扇": "Do not switch lights or exhaust fans",
-		"也不要触碰电器或插头。": "Do not touch electrical appliances or plugs either.",
+		"关火并停止使用所有燃气器具。": "Turn off the flame and stop using every gas appliance.",
+		不要使用明火和电器开关: "Do not use open flames or electrical switches",
+		"不点火、不抽烟；不开关灯和排风扇，避免产生火花。":
+			"Do not light flames or smoke. Do not switch lights or exhaust fans either; they can create sparks.",
+		"开窗通风，关闭燃气总阀": "Open windows to ventilate and close the main gas valve",
+		"如能安全操作，打开门窗通风，并关闭燃气总阀。":
+			"If you can do it safely, open doors and windows to ventilate, then close the main gas valve.",
+		"是否有人感到头晕、恶心或不适？": "Is anyone dizzy, nauseous, or feeling unwell?",
+		"吸入燃气可能引起不适，请先确认现场所有人的状态。":
+			"Breathing in gas can make people ill. Check how everyone on site is doing first.",
+		有人不适: "Someone feels unwell",
+		没有人不适: "No one feels unwell",
+		转移到空气新鲜处: "Move to fresh air",
+		"搀扶不适者到室外或通风良好处休息。":
+			"Help anyone who feels unwell get outside or to a well-ventilated place to rest.",
+		"拨打 119": "Call 119",
+		"说明燃气泄漏情况和身体不适症状。": "Explain the gas leak and the symptoms people have.",
+		联系燃气公司抢修电话: "Call the gas company's emergency repair line",
+		"到室外安全处再拨打；抢修人员确认安全前，不要返回使用火和电器。":
+			"Call from a safe place outside. Do not go back to use flames or electricity until repair staff confirm it is safe.",
+		// SOS card and route-page helper text
+		紧急求助: "Emergency help",
+		"如手机有信号，立即拨打 119": "If your phone has signal, call 119 now",
+		等待救援时: "While waiting for rescue",
+		"保存体力，保持手机电量。有规律地敲击墙壁或管道，让救援人员发现你。":
+			"Save your strength and phone battery. Tap on a wall or pipe in a steady rhythm so rescuers can find you.",
+		"有人靠近时，展示沟通卡": "Someone is nearby — show the communication card",
+		"到达后或需要求助时，向身边的人展示。":
+			"Show this to people around you when you arrive or when you need help.",
 		// Location permission dialog (demo: the location itself is hardcoded)
 		"是否允许获取你的实时位置？": "Allow access to your current location?",
 		"用于确认所在区和附近避难设施，仅本次使用，不保存位置历史。":
@@ -223,7 +280,8 @@ export const FULL_I18N: Record<"en" | "ja", Record<string, string>> = {
 		允许获取位置: "Allow location access",
 		不允许: "Don't allow",
 		"已获取当前位置：东京市新宿区": "Location acquired: Shinjuku, Tokyo",
-		"未获得位置许可，无法继续下一步": "Location permission is required to continue.",
+		"未获得定位权限，将使用默认位置提供参考":
+			"Location permission was not granted. A default location will be used for reference.",
 		东京市新宿区: "Shinjuku, Tokyo",
 		仅本次使用: "This session only",
 		// Demo shelter candidates & route reference
@@ -332,8 +390,8 @@ export const FULL_I18N: Record<"en" | "ja", Record<string, string>> = {
 		"根据受伤情况，系统会给出不同的行动指引。":
 			"けがの状況に応じて、次の行動を案内します。",
 		没有受伤: "けがはない",
-		"受到轻伤，不影响移动": "軽傷だが移動できる",
-		被建筑物压住: "建物や家具に挟まれて動けない",
+		"受轻伤，可以移动": "軽傷で、移動できる",
+		"被困住或无法移动（被压 / 重伤）": "挟まれた・動けない（下敷き / 重傷）",
 		自宅: "自宅",
 		"公司、学校、商场等建筑内": "会社・学校・商業施設などの建物内",
 		其他: "その他",
@@ -346,22 +404,57 @@ export const FULL_I18N: Record<"en" | "ja", Record<string, string>> = {
 			"近くの安全な場所に移動し、ガラス・背の高い棚・吊り下げ物・塀から離れてください。揺れが止まるまで待ちます。",
 		不要强行挣脱: "無理に抜け出そうとしない",
 		"避免二次受伤。": "二次的なけがを避けるためです。",
-		大声呼救: "大声で助けを呼ぶ",
-		"或敲击墙壁、管道发出规律声音。": "壁や配管を規則的に叩いて音を出してください。",
-		"如手机有信号，拨打119": "電話がつながる場合は119番へ",
-		"或发送求救信息。": "または救助を求めるメッセージを送ってください。",
-		等待救援: "救助を待つ",
-		"节省体力和电量。": "体力とバッテリーを温存してください。",
-		穿鞋或厚底拖鞋: "靴か厚底のスリッパを履く",
+		"摇晃停止了，继续": "揺れが止まりました。次へ",
+		用敲击代替呼喊: "叫ばずに音を出して知らせる",
+		"有规律地敲击墙壁或管道。节省体力，避免吸入粉尘。":
+			"壁や配管を規則的に叩いてください。体力を温存し、粉じんを吸い込まないようにします。",
+		穿上鞋保护双脚: "靴を履いて足を守る",
 		"避免踩到玻璃和碎片。": "ガラスや破片を踏まないようにしてください。",
 		"不取行李，不乘电梯": "荷物を取らず、エレベーターを使わない",
-		"沿可见安全出口向开阔处移动。": "見える非常口から開けた場所へ移動してください。",
-		"不点火，不开关电器": "火を使わず、電気機器のスイッチに触れない",
-		"离开该区域后再求助。": "その場を離れてから助けを求めてください。",
+		"沿安全出口向开阔处移动，途中不要点火、不开关电器。":
+			"非常口から開けた場所へ移動してください。途中で火を使ったり、電気機器のスイッチに触れたりしないでください。",
+		听从工作人员指示: "係員の指示に従う",
+		"按现场引导行动，不要擅自返回建筑内。":
+			"現場の誘導に従って行動し、自分の判断で建物内へ戻らないでください。",
+		从安全出口离开: "非常口から外へ出る",
+		"不取行李，不乘电梯，向开阔处移动。":
+			"荷物を取らず、エレベーターを使わずに、開けた場所へ移動してください。",
+		警惕余震: "余震に警戒する",
+		"穿好鞋，远离高柜、玻璃窗和悬挂物。":
+			"靴を履いたままにし、背の高い家具・ガラス窓・吊り下げ物から離れてください。",
+		关注官方信息: "公式情報を確認し続ける",
+		"留意 NHK、气象厅和自治体的官方发布。":
+			"NHK、気象庁、自治体の公式発表に注意してください。",
 		立刻停止使用燃气: "ガスの使用をすぐにやめる",
-		"别点火、抽烟。": "火をつけたり、たばこを吸ったりしないでください。",
-		"不要开关灯、排风扇": "照明や換気扇のスイッチに触れない",
-		"也不要触碰电器或插头。": "電気機器やプラグにも触れないでください。",
+		"关火并停止使用所有燃气器具。": "火を消し、すべてのガス機器の使用をやめてください。",
+		不要使用明火和电器开关: "火気と電気のスイッチを使わない",
+		"不点火、不抽烟；不开关灯和排风扇，避免产生火花。":
+			"火をつけたり、たばこを吸ったりしないでください。火花が出るため、照明や換気扇のスイッチにも触れないでください。",
+		"开窗通风，关闭燃气总阀": "窓を開けて換気し、ガスの元栓を閉める",
+		"如能安全操作，打开门窗通风，并关闭燃气总阀。":
+			"安全に行える場合は、ドアや窓を開けて換気し、ガスの元栓を閉めてください。",
+		"是否有人感到头晕、恶心或不适？": "めまい・吐き気・体調不良の人はいますか？",
+		"吸入燃气可能引起不适，请先确认现场所有人的状态。":
+			"ガスを吸い込むと体調を崩すことがあります。まず現場にいる全員の状態を確認してください。",
+		有人不适: "体調が悪い人がいる",
+		没有人不适: "体調が悪い人はいない",
+		转移到空气新鲜处: "空気の新鮮な場所へ移動する",
+		"搀扶不适者到室外或通风良好处休息。":
+			"体調の悪い人を支えて、屋外や換気の良い場所で休ませてください。",
+		"拨打 119": "119番に電話する",
+		"说明燃气泄漏情况和身体不适症状。": "ガス漏れの状況と体調不良の症状を伝えてください。",
+		联系燃气公司抢修电话: "ガス会社の緊急連絡先に電話する",
+		"到室外安全处再拨打；抢修人员确认安全前，不要返回使用火和电器。":
+			"屋外の安全な場所から電話してください。作業員が安全を確認するまで、火や電気を使いに戻らないでください。",
+		// SOS card and route-page helper text
+		紧急求助: "緊急の救助要請",
+		"如手机有信号，立即拨打 119": "電話がつながる場合は、すぐに119番へ",
+		等待救援时: "救助を待つあいだ",
+		"保存体力，保持手机电量。有规律地敲击墙壁或管道，让救援人员发现你。":
+			"体力とバッテリーを温存してください。壁や配管を規則的に叩いて、救助隊に居場所を知らせます。",
+		"有人靠近时，展示沟通卡": "人が近づいたらコミュニケーションカードを見せる",
+		"到达后或需要求助时，向身边的人展示。":
+			"到着したときや助けが必要なときに、周囲の人に見せてください。",
 		// Location permission dialog (demo: the location itself is hardcoded)
 		"是否允许获取你的实时位置？": "現在地の取得を許可しますか？",
 		"用于确认所在区和附近避难设施，仅本次使用，不保存位置历史。":
@@ -369,7 +462,8 @@ export const FULL_I18N: Record<"en" | "ja", Record<string, string>> = {
 		允许获取位置: "位置情報を許可する",
 		不允许: "許可しない",
 		"已获取当前位置：东京市新宿区": "現在地を取得しました：東京都新宿区",
-		"未获得位置许可，无法继续下一步": "位置情報の許可がないため、先に進めません。",
+		"未获得定位权限，将使用默认位置提供参考":
+			"位置情報の許可がないため、既定の位置を参考として使用します。",
 		东京市新宿区: "東京都新宿区",
 		仅本次使用: "今回のみ使用",
 		// Demo shelter candidates & route reference

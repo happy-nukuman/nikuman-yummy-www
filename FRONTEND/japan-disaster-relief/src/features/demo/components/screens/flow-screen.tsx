@@ -33,12 +33,14 @@ export function FlowScreen({
 	onBackFromAction,
 }: FlowScreenProps) {
 	const actionCard = node?.type === "action" ? node.cards[cardIndex] : null;
+	// 最后一张行动卡的主按钮可由节点自定义文案（如“摇晃停止了，继续”）。
+	const isLastCard = node?.type === "action" && cardIndex + 1 >= node.cards.length;
 
 	return (
 		<section className={`screen${active ? " active" : ""}`} data-screen="flow">
 			{node?.type === "question" && (
 				<>
-					<Progress on={2} />
+					<Progress on={node.stage ?? 2} />
 					<div className="question-count">{t(lang, "状态确认")}</div>
 					<h1 className="hero-title">{t(lang, node.title)}</h1>
 					<p className="lead">{t(lang, node.lead)}</p>
@@ -67,7 +69,7 @@ export function FlowScreen({
 			)}
 			{node?.type === "action" && actionCard && (
 				<>
-					<Progress on={3} />
+					<Progress on={node.stage ?? 3} />
 					<div className="question-count">
 						{`${t(lang, "行动")} ${cardIndex + 1} / ${node.cards.length}`}
 					</div>
@@ -93,8 +95,14 @@ export function FlowScreen({
 						{t(lang, "规则来源：东京都防灾相关官方资料｜规则版本 v1.0｜非专业建筑或医疗判断")}
 					</div>
 					<div className="actions">
+						{actionCard.tel && (
+							// 目前唯一的 tel 值就是 119，按钮文案沿用固定词条。
+							<a className="btn primary" href={`tel:${actionCard.tel}`}>
+								📞 {t(lang, "拨打 119")}
+							</a>
+						)}
 						<button type="button" className="btn primary" onClick={onNextActionCard}>
-							{t(lang, "下一步")}
+							{t(lang, isLastCard && node.nextLabel ? node.nextLabel : "下一步")}
 						</button>
 						<button type="button" className="btn secondary" onClick={onOpenCommunication}>
 							{t(lang, "我做不到")}
