@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import type { DemoShelterCandidate } from "@nikuman-yummy/shared";
 import type { GeoPoint } from "@/lib/geo/calculate-distance";
+import type { DisasterInfoItem } from "@/features/demo/disaster-info";
 import { useDemoShelters } from "@/features/shelter/hooks/use-demo-shelters";
 import { type DemoLang, HEADER_LABELS, PHRASES, t, WELCOME_COPY } from "@/features/demo/i18n";
 import { FLOWS, type FlowId, getNode, resolveOption } from "@/features/demo/flows";
@@ -20,6 +21,9 @@ import { EvacuationScreen } from "@/features/demo/components/screens/evacuation-
 import { FacilitiesScreen } from "@/features/demo/components/screens/facilities-screen";
 import { NavigateScreen } from "@/features/demo/components/screens/navigate-screen";
 import { SosScreen } from "@/features/demo/components/screens/sos-screen";
+import { EmergencyScreen } from "@/features/demo/components/screens/emergency-screen";
+import { DisasterListScreen } from "@/features/demo/components/screens/disaster-list-screen";
+import { DisasterDetailScreen } from "@/features/demo/components/screens/disaster-detail-screen";
 import { CommunicationScreen } from "@/features/demo/components/screens/communication-screen";
 import "../demo.css";
 
@@ -33,11 +37,14 @@ type ScreenName =
 	| "facilities"
 	| "navigate"
 	| "sos"
-	| "communication";
+	| "emergency"
+	| "communication"
+	| "disasters"
+	| "disaster-detail";
 
-// Demo 固定“现在地”（东京都厅附近）：demo 版不调用浏览器定位，
+// Demo 固定“现在地”（东京都新宿区西新宿六丁目8番付近）：demo 版不调用浏览器定位，
 // 保证候选列表始终命中新宿区数据快照。
-const DEMO_ORIGIN: GeoPoint = { latitude: 35.6896342, longitude: 139.6917418 };
+const DEMO_ORIGIN: GeoPoint = { latitude: 35.6931, longitude: 139.6887 };
 
 const DEMO_SHELTER_LIMIT = 5;
 
@@ -82,9 +89,11 @@ export function DemoApp({ initialLang }: DemoAppProps) {
 	const [locPermission, setLocPermission] = useState<"unknown" | "granted" | "denied">("unknown");
 	// 用户在候选列表中选择的避难设施（路线页的目的地）。
 	const [selectedShelter, setSelectedShelter] = useState<DemoShelterCandidate | null>(null);
+	// 灾害信息列表中选中的那条信息（详情页的数据源）。
+	const [selectedDisaster, setSelectedDisaster] = useState<DisasterInfoItem | null>(null);
 	const shelters = useDemoShelters();
-	// 选完语言后以弹窗形式询问位置许可；拒绝也能继续，只是改用默认位置。
-	const [locDialogOpen, setLocDialogOpen] = useState(false);
+	// 进入首页前先以弹窗形式询问位置许可；拒绝也能继续，只是改用默认位置。
+	const [locDialogOpen, setLocDialogOpen] = useState(true);
 	// 事象确认卡：灾害模式自动识别推荐地震并高亮，日常应急为手动选择。
 	const [eventChoice, setEventChoice] = useState("earthquake");
 	const [dailyChoice, setDailyChoice] = useState<string | null>(null);
@@ -125,34 +134,51 @@ export function DemoApp({ initialLang }: DemoAppProps) {
 		notify(WELCOME_COPY[next].toast);
 	}
 
-	function pickLanguage(next: string) {
-		if (next === "more") {
-			notify(t(lang, "更多语言将在后续版本开放"));
-			return;
-		}
-		const picked = next as DemoLang;
-		setLang(picked);
-		notify(WELCOME_COPY[picked].toast);
-		// 已允许过则直接进入下一页；否则（含之前拒绝过）弹窗询问位置许可。
-		if (locPermission === "granted") {
-			pushHistory();
-			setScreen("mode");
-		} else {
-			setLocDialogOpen(true);
-		}
+	// 首页主 CTA「查看现在应该做什么」：仅在获得定位许可后可用
+	//（按钮在未许可时是 disabled，这里的判断是兜底）。
+	function startGuide() {
+		if (locPermission !== "granted") return;
+		pushHistory();
+		setScreen("mode");
 	}
 
+	// 首页「紧急求助」：直达 119 / 110 求助画面，不经过定位询问。
+	function openEmergency() {
+		pushHistory();
+		setScreen("emergency");
+	}
+
+	// 首页「附近避难设施」磁贴：调用既有的避难所候选接口，复用同一列表画面。
+	function openFacilities() {
+		pushHistory();
+		setScreen("facilities");
+		searchShelters();
+	}
+
+	// 首页「灾害信息」磁贴：进入定位地点附近的灾害信息列表（demo 数据快照）。
+	function openDisasterInfo() {
+		pushHistory();
+		setScreen("disasters");
+	}
+
+	// 列表中点击某条信息：进入该条灾害信息的详情页。
+	function openDisasterDetail(item: DisasterInfoItem) {
+		pushHistory();
+		setSelectedDisaster(item);
+		setScreen("disaster-detail");
+	}
+
+	// 弹窗在首页出现，作答后留在首页，把获取到的位置显示在首页位置卡片里。
+	// 拒绝后不显示地址，位置相关功能（查看现在应该做什么等）不可用；
+	// 紧急求助和沟通卡不依赖位置，仍可使用。
 	function decideLocation(allow: boolean) {
 		setLocPermission(allow ? "granted" : "denied");
 		setLocDialogOpen(false);
 		if (allow) {
-			notify(t(lang, "已获取当前位置：东京市新宿区"));
+			notify(t(lang, "已获取当前位置：东京都新宿区西新宿六丁目8番"));
 		} else {
-			// 拒绝也要能走完全部流程：避难所检索本来就用写死的演示坐标。
-			notify(t(lang, "未获得定位权限，将使用默认位置提供参考"));
+			notify(t(lang, "未获得定位权限，位置相关功能不可用"));
 		}
-		pushHistory();
-		setScreen("mode");
 	}
 
 	// 进入“附近设施候选”页时用演示坐标请求 Demo 避难所列表。
@@ -224,11 +250,23 @@ export function DemoApp({ initialLang }: DemoAppProps) {
 		setCardIndex(0);
 		setHistory([]);
 		setSelectedShelter(null);
+		setSelectedDisaster(null);
 		setScreen("mode");
 	}
 
-	function selectEvent(value: string) {
-		setEventChoice(value);
+	// 紧急求助页的“返回主页”：清空状态回到首页（欢迎页）。
+	function goWelcome() {
+		setFlowPos(null);
+		setFlowAnswers({});
+		setCardIndex(0);
+		setHistory([]);
+		setSelectedShelter(null);
+		setSelectedDisaster(null);
+		setScreen("welcome");
+	}
+
+	// 事象确认页（new-ui ③）：点选只更新选中态，「确认并继续」才前进。
+	function confirmEvent(value: string) {
 		if (value !== "earthquake") {
 			notify(t(lang, "本版本先提供地震流程"));
 			return;
@@ -236,8 +274,7 @@ export function DemoApp({ initialLang }: DemoAppProps) {
 		startFlow("earthquake");
 	}
 
-	function selectDaily(value: string) {
-		setDailyChoice(value);
+	function confirmDaily(value: string) {
 		if (value !== "gas") {
 			notify(t(lang, "该应急类型即将开放"));
 			return;
@@ -271,8 +308,10 @@ export function DemoApp({ initialLang }: DemoAppProps) {
 	}
 
 	// 路线页“打开沟通卡”：沿导航节点的 next 前进，让流程真正走完。
+	// 从首页磁贴进入时没有流程上下文，直接打开沟通卡。
 	function proceedFromNavigate() {
 		if (flowPos && flowNode?.type === "navigation") advanceTo(flowPos.flowId, flowNode.next);
+		else openCommunication();
 	}
 
 	// SOS 页“有人靠近时，展示沟通卡”：沿 SOS 节点的 next 前进。
@@ -301,9 +340,9 @@ export function DemoApp({ initialLang }: DemoAppProps) {
 	const headerSub =
 		screen === "communication" ? HEADER_LABELS[lang].communication : HEADER_LABELS[lang].default;
 
-	// 许可后在语言页之外的页面顶部常驻显示获取到的位置。
+	// 许可后在首页和沟通卡之外的页面（含紧急求助）顶部常驻显示获取到的位置。
 	const showLocBar = locPermission === "granted" && !["welcome", "communication"].includes(screen);
-	const locText = `${t(lang, "东京市新宿区")} · ${t(lang, "仅本次使用")}`;
+	const locText = `${t(lang, "东京都新宿区西新宿六丁目8番")} · ${t(lang, "仅本次使用")}`;
 
 	return (
 		<div className="app-shell">
@@ -316,7 +355,16 @@ export function DemoApp({ initialLang }: DemoAppProps) {
 				/>
 				<main className="main">
 					{showLocBar && <div className="loc-bar">📍 {locText}</div>}
-					<WelcomeScreen active={screen === "welcome"} lang={lang} onPickLanguage={pickLanguage} />
+					<WelcomeScreen
+						active={screen === "welcome"}
+						lang={lang}
+						locPermission={locPermission}
+						onStart={startGuide}
+						onEmergency={openEmergency}
+						onOpenFacilities={openFacilities}
+						onOpenDisasterInfo={openDisasterInfo}
+						onRequestLocation={() => setLocDialogOpen(true)}
+					/>
 					<ModeScreen
 						active={screen === "mode"}
 						lang={lang}
@@ -328,10 +376,13 @@ export function DemoApp({ initialLang }: DemoAppProps) {
 						active={screen === "event"}
 						name="event"
 						lang={lang}
-						lead="系统根据公开信息推荐“地震”，请你确认。"
+						title="根据公开信息，可能发生了地震"
+						lead="以下是系统根据公开灾害信息的建议，请结合现场情况确认。"
+						showDataSources
 						choices={EVENT_CHOICES}
 						selected={eventChoice}
-						onSelect={selectEvent}
+						onSelect={setEventChoice}
+						onConfirm={confirmEvent}
 						onBack={() => setScreen("mode")}
 					/>
 					<EventChoiceScreen
@@ -341,7 +392,8 @@ export function DemoApp({ initialLang }: DemoAppProps) {
 						lead="请手动选择日常应急类型。"
 						choices={DAILY_CHOICES}
 						selected={dailyChoice}
-						onSelect={selectDaily}
+						onSelect={setDailyChoice}
+						onConfirm={confirmDaily}
 						onBack={() => setScreen("mode")}
 					/>
 					<FlowScreen
@@ -360,7 +412,9 @@ export function DemoApp({ initialLang }: DemoAppProps) {
 						active={screen === "shelter"}
 						lang={lang}
 						locationLabel={
-							locPermission === "granted" ? locText : t(lang, "東京都新宿区附近 · 仅本次使用")
+							locPermission === "granted"
+								? locText
+								: t(lang, "東京都新宿区西新宿六丁目8番附近 · 仅本次使用")
 						}
 						onAnswer={answerEvacuation}
 						onBack={goBack}
@@ -386,6 +440,19 @@ export function DemoApp({ initialLang }: DemoAppProps) {
 						active={screen === "sos"}
 						lang={lang}
 						onShowCommunication={proceedFromSos}
+						onBack={goBack}
+					/>
+					<EmergencyScreen active={screen === "emergency"} lang={lang} onHome={goWelcome} />
+					<DisasterListScreen
+						active={screen === "disasters"}
+						lang={lang}
+						onOpenDetail={openDisasterDetail}
+						onBack={goBack}
+					/>
+					<DisasterDetailScreen
+						active={screen === "disaster-detail"}
+						lang={lang}
+						item={selectedDisaster}
 						onBack={goBack}
 					/>
 					<CommunicationScreen

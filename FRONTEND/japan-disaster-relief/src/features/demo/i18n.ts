@@ -29,46 +29,29 @@ export function parseAcceptLanguage(header: string | null): string[] {
 }
 
 export interface WelcomeCopy {
-	sub: string;
 	title: string;
 	lead: string;
 	prompt: string;
-	locTitle: string;
-	locCopy: string;
-	privacy: string;
 	toast: string;
 }
 
 export const WELCOME_COPY: Record<DemoLang, WelcomeCopy> = {
 	zh: {
-		sub: "灾后下一步行动",
-		title: "紧急时，先完成正确的下一步",
-		lead: "为在东京生活或短期停留的外国人优先设计，任何人都能使用。",
+		title: "紧急时，从正确的下一步开始",
+		lead: "为在东京生活和滞在的外国人提供母语的灾害行动指引。",
 		prompt: "请选择界面语言",
-		locTitle: "位置仅用于本次匹配",
-		locCopy: "用于确认所在区和附近设施，不保存精确位置历史。",
-		privacy: "无需注册 · 不收集姓名、住址或在留资格",
 		toast: "已切换为中文",
 	},
 	en: {
-		sub: "Your next step after a disaster",
-		title: "In an emergency, take the right next step first",
-		lead: "Designed primarily for foreign residents and visitors in Tokyo, and available to everyone.",
+		title: "In an emergency, start with the right next step",
+		lead: "Disaster action guidance in your own language, for foreign residents and visitors in Tokyo.",
 		prompt: "Choose your interface language",
-		locTitle: "Location is used only for this session",
-		locCopy:
-			"Used to identify your area and nearby facilities. Precise location history is not saved.",
-		privacy: "No registration · No name, address, or residence status collected",
 		toast: "Language changed to English",
 	},
 	ja: {
-		sub: "災害後の次の行動",
 		title: "緊急時は、正しい次の一歩から",
-		lead: "東京で暮らす・滞在する外国人を優先して設計し、誰でも利用できます。",
+		lead: "東京で暮らす・滞在する外国人に、母語での災害行動ガイドを提供します。",
 		prompt: "表示言語を選択してください",
-		locTitle: "位置情報は今回の照合にのみ使用",
-		locCopy: "現在地の区市町村と近隣施設の確認に使用し、正確な位置履歴は保存しません。",
-		privacy: "登録不要 · 氏名、住所、在留資格は収集しません",
 		toast: "日本語に切り替えました",
 	},
 };
@@ -126,9 +109,27 @@ export const PHRASE_TEXT: Record<DemoLang, string[]> = {
 export const FULL_I18N: Record<"en" | "ja", Record<string, string>> = {
 	en: {
 		选择模式: "CHOOSE MODE",
-		更多语言: "More languages",
-		更多语言将在后续版本开放: "More languages will be available in a future version",
 		本版本先提供地震流程: "This version provides the earthquake flow first",
+		// Home screen (redesigned per DOCS/new-ui.png ①)
+		查看现在应该做什么: "See what to do now",
+		帮助您做出正确的下一步判断: "Helps you decide the right next step",
+		"灾害・急病・事故・危险情况时使用": "For disasters, sudden illness, accidents, or danger",
+		附近避难设施: "Nearby shelters",
+		查看最近的避难设施: "Find the closest evacuation facilities",
+		灾害信息: "Disaster info",
+		获取最新灾害通知: "Get the latest disaster notices",
+		"无需注册 · 不收集个人信息": "No registration · No personal data collected",
+		"位置信息仅用于本次查询，不会被保存。":
+			"Location is used only for this search and is not saved.",
+		"定位精度：大致位置": "Location accuracy: approximate",
+		"正在获取当前位置…": "Acquiring current location…",
+		// Emergency help screen (DOCS/new-ui.png ⑦)
+		"如果遇到危险，请立即求助": "If you are in danger, call for help immediately",
+		"火灾・救护・急病": "Fire / Ambulance / Sudden illness",
+		"拨打 110": "Call 110",
+		"警察・犯罪・纠纷・危险人物": "Police / Crime / Disputes / Dangerous person",
+		"确保自身安全后再拨打电话。尽量在安全地点使用。":
+			"Make sure you are safe before calling. Use from a safe place whenever possible.",
 		该应急类型即将开放: "This emergency type will be available soon",
 		当前浏览器不支持朗读: "This browser does not support speech playback",
 		沟通卡: "Communication card",
@@ -144,6 +145,17 @@ export const FULL_I18N: Record<"en" | "ja", Record<string, string>> = {
 		日常应急: "Everyday emergency",
 		"系统根据公开信息推荐“地震”，请你确认。":
 			"Based on public information, the system suggests “Earthquake.” Please confirm.",
+		// Event-confirmation data-source card (DOCS/new-ui.png ③)
+		"根据公开信息，可能发生了地震": "Based on public information, an earthquake may have occurred",
+		"以下是系统根据公开灾害信息的建议，请结合现场情况确认。":
+			"The suggestion below is based on public disaster information. Please confirm it against the actual situation on site.",
+		数据来源: "Data sources",
+		"日本气象厅、东京都防灾信息、内阁府防灾信息 等":
+			"Japan Meteorological Agency, Tokyo Metropolitan disaster information, Cabinet Office disaster information, etc.",
+		更新时间: "Updated",
+		"此信息仅供参考，请以实际情况为准。":
+			"This information is for reference only. Follow the actual situation on site.",
+		确认并继续: "Confirm and continue",
 		地震: "Earthquake",
 		"系统推荐 · 请确认": "Suggested by system · Please confirm",
 		火灾: "Fire",
@@ -165,7 +177,8 @@ export const FULL_I18N: Record<"en" | "ja", Record<string, string>> = {
 		"“附近”不代表安全；“数据中存在”不代表现在开放；路线是否可通行需要现场确认。":
 			"“Nearby” does not mean safe. Being listed in the data does not mean the facility is currently open. Route accessibility must be checked on site.",
 		当前位置: "Current location",
-		"東京都新宿区附近 · 仅本次使用": "Near Shinjuku City, Tokyo · Used only for this session",
+		"東京都新宿区西新宿六丁目8番附近 · 仅本次使用":
+			"Near Nishi-Shinjuku 6-8, Shinjuku City, Tokyo · Used only for this session",
 		暂时不需要: "Not now",
 		附近设施候选: "Nearby facility candidates",
 		打开沟通卡: "Open communication card",
@@ -279,11 +292,88 @@ export const FULL_I18N: Record<"en" | "ja", Record<string, string>> = {
 			"Used to identify your area and nearby evacuation facilities. Used only for this session; location history is not saved.",
 		允许获取位置: "Allow location access",
 		不允许: "Don't allow",
-		"已获取当前位置：东京市新宿区": "Location acquired: Shinjuku, Tokyo",
-		"未获得定位权限，将使用默认位置提供参考":
-			"Location permission was not granted. A default location will be used for reference.",
-		东京市新宿区: "Shinjuku, Tokyo",
+		"已获取当前位置：东京都新宿区西新宿六丁目8番":
+			"Location acquired: Nishi-Shinjuku 6-8, Shinjuku City, Tokyo",
+		"未获得定位权限，位置相关功能不可用":
+			"Location permission was not granted. Location-based features are unavailable.",
+		未获得定位权限: "Location permission not granted",
+		"允许定位后才能使用位置相关功能。": "Allow location access to use location-based features.",
+		东京都新宿区西新宿六丁目8番: "Nishi-Shinjuku 6-8, Shinjuku City, Tokyo",
 		仅本次使用: "This session only",
+		// Disaster info list & detail (home tile → nearby disaster info snapshot)
+		当前位置附近的灾害信息: "Disaster information near your location",
+		"以下是根据本次位置整理的公开灾害信息，点击查看详情。":
+			"Public disaster information for this session's location. Tap an item for details.",
+		"新宿区当前没有生效的警报・注意报":
+			"No warnings or advisories are currently in effect for Shinjuku City",
+		"2026年8月8日 10:01 气象厅发表":
+			"Issued by the Japan Meteorological Agency, Aug 8, 2026, 10:01",
+		"非实时信息。请以官方最新发布为准。":
+			"Not real-time information. Always follow the latest official announcements.",
+		详细信息: "Details",
+		建议行动: "Recommended actions",
+		发表时间: "Issued at",
+		发表机关: "Issued by",
+		对象地域: "Target area",
+		// Heatstroke Warning Alert (issued for Tokyo on Aug 7, 2026)
+		高温: "Heat",
+		"中暑警戒警报（东京地方）": "Heatstroke Warning Alert (Tokyo area)",
+		"2026年8月7日 05:00 发表": "Issued Aug 7, 2026, 05:00",
+		"环境省・气象厅": "Ministry of the Environment / Japan Meteorological Agency",
+		"预计将出现危害健康的显著高温，请注意防暑降温、及时补水。":
+			"Dangerously high temperatures are expected. Guard against heatstroke and stay hydrated.",
+		"环境省和气象厅向东京都发布了中暑警戒警报。气温将显著升高，可能对健康造成危害，请采取防暑措施。":
+			"The Ministry of the Environment and the Japan Meteorological Agency have issued a Heatstroke Warning Alert for Tokyo. Temperatures will be significantly high and may harm your health. Take precautions against the heat.",
+		"东京地方（含新宿区）": "Tokyo area (including Shinjuku City)",
+		"2026年8月7日 05:00": "Aug 7, 2026, 05:00",
+		"在室内适当使用空调，保持凉爽环境。":
+			"Use air conditioning appropriately indoors and stay in a cool environment.",
+		"尽量减少外出，避免长时间在烈日下活动。":
+			"Go outside as little as possible and avoid long activity under the strong sun.",
+		"勤补充水分和盐分，注意休息。": "Take in water and salt frequently, and rest often.",
+		"多留意老人、儿童等不易察觉中暑人群的状况。":
+			"Check often on older people, children, and others who may not notice heatstroke symptoms.",
+		// Earthquake information (Tokyo 23 wards, Aug 5, 2026, M3.5)
+		"震源・震度信息：东京都23区": "Earthquake information: Tokyo 23 wards",
+		"2026年8月5日 18:06 左右发生": "Occurred around 18:06, Aug 5, 2026",
+		气象厅: "Japan Meteorological Agency",
+		"东京都23区发生 M3.5 地震，最大震度1，无海啸风险。":
+			"An M3.5 earthquake occurred in Tokyo's 23 wards. Maximum intensity 1; no tsunami risk.",
+		"气象厅发布的震源・震度信息：8月5日傍晚，东京都23区发生了 M3.5 的地震。此次地震震度较小，无海啸风险。":
+			"Epicenter and intensity information from the JMA: on the evening of August 5, an M3.5 earthquake occurred in Tokyo's 23 wards. The shaking was minor and there is no tsunami risk.",
+		发生时刻: "Time of occurrence",
+		"2026年8月5日 18:06 左右": "Around 18:06, Aug 5, 2026",
+		震源地: "Epicenter",
+		东京都23区: "Tokyo 23 wards",
+		规模: "Magnitude",
+		"M3.5": "M3.5",
+		震源深度: "Depth",
+		约120公里: "About 120 km",
+		最大震度: "Maximum intensity",
+		"震度1（栃木县宇都宫市）": "Intensity 1 (Utsunomiya, Tochigi)",
+		海啸: "Tsunami",
+		无海啸风险: "No tsunami risk",
+		"此次地震震度较小，通常无需特别行动。":
+			"The shaking was minor; usually no special action is needed.",
+		"如再次感到摇晃，先保护头部，远离可能坠落的物品。":
+			"If you feel shaking again, protect your head first and stay away from objects that could fall.",
+		"留意气象厅的后续发布。": "Keep an eye on further announcements from the JMA.",
+		// Thunderstorm advisory (Western Tama, issued Aug 8, 2026)
+		气象: "Weather",
+		"雷注意报（东京都多摩西部）": "Thunderstorm advisory (Western Tama, Tokyo)",
+		"2026年8月8日 10:01 发表": "Issued Aug 8, 2026, 10:01",
+		"多摩西部发布了雷注意报；东京23区（含新宿区）目前没有警报・注意报。":
+			"A thunderstorm advisory is in effect for Western Tama. No warnings or advisories for Tokyo's 23 wards (including Shinjuku).",
+		"气象厅向东京都多摩西部（青梅市、あきる野市等）发布了雷注意报。您所在的东京23区（含新宿区）目前没有生效的警报・注意报，但天气可能突变，请留意天空变化。":
+			"The JMA has issued a thunderstorm advisory for Western Tama in Tokyo (Ome, Akiruno, and nearby cities). No warnings or advisories are in effect for Tokyo's 23 wards (including Shinjuku), but the weather can change suddenly — keep an eye on the sky.",
+		东京都多摩西部: "Western Tama, Tokyo",
+		"23区（含新宿区）": "Tokyo 23 wards (incl. Shinjuku)",
+		"无警报・注意报": "No warnings or advisories",
+		"2026年8月8日 10:01": "Aug 8, 2026, 10:01",
+		"天气突变时，警惕雷电和局部强降雨。":
+			"If the weather changes suddenly, watch out for lightning and localized heavy rain.",
+		"听到雷声时，远离空旷场地和大树，进入牢固的建筑物内。":
+			"When you hear thunder, stay away from open ground and tall trees, and move inside a sturdy building.",
 		// Demo shelter candidates & route reference
 		"正在获取附近的避难所候选…": "Loading nearby shelter candidates…",
 		"根据本次位置查询官方开放数据快照。":
@@ -310,9 +400,27 @@ export const FULL_I18N: Record<"en" | "ja", Record<string, string>> = {
 	},
 	ja: {
 		选择模式: "モードを選択",
-		更多语言: "その他の言語",
-		更多语言将在后续版本开放: "その他の言語は今後のバージョンで対応予定です",
 		本版本先提供地震流程: "このバージョンではまず地震のフローを提供します",
+		// Home screen (redesigned per DOCS/new-ui.png ①)
+		查看现在应该做什么: "今すべきことを確認",
+		帮助您做出正确的下一步判断: "正しい次の一歩の判断をサポートします",
+		"灾害・急病・事故・危险情况时使用": "災害・急病・事故・危険なときに使用",
+		附近避难设施: "近くの避難施設",
+		查看最近的避难设施: "最寄りの避難施設を確認",
+		灾害信息: "災害情報",
+		获取最新灾害通知: "最新の災害情報を取得",
+		"无需注册 · 不收集个人信息": "登録不要 · 個人情報は収集しません",
+		"位置信息仅用于本次查询，不会被保存。":
+			"位置情報は今回の検索のみに使用し、保存されません。",
+		"定位精度：大致位置": "位置精度：おおよその位置",
+		"正在获取当前位置…": "現在地を取得しています…",
+		// Emergency help screen (DOCS/new-ui.png ⑦)
+		"如果遇到危险，请立即求助": "危険なときは、すぐに助けを求めてください",
+		"火灾・救护・急病": "火事・救急・急病",
+		"拨打 110": "110番に電話する",
+		"警察・犯罪・纠纷・危险人物": "警察・犯罪・トラブル・不審者",
+		"确保自身安全后再拨打电话。尽量在安全地点使用。":
+			"自身の安全を確保してから電話してください。できるだけ安全な場所で使用してください。",
 		该应急类型即将开放: "この緊急タイプは近日対応予定です",
 		当前浏览器不支持朗读: "このブラウザは読み上げに対応していません",
 		沟通卡: "コミュニケーションカード",
@@ -327,6 +435,17 @@ export const FULL_I18N: Record<"en" | "ja", Record<string, string>> = {
 		日常应急: "日常の緊急時",
 		"系统根据公开信息推荐“地震”，请你确认。":
 			"公開情報に基づき「地震」が候補です。確認してください。",
+		// Event-confirmation data-source card (DOCS/new-ui.png ③)
+		"根据公开信息，可能发生了地震": "公開情報によると、地震が発生した可能性があります",
+		"以下是系统根据公开灾害信息的建议，请结合现场情况确认。":
+			"以下は公開されている災害情報に基づく候補です。現場の状況と合わせて確認してください。",
+		数据来源: "データ出典",
+		"日本气象厅、东京都防灾信息、内阁府防灾信息 等":
+			"気象庁、東京都防災情報、内閣府防災情報 など",
+		更新时间: "更新時刻",
+		"此信息仅供参考，请以实际情况为准。":
+			"この情報は参考情報です。実際の状況を優先してください。",
+		确认并继续: "確認して続行",
 		地震: "地震",
 		"系统推荐 · 请确认": "システム候補 · 確認してください",
 		火灾: "火災",
@@ -347,7 +466,7 @@ export const FULL_I18N: Record<"en" | "ja", Record<string, string>> = {
 		"“附近”不代表安全；“数据中存在”不代表现在开放；路线是否可通行需要现场确认。":
 			"「近い」ことは安全を意味しません。データに載っていても現在開設中とは限りません。経路が通行可能かは現場で確認してください。",
 		当前位置: "現在地",
-		"東京都新宿区附近 · 仅本次使用": "東京都新宿区付近 · 今回のみ使用",
+		"東京都新宿区西新宿六丁目8番附近 · 仅本次使用": "東京都新宿区西新宿六丁目8番付近 · 今回のみ使用",
 		暂时不需要: "今は必要ありません",
 		附近设施候选: "近くの施設候補",
 		打开沟通卡: "コミュニケーションカードを開く",
@@ -461,11 +580,87 @@ export const FULL_I18N: Record<"en" | "ja", Record<string, string>> = {
 			"現在地の区市町村と近隣の避難施設の確認に使用します。今回のみ使用し、位置履歴は保存しません。",
 		允许获取位置: "位置情報を許可する",
 		不允许: "許可しない",
-		"已获取当前位置：东京市新宿区": "現在地を取得しました：東京都新宿区",
-		"未获得定位权限，将使用默认位置提供参考":
-			"位置情報の許可がないため、既定の位置を参考として使用します。",
-		东京市新宿区: "東京都新宿区",
+		"已获取当前位置：东京都新宿区西新宿六丁目8番":
+			"現在地を取得しました：東京都新宿区西新宿六丁目8番",
+		"未获得定位权限，位置相关功能不可用":
+			"位置情報の許可がないため、位置情報を利用する機能は使用できません。",
+		未获得定位权限: "位置情報が許可されていません",
+		"允许定位后才能使用位置相关功能。":
+			"位置情報を許可すると、位置情報を利用する機能が使えます。",
+		东京都新宿区西新宿六丁目8番: "東京都新宿区西新宿六丁目8番",
 		仅本次使用: "今回のみ使用",
+		// Disaster info list & detail (home tile → nearby disaster info snapshot)
+		当前位置附近的灾害信息: "現在地周辺の災害情報",
+		"以下是根据本次位置整理的公开灾害信息，点击查看详情。":
+			"今回の位置情報をもとに整理した公開災害情報です。タップすると詳細を表示します。",
+		"新宿区当前没有生效的警报・注意报": "新宿区には現在、警報・注意報は発表されていません",
+		"2026年8月8日 10:01 气象厅发表": "2026年8月8日 10:01 気象庁発表",
+		"非实时信息。请以官方最新发布为准。":
+			"リアルタイム情報ではありません。最新の公式発表を優先してください。",
+		详细信息: "詳細情報",
+		建议行动: "推奨される行動",
+		发表时间: "発表時刻",
+		发表机关: "発表機関",
+		对象地域: "対象地域",
+		// Heatstroke Warning Alert (issued for Tokyo on Aug 7, 2026)
+		高温: "高温",
+		"中暑警戒警报（东京地方）": "熱中症警戒アラート（東京地方）",
+		"2026年8月7日 05:00 发表": "2026年8月7日 05:00 発表",
+		"环境省・气象厅": "環境省・気象庁",
+		"预计将出现危害健康的显著高温，请注意防暑降温、及时补水。":
+			"健康に影響が出るおそれのある危険な暑さが予想されます。暑さ対策と水分補給を心がけてください。",
+		"环境省和气象厅向东京都发布了中暑警戒警报。气温将显著升高，可能对健康造成危害，请采取防暑措施。":
+			"環境省と気象庁は東京都に熱中症警戒アラートを発表しました。気温が著しく高くなり、健康被害が生じるおそれがあります。暑さへの対策をとってください。",
+		"东京地方（含新宿区）": "東京地方（新宿区を含む）",
+		"2026年8月7日 05:00": "2026年8月7日 05:00",
+		"在室内适当使用空调，保持凉爽环境。":
+			"屋内ではエアコンを適切に使用し、涼しい環境で過ごしてください。",
+		"尽量减少外出，避免长时间在烈日下活动。":
+			"外出はできるだけ控え、炎天下での長時間の活動は避けてください。",
+		"勤补充水分和盐分，注意休息。": "こまめに水分・塩分を補給し、休憩をとってください。",
+		"多留意老人、儿童等不易察觉中暑人群的状况。":
+			"高齢者や子どもなど、熱中症に気づきにくい人の様子に気を配ってください。",
+		// Earthquake information (Tokyo 23 wards, Aug 5, 2026, M3.5)
+		"震源・震度信息：东京都23区": "震源・震度情報：東京都23区",
+		"2026年8月5日 18:06 左右发生": "2026年8月5日 18時06分ごろ発生",
+		气象厅: "気象庁",
+		"东京都23区发生 M3.5 地震，最大震度1，无海啸风险。":
+			"東京都23区で M3.5 の地震が発生しました。最大震度1、津波の心配はありません。",
+		"气象厅发布的震源・震度信息：8月5日傍晚，东京都23区发生了 M3.5 的地震。此次地震震度较小，无海啸风险。":
+			"気象庁発表の震源・震度情報：8月5日夕方、東京都23区で M3.5 の地震が発生しました。揺れは小さく、津波の心配はありません。",
+		发生时刻: "発生時刻",
+		"2026年8月5日 18:06 左右": "2026年8月5日 18時06分ごろ",
+		震源地: "震源地",
+		东京都23区: "東京都23区",
+		规模: "マグニチュード",
+		"M3.5": "M3.5",
+		震源深度: "震源の深さ",
+		约120公里: "約120km",
+		最大震度: "最大震度",
+		"震度1（栃木县宇都宫市）": "震度1（栃木県宇都宮市）",
+		海啸: "津波",
+		无海啸风险: "津波の心配はありません",
+		"此次地震震度较小，通常无需特别行动。":
+			"今回の揺れは小さく、通常は特別な行動は必要ありません。",
+		"如再次感到摇晃，先保护头部，远离可能坠落的物品。":
+			"再び揺れを感じたら、まず頭を守り、落下しそうな物から離れてください。",
+		"留意气象厅的后续发布。": "気象庁の続報に注意してください。",
+		// Thunderstorm advisory (Western Tama, issued Aug 8, 2026)
+		气象: "気象",
+		"雷注意报（东京都多摩西部）": "雷注意報（東京都多摩西部）",
+		"2026年8月8日 10:01 发表": "2026年8月8日 10:01 発表",
+		"多摩西部发布了雷注意报；东京23区（含新宿区）目前没有警报・注意报。":
+			"多摩西部に雷注意報が発表されています。東京23区（新宿区を含む）には警報・注意報はありません。",
+		"气象厅向东京都多摩西部（青梅市、あきる野市等）发布了雷注意报。您所在的东京23区（含新宿区）目前没有生效的警报・注意报，但天气可能突变，请留意天空变化。":
+			"気象庁は東京都多摩西部（青梅市・あきる野市など）に雷注意報を発表しました。東京23区（新宿区を含む）には現在、警報・注意報は発表されていませんが、天気が急変するおそれがあるため、空の変化に注意してください。",
+		东京都多摩西部: "東京都多摩西部",
+		"23区（含新宿区）": "23区（新宿区を含む）",
+		"无警报・注意报": "警報・注意報なし",
+		"2026年8月8日 10:01": "2026年8月8日 10:01",
+		"天气突变时，警惕雷电和局部强降雨。":
+			"天気が急変したときは、落雷や局地的な激しい雨に注意してください。",
+		"听到雷声时，远离空旷场地和大树，进入牢固的建筑物内。":
+			"雷の音が聞こえたら、開けた場所や高い木から離れ、頑丈な建物の中に入ってください。",
 		// Demo shelter candidates & route reference
 		"正在获取附近的避难所候选…": "近くの避難所候補を取得しています…",
 		"根据本次位置查询官方开放数据快照。":

@@ -9,6 +9,7 @@ import {
 	resolveOption,
 	validateFlow,
 } from "./flows";
+import { DISASTER_INFO_ITEMS } from "./disaster-info";
 import { FULL_I18N, PHRASES, PHRASE_TEXT } from "./i18n";
 
 function question(flow: Flow, id: string) {
@@ -241,11 +242,66 @@ const STATIC_SCREEN_KEYS = [
 	"有人靠近时，展示沟通卡",
 	"到达后或需要求助时，向身边的人展示。",
 	"拨打 119",
-	"未获得定位权限，将使用默认位置提供参考",
+	// 首页（new-ui ①）
+	"查看现在应该做什么",
+	"帮助您做出正确的下一步判断",
+	"灾害・急病・事故・危险情况时使用",
+	"附近避难设施",
+	"查看最近的避难设施",
+	"灾害信息",
+	"获取最新灾害通知",
+	"无需注册 · 不收集个人信息",
+	"位置信息仅用于本次查询，不会被保存。",
+	"定位精度：大致位置",
+	"正在获取当前位置…",
+	"未获得定位权限",
+	"允许定位后才能使用位置相关功能。",
+	"未获得定位权限，位置相关功能不可用",
+	"允许获取位置",
+	"已获取当前位置：东京都新宿区西新宿六丁目8番",
+	"东京都新宿区西新宿六丁目8番",
+	"東京都新宿区西新宿六丁目8番附近 · 仅本次使用",
+	// 灾害信息列表 + 详情
+	"当前位置附近的灾害信息",
+	"以下是根据本次位置整理的公开灾害信息，点击查看详情。",
+	"新宿区当前没有生效的警报・注意报",
+	"2026年8月8日 10:01 气象厅发表",
+	"非实时信息。请以官方最新发布为准。",
+	"详细信息",
+	"建议行动",
+	"发表机关",
+	// 事象确认页数据来源卡（new-ui ③）
+	"根据公开信息，可能发生了地震",
+	"以下是系统根据公开灾害信息的建议，请结合现场情况确认。",
+	"数据来源",
+	"日本气象厅、东京都防灾信息、内阁府防灾信息 等",
+	"更新时间",
+	"此信息仅供参考，请以实际情况为准。",
+	"确认并继续",
+	// 紧急求助（new-ui ⑦）
+	"如果遇到危险，请立即求助",
+	"火灾・救护・急病",
+	"拨打 110",
+	"警察・犯罪・纠纷・危险人物",
+	"确保自身安全后再拨打电话。尽量在安全地点使用。",
 ];
 
 describe("flow i18n coverage", () => {
 	const strings = new Set<string>(STATIC_SCREEN_KEYS);
+	// 灾害信息 demo 数据的所有文案同样以中文为键，一并检查覆盖。
+	for (const item of DISASTER_INFO_ITEMS) {
+		strings.add(item.category);
+		strings.add(item.title);
+		strings.add(item.issuedAt);
+		strings.add(item.source);
+		strings.add(item.summary);
+		strings.add(item.lead);
+		for (const [label, value] of item.facts) {
+			strings.add(label);
+			strings.add(value);
+		}
+		for (const advice of item.advice) strings.add(advice);
+	}
 	for (const flow of Object.values(FLOWS)) {
 		for (const node of Object.values(flow.nodes)) {
 			if (node.type === "question") {
