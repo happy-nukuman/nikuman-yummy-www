@@ -13,7 +13,7 @@ export type TranslationResponse = {
 	translatedText: string;
 	sourceLanguage: TranslationSourceLanguage;
 	targetLanguage: TranslationLanguage;
-	provider: "gemini";
+	provider: "workers-ai" | "gemini";
 	model: string;
 };
 

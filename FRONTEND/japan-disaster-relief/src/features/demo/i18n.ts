@@ -78,6 +78,23 @@ export const PHRASES: ReadonlyArray<readonly [string[], string, string]> = [
 	],
 ];
 
+// 日本人回应外国人用的固定短句：[日语原文, 中文译文, 英文译文]。
+// 原文和译文都是审核过的固定文案，不经过翻译接口。
+export const REPLY_PHRASES: ReadonlyArray<readonly [string, string, string]> = [
+	["わかりました。", "明白了。", "Understood."],
+	["大丈夫ですか？", "您还好吗？", "Are you okay?"],
+	["少々お待ちください。", "请稍等一下。", "Please wait a moment."],
+	["ついてきてください。", "请跟我来。", "Please follow me."],
+	["避難所まで案内します。", "我带您去避难所。", "I will take you to the evacuation shelter."],
+	["救急車を呼びました。", "已经叫了救护车。", "An ambulance has been called."],
+];
+
+/** 按界面语言取日方固定回应的译文（ja 界面直接显示日语原文）。 */
+export function replyPhraseTranslation(lang: DemoLang, index: number): string {
+	const [ja, zh, en] = REPLY_PHRASES[index];
+	return lang === "zh" ? zh : lang === "en" ? en : ja;
+}
+
 export const PHRASE_TEXT: Record<DemoLang, string[]> = {
 	zh: [
 		"请告诉我避难地点。",
@@ -186,13 +203,25 @@ export const FULL_I18N: Record<"en" | "ja", Record<string, string>> = {
 		打开沟通卡: "Open communication card",
 		请把屏幕给对方看: "Show this screen to the other person",
 		"🔊 朗读日语": "🔊 Speak Japanese",
-		切换其他沟通卡: "Switch phrase",
-		选择要展示的沟通卡: "Choose a card to show",
-		收起列表: "Hide list",
+		"⏹ 停止": "⏹ Stop",
+		"点选下方常用沟通卡，或输入文字，系统会翻译成日语展示给对方。":
+			"Tap a common phrase below, or type your own words — they will be translated into Japanese to show the other person.",
+		常用沟通卡: "Common phrases",
+		"输入想说的话，翻译成日语": "Type what you want to say…",
+		发送: "Send",
+		我说: "Me",
+		语音输入: "Voice input",
+		"聆听中…": "Listening…",
+		当前浏览器不支持语音输入: "This browser does not support voice input",
+		未获得麦克风权限: "Microphone permission was not granted",
+		"语音识别失败，请重试": "Voice recognition failed. Please try again.",
+		固定审核翻译: "Reviewed fixed translation",
+		"AI 翻译 · 仅供参考": "AI translation · For reference only",
+		"翻译中…": "Translating…",
+		翻译失败: "Translation failed",
 		返回: "Back",
 		返回上一步: "Back to previous step",
 		返回主页: "Back to home",
-		"固定审核翻译 · 核心功能不依赖 AI": "Reviewed fixed translations · Core functions do not depend on AI",
 		当前服务受限: "Service currently limited",
 		"无法获取最新设施数据。请确认现场广播、工作人员和官方信息。":
 			"The latest facility data could not be retrieved. Check on-site announcements, staff instructions, and official information.",
@@ -476,13 +505,25 @@ export const FULL_I18N: Record<"en" | "ja", Record<string, string>> = {
 		打开沟通卡: "コミュニケーションカードを開く",
 		请把屏幕给对方看: "相手にこの画面を見せてください",
 		"🔊 朗读日语": "🔊 日本語を読み上げる",
-		切换其他沟通卡: "別のカードに切り替える",
-		选择要展示的沟通卡: "表示するカードを選択",
-		收起列表: "リストを閉じる",
+		"⏹ 停止": "⏹ 停止",
+		"点选下方常用沟通卡，或输入文字，系统会翻译成日语展示给对方。":
+			"下のよく使うフレーズを選ぶか、伝えたいことを入力してください。日本語に翻訳して相手に表示します。",
+		常用沟通卡: "よく使うフレーズ",
+		"输入想说的话，翻译成日语": "伝えたいことを入力…",
+		发送: "送信",
+		我说: "自分",
+		语音输入: "音声入力",
+		"聆听中…": "聞き取り中…",
+		当前浏览器不支持语音输入: "このブラウザは音声入力に対応していません",
+		未获得麦克风权限: "マイクの使用が許可されていません",
+		"语音识别失败，请重试": "音声認識に失敗しました。もう一度お試しください。",
+		固定审核翻译: "確認済みの固定翻訳",
+		"AI 翻译 · 仅供参考": "AI翻訳 · 参考情報",
+		"翻译中…": "翻訳中…",
+		翻译失败: "翻訳に失敗しました",
 		返回: "戻る",
 		返回上一步: "前のステップに戻る",
 		返回主页: "ホームに戻る",
-		"固定审核翻译 · 核心功能不依赖 AI": "確認済み固定翻訳 · コア機能はAIに依存しません",
 		当前服务受限: "現在サービスが制限されています",
 		"无法获取最新设施数据。请确认现场广播、工作人员和官方信息。":
 			"最新の施設データを取得できません。現場放送、係員、公式情報を確認してください。",

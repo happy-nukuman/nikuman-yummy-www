@@ -5,7 +5,7 @@ import type { DemoShelterCandidate } from "@nikuman-yummy/shared";
 import type { GeoPoint } from "@/lib/geo/calculate-distance";
 import type { DisasterInfoItem } from "@/features/demo/disaster-info";
 import { useDemoShelters } from "@/features/shelter/hooks/use-demo-shelters";
-import { type DemoLang, HEADER_LABELS, PHRASES, t, WELCOME_COPY } from "@/features/demo/i18n";
+import { type DemoLang, HEADER_LABELS, t, WELCOME_COPY } from "@/features/demo/i18n";
 import { FLOWS, type FlowId, getNode, resolveOption } from "@/features/demo/flows";
 import { useToast } from "@/features/demo/hooks/use-toast";
 import { TopBar } from "@/features/demo/components/top-bar";
@@ -100,8 +100,6 @@ export function DemoApp({ initialLang }: DemoAppProps) {
 	const [flowPos, setFlowPos] = useState<FlowPosition | null>(null);
 	const [flowAnswers, setFlowAnswers] = useState<Record<string, string>>({});
 	const [cardIndex, setCardIndex] = useState(0);
-	const [phrase, setPhrase] = useState(0);
-	const [phrasePickerOpen, setPhrasePickerOpen] = useState(false);
 	const [history, setHistory] = useState<NavSnapshot[]>([]);
 	const { toast, notify } = useToast();
 
@@ -199,7 +197,6 @@ export function DemoApp({ initialLang }: DemoAppProps) {
 
 	// 只负责切到沟通卡画面，压栈由调用方决定。
 	function showCommunication() {
-		setPhrasePickerOpen(false);
 		setScreen("communication");
 	}
 
@@ -317,24 +314,6 @@ export function DemoApp({ initialLang }: DemoAppProps) {
 	// SOS 页“有人靠近时，展示沟通卡”：沿 SOS 节点的 next 前进。
 	function proceedFromSos() {
 		if (flowPos && flowNode?.type === "sos") advanceTo(flowPos.flowId, flowNode.next);
-	}
-
-	// 选择后保持列表展开：立即收起会让整页高度骤变、滚动位置跳回顶部，看起来像重新加载了页面。
-	function pickPhrase(index: number) {
-		if ("speechSynthesis" in window) speechSynthesis.cancel();
-		setPhrase(index);
-		window.scrollTo({ top: 0, behavior: "smooth" });
-	}
-
-	function speak() {
-		if ("speechSynthesis" in window) {
-			speechSynthesis.cancel();
-			const utterance = new SpeechSynthesisUtterance(PHRASES[phrase][2]);
-			utterance.lang = "ja-JP";
-			speechSynthesis.speak(utterance);
-		} else {
-			notify(t(lang, "当前浏览器不支持朗读"));
-		}
 	}
 
 	const headerSub =
@@ -460,11 +439,7 @@ export function DemoApp({ initialLang }: DemoAppProps) {
 					<CommunicationScreen
 						active={screen === "communication"}
 						lang={lang}
-						phrase={phrase}
-						pickerOpen={phrasePickerOpen}
-						onSpeak={speak}
-						onTogglePicker={() => setPhrasePickerOpen((prev) => !prev)}
-						onPickPhrase={pickPhrase}
+						onToast={notify}
 						onReturn={goBack}
 						onHome={goHome}
 					/>
