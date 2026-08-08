@@ -2,7 +2,6 @@
 
 import type { DemoShelterCandidate } from "@nikuman-yummy/shared";
 import { type DemoLang, t } from "@/features/demo/i18n";
-import { Progress } from "@/features/demo/components/progress";
 import { ShelterCandidateList } from "@/features/shelter/components/shelter-candidate-list";
 import type { useDemoShelters } from "@/features/shelter/hooks/use-demo-shelters";
 
@@ -26,7 +25,6 @@ export function FacilitiesScreen({
 }: FacilitiesScreenProps) {
 	return (
 		<section className={`screen${active ? " active" : ""}`} data-screen="facilities">
-			<Progress on={5} />
 			<h1 className="hero-title">{t(lang, "附近设施候选")}</h1>
 			{shelters.isPending && (
 				<div className="panel">
