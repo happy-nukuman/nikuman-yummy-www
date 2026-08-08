@@ -34,6 +34,25 @@ describe("POST /api/demo/shelters/nearby", () => {
 		);
 	});
 
+	it("uses the fixed Tokyo Metropolitan Government Building origin for any valid request coordinates", async () => {
+		const response = await request({
+			latitude: 40.7128,
+			longitude: -74.006,
+			limit: 2,
+		});
+		const body = await response.json<DemoShelterNearbyResponse>();
+
+		expect(response.status).toBe(200);
+		expect(body.origin).toEqual({
+			latitude: 35.6896342,
+			longitude: 139.6917418,
+		});
+		expect(body.facilities.map((facility) => facility.nameJa)).toEqual([
+			"西新宿小学校",
+			"西新宿中学校",
+		]);
+	});
+
 	it.each([
 		"not-json",
 		{},

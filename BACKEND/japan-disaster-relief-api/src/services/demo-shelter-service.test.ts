@@ -1,23 +1,19 @@
 import { describe, expect, it } from "vitest";
 import {
+	DEMO_SHELTER_SEARCH_ORIGIN,
 	DEMO_SHELTER_SEARCH_RADIUS_METERS,
 	findNearbyDemoShelters,
 } from "./demo-shelter-service";
 
-const TOKYO_METROPOLITAN_GOVERNMENT_BUILDING = {
-	latitude: 35.6896342,
-	longitude: 139.6917418,
-};
-
 describe("findNearbyDemoShelters", () => {
 	it("returns Japanese shelter names ordered by distance from Tokyo Metropolitan Government Building", () => {
 		const response = findNearbyDemoShelters({
-			...TOKYO_METROPOLITAN_GOVERNMENT_BUILDING,
+			...DEMO_SHELTER_SEARCH_ORIGIN,
 			limit: 3,
 		});
 
 		expect(response.dataStatus).toBe("not_realtime");
-		expect(response.origin).toEqual(TOKYO_METROPOLITAN_GOVERNMENT_BUILDING);
+		expect(response.origin).toEqual(DEMO_SHELTER_SEARCH_ORIGIN);
 		expect(response.searchRadiusMeters).toBe(DEMO_SHELTER_SEARCH_RADIUS_METERS);
 		expect(response.facilities).toHaveLength(3);
 		expect(response.facilities.map((facility) => facility.nameJa)).toEqual([
@@ -36,12 +32,21 @@ describe("findNearbyDemoShelters", () => {
 		});
 	});
 
-	it("returns no candidates when the request is outside the demo radius", () => {
-		const response = findNearbyDemoShelters({
+	it("ignores request coordinates and always searches from Tokyo Metropolitan Government Building", () => {
+		const tokyoStationResponse = findNearbyDemoShelters({
 			latitude: 35.681236,
 			longitude: 139.767125,
 		});
+		const overseasResponse = findNearbyDemoShelters({
+			latitude: 40.7128,
+			longitude: -74.006,
+		});
 
-		expect(response.facilities).toEqual([]);
+		expect(tokyoStationResponse.origin).toEqual(DEMO_SHELTER_SEARCH_ORIGIN);
+		expect(overseasResponse.origin).toEqual(DEMO_SHELTER_SEARCH_ORIGIN);
+		expect(tokyoStationResponse.facilities).toEqual(
+			overseasResponse.facilities,
+		);
+		expect(tokyoStationResponse.facilities).toHaveLength(5);
 	});
 });

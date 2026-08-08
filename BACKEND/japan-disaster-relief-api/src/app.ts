@@ -10,6 +10,7 @@ import { registerHealthRoutes } from "./routes/health";
 import { registerMunicipalityRoutes } from "./routes/municipalities";
 import { registerRulesRoutes } from "./routes/rules";
 import { registerSystemRoutes } from "./routes/system";
+import { registerTranslationRoutes } from "./routes/translations";
 import type { AppEnv } from "./types/app-env";
 
 export function createApp(): Hono<AppEnv> {
@@ -26,6 +27,7 @@ export function createApp(): Hono<AppEnv> {
 	registerAlertRoutes(app);
 	registerDemoAlertRoutes(app);
 	registerDemoShelterRoutes(app);
+	registerTranslationRoutes(app);
 
 	app.notFound(handleNotFound);
 	app.onError(handleError);

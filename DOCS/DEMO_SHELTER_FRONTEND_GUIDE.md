@@ -9,13 +9,14 @@
 
 ## 1. 接口能力与边界
 
-前端提交用户本次位置的 WGS84 经纬度，后端执行以下操作：
+前端提交任意合法的 WGS84 经纬度以满足现有请求 Contract。后端不会使用请求坐标进行查询，而是执行以下操作：
 
 1. 校验经纬度与可选结果数量；
-2. 计算用户坐标与 Demo 避难所之间的 Haversine 直线距离；
-3. 只保留 3,000 米以内的设施；
-4. 按距离从近到远排序；
-5. 返回日文设施名、日文地址、设施坐标、距离和 Google Maps 位置链接。
+2. 使用固定东京都厅坐标 `35.6896342, 139.6917418` 作为查询原点；
+3. 计算东京都厅与 Demo 避难所之间的 Haversine 直线距离；
+4. 只保留固定原点 3,000 米以内的设施；
+5. 按距离从近到远排序；
+6. 返回日文设施名、日文地址、设施坐标、距离和 Google Maps 位置链接。
 
 此接口不会：
 
@@ -25,6 +26,8 @@
 - 保存位置历史；
 - 调用生成式 AI；
 - 访问 D1 数据库或外部实时接口。
+
+关键行为：无论请求传入东京都厅、东京站、海外或其他合法坐标，返回的候选、距离和排序均相同；只有 `limit` 会改变返回条数。
 
 ## 2. Base URL 与环境配置
 
@@ -98,8 +101,8 @@ Demo 版不调用浏览器定位。前端固定使用东京都新宿区（东京
 
 | 字段 | 类型 | 必填 | 规则 |
 |---|---|---:|---|
-| `latitude` | `number` | 是 | WGS84 纬度，有限数值，范围 `-90` 至 `90` |
-| `longitude` | `number` | 是 | WGS84 经度，有限数值，范围 `-180` 至 `180` |
+| `latitude` | `number` | 是 | WGS84 纬度，有限数值，范围 `-90` 至 `90`；通过校验后不参与查询 |
+| `longitude` | `number` | 是 | WGS84 经度，有限数值，范围 `-180` 至 `180`；通过校验后不参与查询 |
 | `limit` | `number` | 否 | 结果数量，整数 `1` 至 `10`，默认 `5` |
 
 禁止把字符串形式的坐标直接传给 API：
@@ -152,8 +155,8 @@ Demo 版不调用浏览器定位。前端固定使用东京都新宿区（东京
 | 字段 | 类型 | 前端用途 |
 |---|---|---|
 | `dataStatus` | 固定为 `"not_realtime"` | 显示“非实时数据／无法确认当前开放” |
-| `origin` | `{ latitude, longitude }` | 核对后端实际采用的请求坐标；不要展示过多小数位 |
-| `searchRadiusMeters` | `number` | 空结果说明或调试信息；当前固定为 3,000 米 |
+| `origin` | `{ latitude, longitude }` | 后端实际查询原点；始终为东京都厅固定坐标 |
+| `searchRadiusMeters` | `number` | 固定查询半径；当前为 3,000 米 |
 | `source` | `object` | 来源名称、来源链接、更新时间与实时性 |
 | `facilities` | `DemoShelterCandidate[]` | 避难所候选列表，已按距离升序排列 |
 | `limitations` | `object` | 强制提醒开放状态和路线状态均不可确认 |
@@ -167,7 +170,7 @@ Demo 版不调用浏览器定位。前端固定使用东京都新宿区（东京
 | `addressJa` | `string` | 日文地址，原样展示 |
 | `latitude` | `number` | 设施纬度；用于地图定位 |
 | `longitude` | `number` | 设施经度；用于地图定位 |
-| `distanceMeters` | `number` | 从请求坐标计算的直线距离，整数米 |
+| `distanceMeters` | `number` | 从东京都厅固定坐标计算的直线距离，整数米 |
 | `googleMapsUrl` | `string` | 打开 Google Maps 的设施位置；只能表述为“查看位置” |
 
 ## 6. 共享 TypeScript 类型
@@ -336,8 +339,12 @@ export function useDemoShelters() {
 ```ts
 const shelters = useDemoShelters();
 
-function search(latitude: number, longitude: number) {
-  shelters.mutate({ latitude, longitude, limit: 5 });
+function search() {
+  shelters.mutate({
+    latitude: 35.6896342,
+    longitude: 139.6917418,
+    limit: 5,
+  });
 }
 ```
 
@@ -439,7 +446,7 @@ Google Maps 链接只用于显示设施坐标，不能把按钮写成“开始�
 | 初始 | mutation 尚未调用 | 显示位置说明；进入候选页时用 `DEMO_ORIGIN` 发起请求 |
 | 请求中 | `isPending` | 显示骨架或加载状态，禁用重复请求 |
 | 成功有结果 | `facilities.length > 0` | 按后端顺序展示候选 |
-| 成功无结果 | `facilities.length === 0` | 显示 3 公里内无 Demo 数据，不虚构候选 |
+| 成功无结果 | `facilities.length === 0` | 显示东京都厅 3 公里内无 Demo 数据，不虚构候选 |
 | HTTP 400 | `ApiClientError.status === 400` | 视为前端请求构造错误；用户侧显示通用提示 |
 | 请求超时 | `REQUEST_TIMEOUT` | 显示服务受限、重试入口和基础求助信息 |
 | 网络错误 | `NETWORK_ERROR` | 显示极简网络异常页，不继续展示旧候选 |
@@ -461,7 +468,7 @@ Google Maps 链接只用于显示设施坐标，不能把按钮写成“开始�
 }
 ```
 
-每个响应都有 `X-Request-ID` Header。开发和排障时可以记录 `requestId`，但不要记录用户精确坐标。
+每个响应都有 `X-Request-ID` Header。开发和排障时可以记录 `requestId`；本 Demo 建议始终提交公开的东京都厅固定坐标。
 
 不要把后端英文 `error.message` 直接显示给用户。用户文案由前端语言包管理。
 
@@ -510,7 +517,7 @@ Invoke-RestMethod `
 - [ ] 展示数据来源与更新时间；
 - [ ] 空数组显示无结果，不生成假候选；
 - [ ] 覆盖 loading、success、empty、400、timeout、network error；
-- [ ] 不在浏览器存储、日志或监控中保留精确坐标；
+- [ ] 使用统一的东京都厅 Demo 坐标常量；
 - [ ] 中文、英文、日文切换不会改变候选事实字段；
 - [ ] 返回上一步后再次进入候选页时，重新发起请求（坐标仍为 `DEMO_ORIGIN`）。
 
@@ -519,10 +526,10 @@ Invoke-RestMethod `
 该接口已经覆盖：
 
 - 请求 Contract runtime 校验；
-- 东京都厅坐标附近结果与距离排序；
+- 固定东京都厅坐标附近结果与距离排序；
 - `limit` 截断；
 - Google Maps URL；
-- 3 公里外空结果；
+- 任意合法请求坐标均返回相同候选、距离与排序；
 - 非法 JSON、缺少字段、坐标越界与非法 `limit`；
 - 无 D1 binding 时正常运行。
 
