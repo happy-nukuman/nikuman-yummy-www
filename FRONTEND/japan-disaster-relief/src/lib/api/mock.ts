@@ -1,5 +1,9 @@
-import type { DemoShelterNearbyResponse, HelloResponse } from "@nikuman-yummy/shared";
-import { isDemoShelterNearbyRequest } from "@nikuman-yummy/shared";
+import type {
+	DemoShelterNearbyResponse,
+	HelloResponse,
+	TranslationResponse,
+} from "@nikuman-yummy/shared";
+import { isDemoShelterNearbyRequest, isTranslationRequest } from "@nikuman-yummy/shared";
 import { calculateDistance } from "../geo/calculate-distance";
 
 // Mirrors BACKEND/japan-disaster-relief-api/src/config/demo-shelters.ts — the
@@ -129,11 +133,41 @@ function buildDemoShelterNearbyResponse(body: unknown): DemoShelterNearbyRespons
 	};
 }
 
+// Mirrors POST /api/translations enough for local UI work: a tiny dictionary
+// for common inputs, otherwise the original text with a demo marker. The real
+// endpoint calls Gemini (see BACKEND .../services/gemini-translation-client.ts).
+const MOCK_TRANSLATIONS: Record<string, string> = {
+	谢谢: "ありがとうございます。",
+	"厕所在哪里？": "トイレはどこですか。",
+	厕所在哪里: "トイレはどこですか。",
+	我需要水: "水をください。",
+	"Thank you": "ありがとうございます。",
+	"Where is the toilet?": "トイレはどこですか。",
+	"I need water": "水をください。",
+};
+
+function buildTranslationResponse(body: unknown): TranslationResponse {
+	if (!isTranslationRequest(body)) {
+		throw new Error(
+			"Mock POST /api/translations requires 1-2000 characters of text and a supported targetLanguage.",
+		);
+	}
+
+	return {
+		translatedText: MOCK_TRANSLATIONS[body.text.trim()] ?? `${body.text.trim()}（デモ翻訳）`,
+		sourceLanguage: body.sourceLanguage ?? "auto",
+		targetLanguage: body.targetLanguage,
+		provider: "workers-ai",
+		model: "mock",
+	};
+}
+
 type MockResolver = unknown | ((body: unknown) => unknown);
 
 const mocks = new Map<string, MockResolver>([
 	["GET /api/hello", { message: "hello world!" } satisfies HelloResponse],
 	["POST /api/demo/shelters/nearby", buildDemoShelterNearbyResponse],
+	["POST /api/translations", buildTranslationResponse],
 ]);
 
 async function waitForMockLatency(signal: AbortSignal): Promise<void> {

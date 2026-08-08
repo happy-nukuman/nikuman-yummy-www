@@ -10,6 +10,9 @@
 	"compatibility_flags": [
 		"nodejs_compat"
 	],
+	"ai": {
+		"binding": "AI" // Workers AI：翻译主通道 @cf/meta/m2m100-1.2b（本地 dev 需 wrangler login，未登录时自动回退 Gemini）
+	},
 	"d1_databases": [
 		{
 			"binding": "DB",
