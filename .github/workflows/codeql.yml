@@ -19,8 +19,39 @@ on:
       - "DATA/scripts/**"
 
 jobs:
+  # 先判断本次变更涉及哪些组件，analyze 只扫描变更到的组件：
+  # 只改前端就只扫前端，只改后端就只扫后端，两边都改则两边都扫。
+  changes:
+    name: Detect changed components
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read # push 事件通过 git 历史做 diff
+      pull-requests: read # PR 事件通过 API 读取变更文件列表
+    outputs:
+      # 命中变更的组件名 JSON 数组，例如 ["frontend","shared"]
+      components: ${{ steps.filter.outputs.changes }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Filter changed paths
+        uses: dorny/paths-filter@de90cc6fb38fc0963ad72b210f1f284cd68cea36 # v3.0.2
+        id: filter
+        with:
+          filters: |
+            frontend:
+              - "FRONTEND/japan-disaster-relief/**"
+            backend:
+              - "BACKEND/japan-disaster-relief-api/**"
+            shared:
+              - "SHARED/**"
+            data-scripts:
+              - "DATA/scripts/**"
+
   analyze:
     name: Analyze (${{ matrix.component }})
+    needs: changes
+    # 组件数组为空时跳过，避免空 matrix 报错（正常不会发生，触发 paths 已兜底）。
+    if: needs.changes.outputs.components != '[]'
     runs-on: ubuntu-latest
     permissions:
       security-events: write # 允许把扫描结果写入仓库的 Security 标签页
@@ -28,15 +59,10 @@ jobs:
     strategy:
       fail-fast: false # 一个组件扫描失败不影响另一个
       matrix:
-        include:
-          - component: frontend
-            path: FRONTEND/japan-disaster-relief
-          - component: backend
-            path: BACKEND/japan-disaster-relief-api
-          - component: shared
-            path: SHARED
-          - component: data-scripts
-            path: DATA/scripts
+        component: ${{ fromJSON(needs.changes.outputs.components) }}
+    env:
+      # 组件名 → 扫描目录（与 changes job 的 filters 保持一致）
+      COMPONENT_PATH: ${{ fromJSON('{"frontend":"FRONTEND/japan-disaster-relief","backend":"BACKEND/japan-disaster-relief-api","shared":"SHARED","data-scripts":"DATA/scripts"}')[matrix.component] }}
     steps:
       - uses: actions/checkout@v4
 
@@ -49,7 +75,7 @@ jobs:
           # 限定扫描范围到当前组件目录，避免混入仓库里其他杂项文件
           config: |
             paths:
-              - ${{ matrix.path }}
+              - ${{ env.COMPONENT_PATH }}
 
       - name: Perform CodeQL Analysis
         uses: github/codeql-action/analyze@v3

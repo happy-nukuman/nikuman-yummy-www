@@ -19,12 +19,19 @@ export class ApiClientError extends Error {
 	}
 }
 
-type ApiGetOptions = {
+export type ApiRequestOptions = {
 	signal?: AbortSignal;
 	timeoutMs?: number;
 };
 
-export async function apiGet<T>(path: string, options: ApiGetOptions = {}): Promise<T> {
+type ApiMethod = "GET" | "POST";
+
+async function apiRequest<TResponse>(
+	method: ApiMethod,
+	path: string,
+	body: unknown,
+	options: ApiRequestOptions,
+): Promise<TResponse> {
 	const timeoutMs = options.timeoutMs ?? DEFAULT_REQUEST_TIMEOUT_MS;
 	const controller = new AbortController();
 	let didTimeout = false;
@@ -43,28 +50,31 @@ export async function apiGet<T>(path: string, options: ApiGetOptions = {}): Prom
 
 	try {
 		if (USE_API_MOCK) {
-			return await getMockResponse<T>("GET", path, controller.signal);
+			return await getMockResponse<TResponse>(method, path, controller.signal, body);
 		}
 
 		const response = await fetch(`${API_BASE_URL}${path}`, {
+			method,
 			headers: {
 				Accept: "application/json",
+				...(body !== undefined && { "Content-Type": "application/json" }),
 			},
+			...(body !== undefined && { body: JSON.stringify(body) }),
 			signal: controller.signal,
 		});
 
 		if (!response.ok) {
 			throw new ApiClientError(
 				"HTTP_ERROR",
-				`GET ${path} returned HTTP ${response.status}.`,
+				`${method} ${path} returned HTTP ${response.status}.`,
 				response.status,
 			);
 		}
 
 		try {
-			return (await response.json()) as T;
+			return (await response.json()) as TResponse;
 		} catch {
-			throw new ApiClientError("INVALID_RESPONSE", `GET ${path} returned invalid JSON.`);
+			throw new ApiClientError("INVALID_RESPONSE", `${method} ${path} returned invalid JSON.`);
 		}
 	} catch (error) {
 		if (error instanceof ApiClientError) {
@@ -74,13 +84,28 @@ export async function apiGet<T>(path: string, options: ApiGetOptions = {}): Prom
 		if (controller.signal.aborted) {
 			throw new ApiClientError(
 				didTimeout ? "REQUEST_TIMEOUT" : "REQUEST_ABORTED",
-				didTimeout ? `GET ${path} timed out.` : `GET ${path} was aborted.`,
+				didTimeout ? `${method} ${path} timed out.` : `${method} ${path} was aborted.`,
 			);
 		}
 
-		throw new ApiClientError("NETWORK_ERROR", `GET ${path} failed before receiving a response.`);
+		throw new ApiClientError(
+			"NETWORK_ERROR",
+			`${method} ${path} failed before receiving a response.`,
+		);
 	} finally {
 		globalThis.clearTimeout(timeoutId);
 		options.signal?.removeEventListener("abort", handleExternalAbort);
 	}
+}
+
+export function apiGet<TResponse>(path: string, options: ApiRequestOptions = {}): Promise<TResponse> {
+	return apiRequest<TResponse>("GET", path, undefined, options);
+}
+
+export function apiPost<TRequest, TResponse>(
+	path: string,
+	body: TRequest,
+	options: ApiRequestOptions = {},
+): Promise<TResponse> {
+	return apiRequest<TResponse>("POST", path, body, options);
 }
