@@ -5,17 +5,19 @@ import { type DemoLang, t, WELCOME_COPY } from "@/features/demo/i18n";
 interface TopBarProps {
 	lang: DemoLang;
 	subtitle: string;
+	/** 点击左上角 logo：回到首页（欢迎页）。 */
+	onHome: () => void;
 	onOpenCommunication: () => void;
 	onSwitchLanguage: (lang: DemoLang) => void;
 }
 
-export function TopBar({ lang, subtitle, onOpenCommunication, onSwitchLanguage }: TopBarProps) {
+export function TopBar({ lang, subtitle, onHome, onOpenCommunication, onSwitchLanguage }: TopBarProps) {
 	return (
 		<header className="topbar">
 			<div className="brand">
-				<div className="logo">
+				<button type="button" className="logo" aria-label={t(lang, "返回主页")} onClick={onHome}>
 					<img src="/logo.png" alt="Tokyo Safe First" />
-				</div>
+				</button>
 				<div>
 					<div className="brand-text">Tokyo Safe First</div>
 					<div className="brand-sub">{subtitle}</div>

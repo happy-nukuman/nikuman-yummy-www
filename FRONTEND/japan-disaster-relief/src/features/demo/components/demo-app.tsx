@@ -254,7 +254,7 @@ export function DemoApp({ initialLang }: DemoAppProps) {
 		setScreen("mode");
 	}
 
-	// 紧急求助页的“返回主页”：清空状态回到首页（欢迎页）。
+	// 紧急求助页的“返回主页”和顶栏 logo：清空状态回到首页（欢迎页）。
 	function goWelcome() {
 		setFlowPos(null);
 		setFlowAnswers({});
@@ -340,8 +340,8 @@ export function DemoApp({ initialLang }: DemoAppProps) {
 	const headerSub =
 		screen === "communication" ? HEADER_LABELS[lang].communication : HEADER_LABELS[lang].default;
 
-	// 许可后在首页和沟通卡之外的页面（含紧急求助）顶部常驻显示获取到的位置。
-	const showLocBar = locPermission === "granted" && !["welcome", "communication"].includes(screen);
+	// 许可后在沟通卡之外的页面（含首页、紧急求助）顶部常驻显示获取到的位置。
+	const showLocBar = locPermission === "granted" && screen !== "communication";
 	const locText = `${t(lang, "东京都新宿区西新宿六丁目8番")} · ${t(lang, "仅本次使用")}`;
 
 	return (
@@ -350,6 +350,7 @@ export function DemoApp({ initialLang }: DemoAppProps) {
 				<TopBar
 					lang={lang}
 					subtitle={headerSub}
+					onHome={goWelcome}
 					onOpenCommunication={openCommunication}
 					onSwitchLanguage={switchLanguage}
 				/>
@@ -363,6 +364,7 @@ export function DemoApp({ initialLang }: DemoAppProps) {
 						onEmergency={openEmergency}
 						onOpenFacilities={openFacilities}
 						onOpenDisasterInfo={openDisasterInfo}
+						onOpenCommunication={openCommunication}
 						onRequestLocation={() => setLocDialogOpen(true)}
 					/>
 					<ModeScreen

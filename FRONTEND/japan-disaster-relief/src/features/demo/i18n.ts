@@ -118,6 +118,8 @@ export const FULL_I18N: Record<"en" | "ja", Record<string, string>> = {
 		查看最近的避难设施: "Find the closest evacuation facilities",
 		灾害信息: "Disaster info",
 		获取最新灾害通知: "Get the latest disaster notices",
+		多语言沟通卡: "Multilingual communication card",
+		用日语短句与周围的人沟通: "Talk to people nearby with Japanese phrases",
 		"无需注册 · 不收集个人信息": "No registration · No personal data collected",
 		"位置信息仅用于本次查询，不会被保存。":
 			"Location is used only for this search and is not saved.",
@@ -409,6 +411,8 @@ export const FULL_I18N: Record<"en" | "ja", Record<string, string>> = {
 		查看最近的避难设施: "最寄りの避難施設を確認",
 		灾害信息: "災害情報",
 		获取最新灾害通知: "最新の災害情報を取得",
+		多语言沟通卡: "多言語コミュニケーションカード",
+		用日语短句与周围的人沟通: "日本語フレーズで周囲の人に伝える",
 		"无需注册 · 不收集个人信息": "登録不要 · 個人情報は収集しません",
 		"位置信息仅用于本次查询，不会被保存。":
 			"位置情報は今回の検索のみに使用し、保存されません。",

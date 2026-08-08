@@ -15,6 +15,8 @@ interface WelcomeScreenProps {
 	onOpenFacilities: () => void;
 	/** 「灾害信息」磁贴：进入附近灾害信息列表（需要定位许可）。 */
 	onOpenDisasterInfo: () => void;
+	/** 「多语言沟通卡」磁贴：打开沟通卡（不依赖位置）。 */
+	onOpenCommunication: () => void;
 	/** 拒绝后重新弹出定位许可弹窗。 */
 	onRequestLocation: () => void;
 }
@@ -27,6 +29,7 @@ export function WelcomeScreen({
 	onEmergency,
 	onOpenFacilities,
 	onOpenDisasterInfo,
+	onOpenCommunication,
 	onRequestLocation,
 }: WelcomeScreenProps) {
 	const welcome = WELCOME_COPY[lang];
@@ -34,7 +37,7 @@ export function WelcomeScreen({
 	const locked = locPermission !== "granted";
 	return (
 		<section className={`screen${active ? " active" : ""}`} data-screen="welcome">
-			{locPermission === "denied" ? (
+			{locPermission === "denied" && (
 				// 拒绝定位：不显示地址，说明位置相关功能不可用，并提供重新授权入口。
 				<div className="panel amber">
 					<div className="panel-row">
@@ -48,22 +51,9 @@ export function WelcomeScreen({
 						{t(lang, "允许获取位置")}
 					</button>
 				</div>
-			) : (
-				<div className="panel tint">
-					<div className="panel-row">
-						<div className="panel-icon">📍</div>
-						<div>
-							<div className="panel-title">
-								{locPermission === "unknown"
-									? t(lang, "正在获取当前位置…")
-									: t(lang, "東京都新宿区西新宿六丁目8番附近 · 仅本次使用")}
-							</div>
-							{locPermission === "granted" && (
-								<div className="panel-copy">{t(lang, "定位精度：大致位置")}</div>
-							)}
-						</div>
-					</div>
-				</div>
+			)}
+			{locPermission === "unknown" && (
+				<div className="loc-bar">📍 {t(lang, "正在获取当前位置…")}</div>
 			)}
 			<h1 className="hero-title">{welcome.title}</h1>
 			<p className="lead">{welcome.lead}</p>
@@ -107,6 +97,13 @@ export function WelcomeScreen({
 					</span>
 					<span className="tile-title">{t(lang, "灾害信息")}</span>
 					<span className="tile-copy">{t(lang, "获取最新灾害通知")}</span>
+				</button>
+				<button type="button" className="tile" onClick={onOpenCommunication}>
+					<span className="tile-icon" aria-hidden>
+						💬
+					</span>
+					<span className="tile-title">{t(lang, "多语言沟通卡")}</span>
+					<span className="tile-copy">{t(lang, "用日语短句与周围的人沟通")}</span>
 				</button>
 			</div>
 			<div className="privacy-note">
