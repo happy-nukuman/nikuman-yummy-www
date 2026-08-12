@@ -27,18 +27,17 @@ export function ShelterCandidateCard({
 					<div className="facility-name" lang={name.lang}>
 						{name.text}
 					</div>
-					<div className="facility-meta">
-						{`${t(lang, "避难所")} · ${formatApproxDistance(lang, facility.distanceMeters)}`}
-					</div>
+					<div className="facility-distance">{formatApproxDistance(lang, facility.distanceMeters)}</div>
 				</div>
 				<span className="tag">{`${t(lang, "候选")} ${index + 1}`}</span>
 			</div>
-			<div className="facility-meta" lang={address.lang}>
-				{address.text}
+			<div className="facility-status">
+				<span aria-hidden>!</span>
+				{t(lang, "当前开放状态：无法确认")}
 			</div>
-			<div className="facility-meta">{t(lang, "当前开放状态：无法确认")}</div>
+			<div className="facility-meta" lang={address.lang}>{address.text}</div>
 			<div className="facility-actions">
-				<button type="button" className="btn primary" onClick={() => onNavigate(facility)}>
+				<button type="button" className="btn secondary" onClick={() => onNavigate(facility)}>
 					{t(lang, "选择并查看路线")}
 				</button>
 			</div>

@@ -2,14 +2,14 @@
   "name": "nikuman-yummy-www",
   "version": "0.1.0",
   "private": true,
-  "packageManager": "npm@11.16.0",
+  "packageManager": "npm@12.0.2",
   "workspaces": [
     "FRONTEND/japan-disaster-relief",
     "BACKEND/japan-disaster-relief-api",
     "SHARED"
   ],
   "engines": {
-    "node": "22.23.1"
+    "node": "24.19.0"
   },
   "overrides": {
     "@node-minify/core": {

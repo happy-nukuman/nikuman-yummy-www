@@ -26,7 +26,7 @@ export function ModeScreen({ active, lang, onEnterDisaster, onEnterDaily, onBack
 						</div>
 					</div>
 				</div>
-				<button type="button" className="btn danger" onClick={onEnterDisaster}>
+				<button type="button" className="btn primary" onClick={onEnterDisaster}>
 					{t(lang, "进入灾害模式")}
 				</button>
 			</div>
@@ -47,7 +47,7 @@ export function ModeScreen({ active, lang, onEnterDisaster, onEnterDaily, onBack
 			</div>
 			<div className="actions">
 				<button type="button" className="btn ghost" onClick={onBack}>
-					{t(lang, "返回上一步")}
+					← {t(lang, "返回上一步")}
 				</button>
 			</div>
 		</section>

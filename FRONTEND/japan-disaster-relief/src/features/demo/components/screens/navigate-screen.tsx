@@ -71,11 +71,11 @@ export function NavigateScreen({
 			)}
 			<div className="source">{t(lang, "到达后或需要求助时，向身边的人展示。")}</div>
 			<div className="actions">
-				<button type="button" className="btn primary" onClick={onOpenCommunication}>
+				<button type="button" className="btn secondary" onClick={onOpenCommunication}>
 					{t(lang, "打开沟通卡")}
 				</button>
 				<button type="button" className="btn ghost" onClick={onBack}>
-					{t(lang, "返回上一步")}
+					← {t(lang, "返回上一步")}
 				</button>
 			</div>
 		</section>

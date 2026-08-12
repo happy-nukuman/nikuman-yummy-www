@@ -57,7 +57,7 @@ export function ShelterRouteMap({ origin, destination, lang }: ShelterRouteMapPr
 			</div>
 			<div className="source">{t(lang, "地图无法加载时，请使用下方按钮打开 Google 地图。")}</div>
 			<a
-				className="btn secondary"
+				className="btn primary route-primary"
 				href={buildRouteExternalUrl(origin, destination)}
 				target="_blank"
 				rel="noopener noreferrer"

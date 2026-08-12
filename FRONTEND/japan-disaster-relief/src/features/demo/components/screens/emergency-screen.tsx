@@ -39,7 +39,7 @@ export function EmergencyScreen({ active, lang, onHome }: EmergencyScreenProps) 
 			</div>
 			<div className="actions">
 				<button type="button" className="btn ghost" onClick={onHome}>
-					🏠 {t(lang, "返回主页")}
+					🏠 {t(lang, "返回首页")}
 				</button>
 			</div>
 		</section>

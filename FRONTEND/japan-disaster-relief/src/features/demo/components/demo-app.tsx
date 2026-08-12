@@ -5,7 +5,7 @@ import type { DemoShelterCandidate } from "@nikuman-yummy/shared";
 import type { GeoPoint } from "@/lib/geo/calculate-distance";
 import type { DisasterInfoItem } from "@/features/demo/disaster-info";
 import { useDemoShelters } from "@/features/shelter/hooks/use-demo-shelters";
-import { type DemoLang, HEADER_LABELS, t, WELCOME_COPY } from "@/features/demo/i18n";
+import { type DemoLang, t, WELCOME_COPY } from "@/features/demo/i18n";
 import { FLOWS, type FlowId, getNode, resolveOption } from "@/features/demo/flows";
 import { useToast } from "@/features/demo/hooks/use-toast";
 import { TopBar } from "@/features/demo/components/top-bar";
@@ -25,6 +25,7 @@ import { EmergencyScreen } from "@/features/demo/components/screens/emergency-sc
 import { DisasterListScreen } from "@/features/demo/components/screens/disaster-list-screen";
 import { DisasterDetailScreen } from "@/features/demo/components/screens/disaster-detail-screen";
 import { CommunicationScreen } from "@/features/demo/components/screens/communication-screen";
+import { LocationIcon } from "@/features/demo/components/app-icons";
 import "../demo.css";
 
 type ScreenName =
@@ -305,9 +306,6 @@ export function DemoApp({ initialLang }: DemoAppProps) {
 		if (flowPos && flowNode?.type === "sos") advanceTo(flowPos.flowId, flowNode.next);
 	}
 
-	const headerSub =
-		screen === "communication" ? HEADER_LABELS[lang].communication : HEADER_LABELS[lang].default;
-
 	// 沟通卡「返回」按钮：上一页是主页（欢迎页）或没有历史时不显示，
 	// 此时「返回主页」已覆盖同样的去处。
 	const prevScreen = history[history.length - 1]?.screen;
@@ -315,20 +313,25 @@ export function DemoApp({ initialLang }: DemoAppProps) {
 
 	// 许可后在沟通卡之外的页面（含首页、紧急求助）顶部常驻显示获取到的位置。
 	const showLocBar = locPermission === "granted" && screen !== "communication";
-	const locText = `${t(lang, "东京都新宿区西新宿六丁目8番")} · ${t(lang, "仅本次使用")}`;
+	const locText = `${t(lang, "东京都新宿区西新宿六丁目8番")} · ${t(lang, "本次演示")} · ${t(lang, "仅本次使用")}`;
 
 	return (
 		<div className="app-shell">
 			<div className="phone">
 				<TopBar
 					lang={lang}
-					subtitle={headerSub}
+					isHome={screen === "welcome"}
 					onHome={goWelcome}
 					onOpenCommunication={openCommunication}
 					onSwitchLanguage={switchLanguage}
 				/>
 				<main className="main">
-					{showLocBar && <div className="loc-bar">📍 {locText}</div>}
+					{showLocBar && (
+						<div className="loc-bar">
+							<LocationIcon aria-hidden />
+							<span>{locText}</span>
+						</div>
+					)}
 					<WelcomeScreen
 						active={screen === "welcome"}
 						lang={lang}

@@ -62,7 +62,7 @@ export function FlowScreen({
 							{t(lang, "我做不到 / 需要帮助")}
 						</button>
 						<button type="button" className="btn ghost" onClick={onBack}>
-							{t(lang, "返回上一步")}
+							← {t(lang, "返回上一步")}
 						</button>
 					</div>
 				</>
@@ -97,7 +97,7 @@ export function FlowScreen({
 					<div className="actions">
 						{actionCard.tel && (
 							// 目前唯一的 tel 值就是 119，按钮文案沿用固定词条。
-							<a className="btn primary" href={`tel:${actionCard.tel}`}>
+							<a className="btn emergency" href={`tel:${actionCard.tel}`}>
 								📞 {t(lang, "拨打 119")}
 							</a>
 						)}
@@ -108,7 +108,7 @@ export function FlowScreen({
 							{t(lang, "我做不到")}
 						</button>
 						<button type="button" className="btn ghost" onClick={onBackFromAction}>
-							{t(lang, "返回上一步")}
+							← {t(lang, "返回上一步")}
 						</button>
 					</div>
 				</>

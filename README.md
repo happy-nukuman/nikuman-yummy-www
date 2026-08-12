@@ -33,8 +33,8 @@
 
 ## 环境要求
 
-- Node.js 22（见 `.nvmrc`）
-- npm
+- Node.js 24.19.0 LTS（见 `.nvmrc`）
+- npm 12.0.2
 - Git
 - Wrangler（作为项目依赖安装）
 - Cloudflare account（仅部署需要）

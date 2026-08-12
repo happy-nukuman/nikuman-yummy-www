@@ -48,7 +48,7 @@ export function EvacuationScreen({
 					{t(lang, "暂时不需要")}
 				</button>
 				<button type="button" className="btn ghost" onClick={onBack}>
-					{t(lang, "返回上一步")}
+					← {t(lang, "返回上一步")}
 				</button>
 			</div>
 		</section>

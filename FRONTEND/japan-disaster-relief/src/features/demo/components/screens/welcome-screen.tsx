@@ -1,6 +1,16 @@
 "use client";
 
 import { type DemoLang, t, WELCOME_COPY } from "@/features/demo/i18n";
+import {
+	ChecklistIcon,
+	ChevronRightIcon,
+	CommunicationIcon,
+	DisasterIcon,
+	LocationIcon,
+	ShelterIcon,
+	ShieldIcon,
+	SirenIcon,
+} from "@/features/demo/components/app-icons";
 
 interface WelcomeScreenProps {
 	active: boolean;
@@ -53,62 +63,54 @@ export function WelcomeScreen({
 				</div>
 			)}
 			{locPermission === "unknown" && (
-				<div className="loc-bar">📍 {t(lang, "正在获取当前位置…")}</div>
+				<div className="loc-bar"><LocationIcon aria-hidden /><span>{t(lang, "正在获取当前位置…")}</span></div>
 			)}
 			<h1 className="hero-title">{welcome.title}</h1>
 			<p className="lead">{welcome.lead}</p>
 			<div className="home-actions">
 				<button type="button" className="home-cta go" onClick={onStart} disabled={locked}>
-					<span className="cta-icon" aria-hidden>
-						🧭
-					</span>
+					<span className="cta-icon" aria-hidden><ChecklistIcon /></span>
 					<span className="cta-text">
 						<span className="cta-title">{t(lang, "查看现在应该做什么")}</span>
 						<span className="cta-sub">{t(lang, "帮助您做出正确的下一步判断")}</span>
 					</span>
-					<span className="cta-arrow" aria-hidden>
-						›
-					</span>
+					<span className="cta-arrow" aria-hidden><ChevronRightIcon /></span>
 				</button>
 				<button type="button" className="home-cta sos" onClick={onEmergency}>
-					<span className="cta-icon" aria-hidden>
-						📞
-					</span>
+					<span className="cta-icon" aria-hidden><SirenIcon /></span>
 					<span className="cta-text">
 						<span className="cta-title">{t(lang, "紧急求助")}</span>
 						<span className="cta-sub">{t(lang, "灾害・急病・事故・危险情况时使用")}</span>
 					</span>
-					<span className="cta-arrow" aria-hidden>
-						›
-					</span>
+					<span className="cta-arrow" aria-hidden><ChevronRightIcon /></span>
 				</button>
 			</div>
 			<div className="tile-grid">
 				<button type="button" className="tile" onClick={onOpenFacilities} disabled={locked}>
-					<span className="tile-icon" aria-hidden>
-						📍
-					</span>
+					<span className="tile-icon shelter" aria-hidden><ShelterIcon /></span>
 					<span className="tile-title">{t(lang, "附近避难设施")}</span>
 					<span className="tile-copy">{t(lang, "查看最近的避难设施")}</span>
+					<ChevronRightIcon className="tile-chevron" />
 				</button>
 				<button type="button" className="tile" onClick={onOpenDisasterInfo} disabled={locked}>
-					<span className="tile-icon" aria-hidden>
-						🔔
-					</span>
+					<span className="tile-icon disaster" aria-hidden><DisasterIcon /></span>
 					<span className="tile-title">{t(lang, "灾害信息")}</span>
 					<span className="tile-copy">{t(lang, "获取最新灾害通知")}</span>
+					<ChevronRightIcon className="tile-chevron" />
 				</button>
 				<button type="button" className="tile" onClick={onOpenCommunication}>
-					<span className="tile-icon" aria-hidden>
-						💬
-					</span>
+					<span className="tile-icon communication" aria-hidden><CommunicationIcon /></span>
 					<span className="tile-title">{t(lang, "多语言沟通卡")}</span>
 					<span className="tile-copy">{t(lang, "用日语短句与周围的人沟通")}</span>
+					<ChevronRightIcon className="tile-chevron" />
 				</button>
 			</div>
 			<div className="privacy-note">
-				<div className="privacy-title">{t(lang, "无需注册 · 不收集个人信息")}</div>
-				<div className="privacy-copy">{t(lang, "位置信息仅用于本次查询，不会被保存。")}</div>
+				<ShieldIcon className="privacy-icon" aria-hidden />
+				<div>
+					<div className="privacy-title">{t(lang, "无需注册 · 不收集个人信息")}</div>
+					<div className="privacy-copy">{t(lang, "位置信息仅用于本次查询，不会被保存。")}</div>
+				</div>
 			</div>
 		</section>
 	);

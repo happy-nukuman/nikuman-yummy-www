@@ -59,7 +59,7 @@ export function DisasterListScreen({ active, lang, onOpenDetail, onBack }: Disas
 			</div>
 			<div className="actions">
 				<button type="button" className="btn ghost" onClick={onBack}>
-					{t(lang, "返回上一步")}
+					← {t(lang, "返回上一步")}
 				</button>
 			</div>
 		</section>

@@ -413,11 +413,11 @@ export function CommunicationScreen({
 				<div className={`comm-nav${canReturn ? "" : " single"}`}>
 					{canReturn && (
 						<button type="button" className="btn ghost" onClick={onReturn}>
-							{t(lang, "返回")}
+							← {t(lang, "返回上一步")}
 						</button>
 					)}
 					<button type="button" className="btn ghost" onClick={onHome}>
-						{t(lang, "返回主页")}
+						{t(lang, "返回首页")}
 					</button>
 				</div>
 			</div>

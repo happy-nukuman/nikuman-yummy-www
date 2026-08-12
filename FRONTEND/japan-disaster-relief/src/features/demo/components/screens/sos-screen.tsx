@@ -36,14 +36,14 @@ export function SosScreen({ active, lang, onShowCommunication, onBack }: SosScre
 				{t(lang, "规则来源：东京都防灾相关官方资料｜规则版本 v1.0｜非专业建筑或医疗判断")}
 			</div>
 			<div className="actions">
-				<a className="btn primary sos-call" href="tel:119">
+				<a className="btn emergency sos-call" href="tel:119">
 					📞 {t(lang, "拨打 119")}
 				</a>
 				<button type="button" className="btn secondary" onClick={onShowCommunication}>
 					{t(lang, "有人靠近时，展示沟通卡")}
 				</button>
 				<button type="button" className="btn ghost" onClick={onBack}>
-					{t(lang, "返回上一步")}
+					← {t(lang, "返回上一步")}
 				</button>
 			</div>
 		</section>

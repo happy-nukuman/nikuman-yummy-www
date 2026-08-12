@@ -37,7 +37,7 @@ jobs:
 
       - name: Pin Node and npm versions
         run: |
-          npm install --global npm@11.16.0
+          npm install --global npm@12.0.2
           node --version
           npm --version
 
@@ -82,7 +82,7 @@ jobs:
 
       - name: Pin Node and npm versions
         run: |
-          npm install --global npm@11.16.0
+          npm install --global npm@12.0.2
           node --version
           npm --version
 

@@ -15,16 +15,16 @@ export function LocationDialog({ lang, onDecide }: LocationDialogProps) {
 				className="modal"
 				role="dialog"
 				aria-modal="true"
-				aria-label={t(lang, "是否允许获取你的实时位置？")}
+				aria-label={t(lang, "是否允许使用演示位置？")}
 			>
 				<div className="modal-icon">📍</div>
-				<h2 className="modal-title">{t(lang, "是否允许获取你的实时位置？")}</h2>
+				<h2 className="modal-title">{t(lang, "是否允许使用演示位置？")}</h2>
 				<p className="modal-copy">
-					{t(lang, "用于确认所在区和附近避难设施，仅本次使用，不保存位置历史。")}
+					{t(lang, "本 Demo 使用固定的新宿位置，仅用于本次查询，不会读取或保存实时 GPS。")}
 				</p>
 				<div className="modal-actions">
 					<button type="button" className="btn primary" onClick={() => onDecide(true)}>
-						{t(lang, "允许获取位置")}
+						{t(lang, "使用演示位置")}
 					</button>
 					<button type="button" className="btn secondary" onClick={() => onDecide(false)}>
 						{t(lang, "不允许")}

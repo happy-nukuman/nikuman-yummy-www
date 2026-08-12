@@ -38,7 +38,7 @@ export interface WelcomeCopy {
 export const WELCOME_COPY: Record<DemoLang, WelcomeCopy> = {
 	zh: {
 		title: "紧急时，从正确的下一步开始",
-		lead: "为在东京生活和滞在的外国人提供母语的灾害行动指引。",
+		lead: "为在东京生活和滞留的外国人提供母语的灾害行动指引。",
 		prompt: "请选择界面语言",
 		toast: "已切换为中文",
 	},
@@ -54,14 +54,6 @@ export const WELCOME_COPY: Record<DemoLang, WelcomeCopy> = {
 		prompt: "表示言語を選択してください",
 		toast: "日本語に切り替えました",
 	},
-};
-
-// Header sub-label shown by show(): the communication screen has its own label,
-// every other screen uses the default one.
-export const HEADER_LABELS: Record<DemoLang, { default: string; communication: string }> = {
-	zh: { default: "灾后下一步行动", communication: "日语沟通卡" },
-	en: { default: "Post-disaster next step", communication: "Japanese communication card" },
-	ja: { default: "災害後の次の行動", communication: "日本語コミュニケーションカード" },
 };
 
 // [Japanese card text (lines), default Chinese caption, Japanese text for speech]
@@ -127,6 +119,18 @@ export const FULL_I18N: Record<"en" | "ja", Record<string, string>> = {
 	en: {
 		选择模式: "CHOOSE MODE",
 		本版本先提供地震流程: "This version provides the earthquake flow first",
+		翻译沟通: "Translate",
+		"其他语言…": "Other languages…",
+		选择其他语言: "Choose another language",
+		"以下语言正在准备中，当前版本尚未开放。":
+			"These languages are being prepared and are not available in this version.",
+		准备中: "Coming soon",
+		关闭: "Close",
+		本次演示: "Demo",
+		"是否允许使用演示位置？": "Use the demo location?",
+		"本 Demo 使用固定的新宿位置，仅用于本次查询，不会读取或保存实时 GPS。":
+			"This demo uses a fixed Shinjuku location for this session only. It does not read or save live GPS data.",
+		使用演示位置: "Use demo location",
 		// Home screen (redesigned per DOCS/new-ui.png ①)
 		查看现在应该做什么: "See what to do now",
 		帮助您做出正确的下一步判断: "Helps you decide the right next step",
@@ -222,8 +226,9 @@ export const FULL_I18N: Record<"en" | "ja", Record<string, string>> = {
 		"翻译中…": "Translating…",
 		翻译失败: "Translation failed",
 		返回: "Back",
-		返回上一步: "Back to previous step",
+		返回上一步: "Back",
 		返回主页: "Back to home",
+		返回首页: "Back to Home",
 		当前服务受限: "Service currently limited",
 		"无法获取最新设施数据。请确认现场广播、工作人员和官方信息。":
 			"The latest facility data could not be retrieved. Check on-site announcements, staff instructions, and official information.",
@@ -434,6 +439,18 @@ export const FULL_I18N: Record<"en" | "ja", Record<string, string>> = {
 	ja: {
 		选择模式: "モードを選択",
 		本版本先提供地震流程: "このバージョンではまず地震のフローを提供します",
+		翻译沟通: "翻訳・会話",
+		"其他语言…": "その他の言語…",
+		选择其他语言: "その他の言語を選択",
+		"以下语言正在准备中，当前版本尚未开放。":
+			"以下の言語は準備中のため、現在のバージョンでは利用できません。",
+		准备中: "準備中",
+		关闭: "閉じる",
+		本次演示: "デモ",
+		"是否允许使用演示位置？": "デモ用の位置情報を使用しますか？",
+		"本 Demo 使用固定的新宿位置，仅用于本次查询，不会读取或保存实时 GPS。":
+			"このデモでは新宿の固定位置を今回の検索にのみ使用します。リアルタイムGPSの取得・保存は行いません。",
+		使用演示位置: "デモ位置を使用",
 		// Home screen (redesigned per DOCS/new-ui.png ①)
 		查看现在应该做什么: "今すべきことを確認",
 		帮助您做出正确的下一步判断: "正しい次の一歩の判断をサポートします",
@@ -526,8 +543,9 @@ export const FULL_I18N: Record<"en" | "ja", Record<string, string>> = {
 		"翻译中…": "翻訳中…",
 		翻译失败: "翻訳に失敗しました",
 		返回: "戻る",
-		返回上一步: "前のステップに戻る",
+		返回上一步: "前に戻る",
 		返回主页: "ホームに戻る",
+		返回首页: "ホームへ戻る",
 		当前服务受限: "現在サービスが制限されています",
 		"无法获取最新设施数据。请确认现场广播、工作人员和官方信息。":
 			"最新の施設データを取得できません。現場放送、係員、公式情報を確認してください。",

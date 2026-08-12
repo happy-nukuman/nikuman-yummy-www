@@ -91,7 +91,7 @@ export function EventChoiceScreen({
 					{t(lang, "确认并继续")}
 				</button>
 				<button type="button" className="btn ghost" onClick={onBack}>
-					{t(lang, "返回上一步")}
+					← {t(lang, "返回上一步")}
 				</button>
 			</div>
 		</section>
