@@ -94,5 +94,7 @@ jobs:
         env:
           CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
           CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
-          NEXT_PUBLIC_API_BASE_URL: ${{ vars.NEXT_PUBLIC_API_BASE_URL }}
-          NEXT_PUBLIC_API_MOCK: ${{ vars.NEXT_PUBLIC_API_MOCK }}
+          # 环境变量未在 cloudflare-production environment 配置时使用兜底值：
+          # 指向线上 API 并关闭内置 mock，避免把 mock（デモ翻訳）烙进生产包。
+          NEXT_PUBLIC_API_BASE_URL: ${{ vars.NEXT_PUBLIC_API_BASE_URL || 'https://api-japan-disaster-relief.tokyo-odh-108.workers.dev' }}
+          NEXT_PUBLIC_API_MOCK: ${{ vars.NEXT_PUBLIC_API_MOCK || 'false' }}
