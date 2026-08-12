@@ -35,8 +35,9 @@ export function registerTranslationRoutes(app: Hono<AppEnv>): void {
 						await new WorkersAiTranslationClient(ai).translate(request),
 					),
 				);
-			} catch {
-				// 回退到 Gemini。
+			} catch (error) {
+				// 回退到 Gemini。错误进日志便于区分额度耗尽 / 接口变更等原因。
+				console.error("Workers AI translation failed:", error);
 			}
 		}
 
@@ -52,7 +53,8 @@ export function registerTranslationRoutes(app: Hono<AppEnv>): void {
 					await new GeminiTranslationClient().translate(apiKey, request),
 				),
 			);
-		} catch {
+		} catch (error) {
+			console.error("Gemini translation failed:", error);
 			return translationUnavailable(c);
 		}
 	});

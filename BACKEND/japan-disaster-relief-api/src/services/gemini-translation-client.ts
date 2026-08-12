@@ -53,7 +53,8 @@ export class GeminiTranslationClient {
 					store: false,
 					generation_config: {
 						max_output_tokens: 4_096,
-						thinking_level: "minimal",
+						// 2026-08 起 gemini-2.5-flash 仅接受 high/low（minimal 已被移除）。
+						thinking_level: "low",
 					},
 				}),
 				signal: controller.signal,
@@ -108,7 +109,15 @@ function parseTranslatedText(output: string): string {
 		.trim()
 		.replace(/^```(?:json)?\s*/u, "")
 		.replace(/\s*```$/u, "");
-	const parsed: unknown = JSON.parse(normalized);
+
+	let parsed: unknown;
+	try {
+		parsed = JSON.parse(normalized);
+	} catch {
+		// 2026-08 起 Gemini 可能无视 response_format 直接返回纯文本译文。
+		return stripWrappingQuotes(normalized);
+	}
+
 	if (typeof parsed === "string") {
 		return parsed.trim();
 	}
@@ -123,4 +132,10 @@ function parseTranslatedText(output: string): string {
 	}
 
 	return parsed.translatedText.trim();
+}
+
+// 输入以 JSON 字符串形式提供，模型返回纯文本时可能把整句包进引号里，剥掉一层。
+function stripWrappingQuotes(text: string): string {
+	const match = /^「(.*)」$|^"(.*)"$/su.exec(text);
+	return (match?.[1] ?? match?.[2] ?? text).trim();
 }
