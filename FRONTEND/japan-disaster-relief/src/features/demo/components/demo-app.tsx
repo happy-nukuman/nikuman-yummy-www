@@ -240,18 +240,7 @@ export function DemoApp({ initialLang }: DemoAppProps) {
 		advanceTo(flowId, FLOWS[flowId].start);
 	}
 
-	// 沟通卡的“返回主页”：清空流程状态后回到模式选择页。
-	function goHome() {
-		setFlowPos(null);
-		setFlowAnswers({});
-		setCardIndex(0);
-		setHistory([]);
-		setSelectedShelter(null);
-		setSelectedDisaster(null);
-		setScreen("mode");
-	}
-
-	// 紧急求助页的“返回主页”和顶栏 logo：清空状态回到首页（欢迎页）。
+	// 沟通卡、紧急求助页的“返回主页”和顶栏 logo：清空状态回到首页（欢迎页）。
 	function goWelcome() {
 		setFlowPos(null);
 		setFlowAnswers({});
@@ -318,6 +307,11 @@ export function DemoApp({ initialLang }: DemoAppProps) {
 
 	const headerSub =
 		screen === "communication" ? HEADER_LABELS[lang].communication : HEADER_LABELS[lang].default;
+
+	// 沟通卡「返回」按钮：上一页是主页（欢迎页）或没有历史时不显示，
+	// 此时「返回主页」已覆盖同样的去处。
+	const prevScreen = history[history.length - 1]?.screen;
+	const commCanReturn = prevScreen !== undefined && prevScreen !== "welcome";
 
 	// 许可后在沟通卡之外的页面（含首页、紧急求助）顶部常驻显示获取到的位置。
 	const showLocBar = locPermission === "granted" && screen !== "communication";
@@ -439,9 +433,10 @@ export function DemoApp({ initialLang }: DemoAppProps) {
 					<CommunicationScreen
 						active={screen === "communication"}
 						lang={lang}
+						canReturn={commCanReturn}
 						onToast={notify}
 						onReturn={goBack}
-						onHome={goHome}
+						onHome={goWelcome}
 					/>
 				</main>
 				{locDialogOpen && <LocationDialog lang={lang} onDecide={decideLocation} />}

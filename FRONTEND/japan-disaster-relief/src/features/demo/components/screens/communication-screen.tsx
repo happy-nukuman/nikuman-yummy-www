@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { type PointerEvent as ReactPointerEvent, useEffect, useRef, useState } from "react";
 import type { TranslationLanguage } from "@nikuman-yummy/shared";
 import { useJapaneseSpeech } from "@/features/demo/hooks/use-japanese-speech";
 import { useSpeechRecognition } from "@/features/demo/hooks/use-speech-recognition";
@@ -43,9 +43,55 @@ interface ChatMessage {
 	status: "loading" | "done" | "error";
 }
 
+// 微信同款线条麦克风图标（胶囊话筒 + 拾音弧 + 支杆）。
+function MicIcon() {
+	return (
+		<svg
+			viewBox="0 0 24 24"
+			width="26"
+			height="26"
+			fill="none"
+			stroke="currentColor"
+			strokeWidth="1.8"
+			strokeLinecap="round"
+			strokeLinejoin="round"
+			aria-hidden="true"
+		>
+			<rect x="9" y="3" width="6" height="11" rx="3" />
+			<path d="M5 11a7 7 0 0 0 14 0" />
+			<line x1="12" y1="18" x2="12" y2="21" />
+		</svg>
+	);
+}
+
+// 微信同款线条键盘图标（语音模式下用于切回文字输入）。
+function KeyboardIcon() {
+	return (
+		<svg
+			viewBox="0 0 24 24"
+			width="26"
+			height="26"
+			fill="none"
+			stroke="currentColor"
+			strokeWidth="1.8"
+			strokeLinecap="round"
+			strokeLinejoin="round"
+			aria-hidden="true"
+		>
+			<rect x="3" y="6" width="18" height="12" rx="2.5" />
+			<line x1="7" y1="10" x2="7" y2="10" />
+			<line x1="12" y1="10" x2="12" y2="10" />
+			<line x1="17" y1="10" x2="17" y2="10" />
+			<line x1="8" y1="14" x2="16" y2="14" />
+		</svg>
+	);
+}
+
 interface CommunicationScreenProps {
 	active: boolean;
 	lang: DemoLang;
+	/** 上一页不是主页时才显示「返回」按钮（主页去处已由「返回主页」覆盖）。 */
+	canReturn: boolean;
 	/** 朗读不可用等提示走全局 toast。 */
 	onToast: (message: string) => void;
 	onReturn: () => void;
@@ -57,6 +103,7 @@ interface CommunicationScreenProps {
 export function CommunicationScreen({
 	active,
 	lang,
+	canReturn,
 	onToast,
 	onReturn,
 	onHome,
@@ -65,6 +112,8 @@ export function CommunicationScreen({
 	const [input, setInput] = useState("");
 	// true = 日本人回应模式（输入区切换为日语界面）。
 	const [replyMode, setReplyMode] = useState(false);
+	// true = 语音输入模式：输入框替换为微信式「按住 说话」长条按钮。
+	const [voiceMode, setVoiceMode] = useState(false);
 	const nextIdRef = useRef(0);
 	const listRef = useRef<HTMLDivElement>(null);
 	const speech = useJapaneseSpeech();
@@ -166,12 +215,17 @@ export function CommunicationScreen({
 		}
 	}
 
-	// 🎤：识别结果实时填入输入框，由用户确认后发送（不自动发送，避免误识别直接出卡）。
-	function toggleVoiceInput() {
-		if (recognition.listening) {
-			recognition.stop();
-			return;
-		}
+	// 🎤 / ⌨️：在文字输入和「按住 说话」两种输入方式之间切换（微信同款交互）。
+	function toggleVoiceMode() {
+		if (voiceMode) recognition.stop();
+		setVoiceMode(!voiceMode);
+	}
+
+	// 按住开始识别；识别结果实时填入输入框，由用户确认后发送
+	//（不自动发送，避免误识别直接出卡）。
+	function startHoldToTalk(event: ReactPointerEvent<HTMLButtonElement>) {
+		// 手指滑出按钮也能收到 pointerup，避免录音停不下来。
+		event.currentTarget.setPointerCapture(event.pointerId);
 		// 录音与朗读互斥，否则会把播放的声音识别进去。
 		speech.stop();
 		const started = recognition.start({
@@ -182,7 +236,17 @@ export function CommunicationScreen({
 				else if (failure === "other") onToast(t(lang, "语音识别失败，请重试"));
 			},
 		});
-		if (!started) onToast(t(lang, "当前浏览器不支持语音输入"));
+		if (!started) {
+			onToast(t(lang, "当前浏览器不支持语音输入"));
+			setVoiceMode(false);
+		}
+	}
+
+	// 松开结束识别并切回文字输入，识别文本留在输入框内等用户确认发送。
+	function endHoldToTalk() {
+		if (!recognition.listening) return;
+		recognition.stop();
+		setVoiceMode(false);
 	}
 
 	return (
@@ -305,36 +369,53 @@ export function CommunicationScreen({
 				>
 					<button
 						type="button"
-						className={`chat-mic${recognition.listening ? " listening" : ""}`}
-						onClick={toggleVoiceInput}
-						aria-label={t(lang, "语音输入")}
+						className="chat-mic"
+						onClick={toggleVoiceMode}
+						aria-label={voiceMode ? t(lang, "键盘输入") : t(lang, "语音输入")}
 					>
-						🎤
+						{voiceMode ? <KeyboardIcon /> : <MicIcon />}
 					</button>
-					<input
-						className="chat-input"
-						value={input}
-						onChange={(event) => setInput(event.target.value)}
-						lang={replyMode ? "ja" : undefined}
-						placeholder={
-							recognition.listening
+					{voiceMode ? (
+						// 微信同款「按住 说话」：按住录音，松开后识别文本填入输入框待确认。
+						<button
+							type="button"
+							className={`chat-hold${recognition.listening ? " holding" : ""}`}
+							lang={replyMode ? "ja" : undefined}
+							onPointerDown={startHoldToTalk}
+							onPointerUp={endHoldToTalk}
+							onPointerCancel={endHoldToTalk}
+							onContextMenu={(event) => event.preventDefault()}
+						>
+							{recognition.listening
 								? replyMode
-									? "聞き取り中…"
-									: t(lang, "聆听中…")
+									? "離して 終了"
+									: t(lang, "松开 结束")
 								: replyMode
-									? "日本語で入力…"
-									: t(lang, "输入想说的话，翻译成日语")
-						}
-						enterKeyHint="send"
-					/>
-					<button type="submit" className="chat-send" disabled={input.trim().length === 0}>
-						{replyMode ? "送信" : t(lang, "发送")}
-					</button>
+									? "長押しして 話す"
+									: t(lang, "按住 说话")}
+						</button>
+					) : (
+						<>
+							<input
+								className="chat-input"
+								value={input}
+								onChange={(event) => setInput(event.target.value)}
+								lang={replyMode ? "ja" : undefined}
+								placeholder={replyMode ? "日本語で入力…" : t(lang, "输入想说的话，翻译成日语")}
+								enterKeyHint="send"
+							/>
+							<button type="submit" className="chat-send" disabled={input.trim().length === 0}>
+								{replyMode ? "送信" : t(lang, "发送")}
+							</button>
+						</>
+					)}
 				</form>
-				<div className="comm-nav">
-					<button type="button" className="btn ghost" onClick={onReturn}>
-						{t(lang, "返回")}
-					</button>
+				<div className={`comm-nav${canReturn ? "" : " single"}`}>
+					{canReturn && (
+						<button type="button" className="btn ghost" onClick={onReturn}>
+							{t(lang, "返回")}
+						</button>
+					)}
 					<button type="button" className="btn ghost" onClick={onHome}>
 						{t(lang, "返回主页")}
 					</button>
