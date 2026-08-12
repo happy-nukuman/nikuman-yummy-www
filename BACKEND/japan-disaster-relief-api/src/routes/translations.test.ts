@@ -266,6 +266,30 @@ describe("POST /api/translations (Gemini fallback path)", () => {
 		});
 	});
 
+	it("accepts a plain-text Gemini reply that ignores response_format", async () => {
+		// 2026-08 起观察到 Gemini 可能直接返回带引号的纯文本而非 JSON。
+		vi.stubGlobal(
+			"fetch",
+			vi.fn().mockResolvedValue(
+				Response.json({
+					status: "completed",
+					steps: [
+						{
+							type: "model_output",
+							content: [{ type: "text", text: "「避难所在哪里？」" }],
+						},
+					],
+				}),
+			),
+		);
+
+		const response = await translateRequest(VALID_REQUEST, "secret-gemini-key");
+		const body = await response.json<TranslationResponse>();
+
+		expect(response.status).toBe(200);
+		expect(body.translatedText).toBe("避难所在哪里？");
+	});
+
 	it("uses automatic source-language detection when omitted", async () => {
 		vi.stubGlobal(
 			"fetch",
