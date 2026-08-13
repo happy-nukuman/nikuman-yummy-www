@@ -15,7 +15,6 @@ import { LocationBar } from "@/features/demo/components/location-bar";
 import { LocationDialog } from "@/features/demo/components/location-dialog";
 import { SupportModal } from "@/features/demo/components/support-modal";
 import { WelcomeScreen } from "@/features/demo/components/screens/welcome-screen";
-import { ModeScreen } from "@/features/demo/components/screens/mode-screen";
 import {
 	type EventChoice,
 	EventChoiceScreen,
@@ -33,7 +32,6 @@ import "../demo.css";
 
 type ScreenName =
 	| "welcome"
-	| "mode"
 	| "event"
 	| "daily"
 	| "flow"
@@ -143,10 +141,15 @@ export function DemoApp({ initialLang }: DemoAppProps) {
 		notify(WELCOME_COPY[next].toast);
 	}
 
-	// 首页主 CTA 不依赖定位，始终进入判断流程。
-	function startGuide() {
+	// 首页两张模式卡分别直达对应的事象确认页，不再经过“选择模式”中间页。
+	function enterDisasterMode() {
 		pushHistory();
-		setScreen("mode");
+		setScreen("event");
+	}
+
+	function enterDailyMode() {
+		pushHistory();
+		setScreen("daily");
 	}
 
 	// 首页「紧急求助」：直达 119 / 110 求助画面，不经过定位询问。
@@ -338,7 +341,7 @@ export function DemoApp({ initialLang }: DemoAppProps) {
 		else openCommunication();
 	}
 
-	// SOS 页“有人靠近时，展示沟通卡”：沿 SOS 节点的 next 前进。
+	// SOS 页“打开翻译沟通”：沿 SOS 节点的既有 next 前进。
 	function proceedFromSos() {
 		if (flowPos && flowNode?.type === "sos") advanceTo(flowPos.flowId, flowNode.next);
 	}
@@ -362,17 +365,11 @@ export function DemoApp({ initialLang }: DemoAppProps) {
 						active={screen === "welcome"}
 						lang={lang}
 						locPermission={locPermission}
-						onStart={startGuide}
+						onEnterDisaster={enterDisasterMode}
+						onEnterDaily={enterDailyMode}
 						onEmergency={openEmergency}
 						onOpenFacilities={openFacilities}
 						onOpenDisasterInfo={openDisasterInfo}
-						onOpenCommunication={openCommunication}
-					/>
-					<ModeScreen
-						active={screen === "mode"}
-						lang={lang}
-						onEnterDisaster={() => { pushHistory(); setScreen("event"); }}
-						onEnterDaily={() => { pushHistory(); setScreen("daily"); }}
 					/>
 					<EventChoiceScreen
 						active={screen === "event"}
@@ -404,6 +401,7 @@ export function DemoApp({ initialLang }: DemoAppProps) {
 						cardIndex={cardIndex}
 						onAnswer={answerQuestion}
 						onNextActionCard={nextActionCard}
+						onEmergency={openEmergency}
 						onOpenCommunication={openCommunication}
 					/>
 					<EvacuationScreen

@@ -1,8 +1,14 @@
 import type { Metadata } from "next";
-import { Noto_Sans, Noto_Sans_JP, Noto_Sans_SC } from "next/font/google";
+import { Inter, Noto_Sans, Noto_Sans_JP, Noto_Sans_SC } from "next/font/google";
 import "./globals.css";
 import { DEFAULT_LOCALE } from "@/lib/i18n/config";
 import { Providers } from "./providers";
+
+const inter = Inter({
+	variable: "--font-inter",
+	subsets: ["latin"],
+	display: "swap",
+});
 
 const notoSans = Noto_Sans({
 	variable: "--font-noto-sans",
@@ -45,7 +51,7 @@ export default function RootLayout({
 	return (
 		<html
 			lang={DEFAULT_LOCALE}
-			className={`${notoSans.variable} ${notoSansSC.variable} ${notoSansJP.variable}`}
+			className={`${inter.variable} ${notoSans.variable} ${notoSansSC.variable} ${notoSansJP.variable}`}
 		>
 			<body className="antialiased">
 				<Providers>{children}</Providers>

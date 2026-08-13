@@ -71,19 +71,19 @@ export interface WelcomeCopy {
 
 export const WELCOME_COPY: Record<DemoLang, WelcomeCopy> = {
 	zh: {
-		title: "紧急时，从正确的下一步开始",
+		title: "先安全，再行动",
 		lead: "为在东京生活和滞留的外国人提供母语的灾害行动指引。",
 		prompt: "请选择界面语言",
 		toast: "已切换为中文",
 	},
 	en: {
-		title: "In an emergency, start with the right next step",
+		title: "Safety first. Then act.",
 		lead: "Disaster-response guidance in your own language for international residents and visitors in Tokyo.",
 		prompt: "Choose your interface language",
 		toast: "Language changed to English",
 	},
 	ja: {
-		title: "緊急時は、正しい次の一歩から",
+		title: "まず安全を確保し、それから行動",
 		lead: "東京で暮らす・滞在する外国人に、母語で災害時の行動を案内します。",
 		prompt: "表示言語を選択してください",
 		toast: "日本語に切り替えました",
@@ -151,7 +151,6 @@ export const PHRASE_TEXT: Record<DemoLang, string[]> = {
 // Static-text translations keyed by the original Chinese copy.
 export const FULL_I18N: Record<"en" | "ja", Record<string, string>> = {
 	en: {
-		选择模式: "CHOOSE MODE",
 		本版本先提供地震流程: "This version provides the earthquake flow first",
 		翻译沟通: "Translate",
 		"其他语言…": "Other languages…",
@@ -166,19 +165,16 @@ export const FULL_I18N: Record<"en" | "ja", Record<string, string>> = {
 			"This demo uses a fixed Shinjuku location for this session only. It does not read or save live GPS data.",
 		使用演示位置: "Use demo location",
 		// Home screen (redesigned per DOCS/new-ui.png ①)
-		查看现在应该做什么: "See what to do now",
-		帮助您做出正确的下一步判断: "Helps you decide the right next step",
 		"灾害・急病・事故・危险情况时使用": "For disasters, sudden illness, accidents, or danger",
 		附近避难设施: "Nearby shelters",
 		查看最近的避难设施: "Find the closest evacuation facilities",
 		灾害信息: "Disaster info",
 		公开灾害信息: "Public disaster information",
+		获取最新灾害通知: "Get the latest disaster updates",
 		需要位置权限: "Location required",
 		"附近避难设施和灾害信息暂不可用，其他功能仍可使用。":
 			"Nearby shelters and disaster information are unavailable without location access. Other features still work.",
-		多语言沟通卡: "Multilingual communication card",
-		用日语短句与周围的人沟通: "Talk to people nearby with Japanese phrases",
-		"无需注册 · 不收集个人信息": "No registration · No personal data collected",
+		"无需注册・不收集个人信息": "No registration · No personal data collected",
 		"位置信息仅用于本次查询，不会被保存。":
 			"Location is used only for this search and is not saved.",
 		"定位精度：大致位置": "Location accuracy: approximate",
@@ -201,7 +197,6 @@ export const FULL_I18N: Record<"en" | "ja", Record<string, string>> = {
 		灾害模式: "Disaster mode",
 		"地震、火灾、水灾发生后，不知道下一步怎么办。":
 			"Use this after an earthquake, fire, or flood when you are unsure what to do next.",
-		进入灾害模式: "Enter disaster mode",
 		日常应急: "Everyday emergencies",
 		"系统根据公开信息推荐“地震”，请你确认。":
 			"Public information indicates a possible earthquake. Please confirm against what is happening around you.",
@@ -244,7 +239,6 @@ export const FULL_I18N: Record<"en" | "ja", Record<string, string>> = {
 			"Follow staff instructions, on-site announcements, and official information.",
 		"规则来源：东京都防灾相关官方资料｜规则版本 v1.0｜非专业建筑或医疗判断":
 			"Rule source: Official Tokyo disaster-prevention materials | Rule version v1.0 | Not a professional structural or medical assessment",
-		我做不到: "I cannot do this",
 		"系统会根据本次位置和官方开放数据列出候选设施。":
 			"The system will list candidate facilities using your current session location and official open data.",
 		"选择导航到避难地点时，将询问是否使用演示位置。":
@@ -258,6 +252,7 @@ export const FULL_I18N: Record<"en" | "ja", Record<string, string>> = {
 		暂时不需要: "Not now",
 		附近设施候选: "Nearby evacuation facilities",
 		打开沟通卡: "Open communication card",
+		打开翻译沟通: "Open translation support",
 		请把屏幕给对方看: "Show this screen to the other person",
 		"🔊 朗读日语": "🔊 Speak Japanese",
 		"⏹ 停止": "⏹ Stop",
@@ -289,7 +284,6 @@ export const FULL_I18N: Record<"en" | "ja", Record<string, string>> = {
 		// Flow copy from DOCS/卡片・灾害定义.xlsm
 		"煤气泄漏、迷路、身体不适等紧急状况。":
 			"For situations such as gas leaks, getting lost, or feeling unwell.",
-		进入日常应急: "Start everyday emergency guide",
 		事象确认: "Event check",
 		"现在发生了什么？": "What is happening now?",
 		"请手动选择日常应急类型。": "Please choose the type of everyday emergency.",
@@ -300,7 +294,6 @@ export const FULL_I18N: Record<"en" | "ja", Record<string, string>> = {
 		行动: "Action",
 		下一步: "Next",
 		现在应该做: "Do this now",
-		"我做不到 / 需要帮助": "I cannot do this / I need help",
 		"是否需要避难？": "Do you need to evacuate?",
 		"需要，导航到避难地点": "Yes — navigate to an evacuation site",
 		"摇晃停止了吗？": "Has the shaking stopped?",
@@ -374,7 +367,6 @@ export const FULL_I18N: Record<"en" | "ja", Record<string, string>> = {
 		等待救援时: "While waiting for rescue",
 		"保存体力，保持手机电量。有规律地敲击墙壁或管道，让救援人员发现你。":
 			"Save your strength and phone battery. Tap on a wall or pipe in a steady rhythm so rescuers can find you.",
-		"有人靠近时，展示沟通卡": "Someone is nearby — show the communication card",
 		"到达后或需要求助时，向身边的人展示。":
 			"Show this to people around you when you arrive or when you need help.",
 		// Location permission dialog (demo: the location itself is hardcoded)
@@ -499,7 +491,6 @@ export const FULL_I18N: Record<"en" | "ja", Record<string, string>> = {
 		"在 Google 地图中打开路线": "Open route in Google Maps",
 	},
 	ja: {
-		选择模式: "モードを選択",
 		本版本先提供地震流程: "このバージョンではまず地震のフローを提供します",
 		翻译沟通: "翻訳・会話",
 		"其他语言…": "その他の言語…",
@@ -514,19 +505,16 @@ export const FULL_I18N: Record<"en" | "ja", Record<string, string>> = {
 			"このデモでは新宿の固定位置を今回の検索にのみ使用します。リアルタイムGPSの取得・保存は行いません。",
 		使用演示位置: "デモ位置を使用",
 		// Home screen (redesigned per DOCS/new-ui.png ①)
-		查看现在应该做什么: "今すべきことを確認",
-		帮助您做出正确的下一步判断: "正しい次の一歩の判断をサポートします",
 		"灾害・急病・事故・危险情况时使用": "災害・急病・事故・危険なときに使用",
 		附近避难设施: "近くの避難施設",
 		查看最近的避难设施: "最寄りの避難施設を確認",
 		灾害信息: "災害情報",
 		公开灾害信息: "公開災害情報",
+		获取最新灾害通知: "最新の災害情報を確認",
 		需要位置权限: "位置情報が必要",
 		"附近避难设施和灾害信息暂不可用，其他功能仍可使用。":
 			"付近の避難施設と災害情報は現在利用できません。その他の機能は引き続き利用できます。",
-		多语言沟通卡: "多言語コミュニケーションカード",
-		用日语短句与周围的人沟通: "日本語フレーズで周囲の人に伝える",
-		"无需注册 · 不收集个人信息": "登録不要 · 個人情報は収集しません",
+		"无需注册・不收集个人信息": "登録不要・個人情報は収集しません",
 		"位置信息仅用于本次查询，不会被保存。":
 			"位置情報は今回の検索のみに使用し、保存されません。",
 		"定位精度：大致位置": "位置精度：おおよその位置",
@@ -548,7 +536,6 @@ export const FULL_I18N: Record<"en" | "ja", Record<string, string>> = {
 		灾害模式: "災害モード",
 		"地震、火灾、水灾发生后，不知道下一步怎么办。":
 			"地震・火災・水害の後、次に何をすべきか分からないときに使います。",
-		进入灾害模式: "災害モードを開始",
 		日常应急: "日常の緊急対応",
 		"系统根据公开信息推荐“地震”，请你确认。":
 			"公開情報では地震の可能性があります。現場の状況と合わせて確認してください。",
@@ -590,7 +577,6 @@ export const FULL_I18N: Record<"en" | "ja", Record<string, string>> = {
 		"听从工作人员、现场广播和官方发布。": "係員、現場放送、公式情報に従ってください。",
 		"规则来源：东京都防灾相关官方资料｜规则版本 v1.0｜非专业建筑或医疗判断":
 			"ルール出典：東京都の公式防災資料｜ルール版 v1.0｜建物・医療の専門判断ではありません",
-		我做不到: "できません",
 		"系统会根据本次位置和官方开放数据列出候选设施。":
 			"今回の位置情報と公式オープンデータから候補施設を表示します。",
 		"选择导航到避难地点时，将询问是否使用演示位置。":
@@ -603,6 +589,7 @@ export const FULL_I18N: Record<"en" | "ja", Record<string, string>> = {
 		暂时不需要: "今は必要ありません",
 		附近设施候选: "近くの避難施設",
 		打开沟通卡: "コミュニケーションカードを開く",
+		打开翻译沟通: "翻訳・会話を開く",
 		请把屏幕给对方看: "相手にこの画面を見せてください",
 		"🔊 朗读日语": "🔊 日本語を読み上げる",
 		"⏹ 停止": "⏹ 停止",
@@ -634,7 +621,6 @@ export const FULL_I18N: Record<"en" | "ja", Record<string, string>> = {
 		// Flow copy from DOCS/卡片・灾害定义.xlsm
 		"煤气泄漏、迷路、身体不适等紧急状况。":
 			"ガス漏れ、道に迷ったとき、体調不良などの日常の緊急時に使います。",
-		进入日常应急: "日常の緊急対応を開始",
 		事象确认: "事象確認",
 		"现在发生了什么？": "今、何が起きていますか？",
 		"请手动选择日常应急类型。": "日常の緊急対応の種類を選んでください。",
@@ -645,7 +631,6 @@ export const FULL_I18N: Record<"en" | "ja", Record<string, string>> = {
 		行动: "行動",
 		下一步: "次へ",
 		现在应该做: "今すること",
-		"我做不到 / 需要帮助": "できません / 助けが必要です",
 		"是否需要避难？": "避難が必要ですか？",
 		"需要，导航到避难地点": "はい、避難場所を探す",
 		"摇晃停止了吗？": "揺れは止まりましたか？",
@@ -719,7 +704,6 @@ export const FULL_I18N: Record<"en" | "ja", Record<string, string>> = {
 		等待救援时: "救助を待つあいだ",
 		"保存体力，保持手机电量。有规律地敲击墙壁或管道，让救援人员发现你。":
 			"体力とバッテリーを温存してください。壁や配管を規則的に叩いて、救助隊に居場所を知らせてください。",
-		"有人靠近时，展示沟通卡": "人が近づいたらコミュニケーションカードを見せる",
 		"到达后或需要求助时，向身边的人展示。":
 			"到着したときや助けが必要なときに、周囲の人に見せてください。",
 		// Location permission dialog (demo: the location itself is hardcoded)

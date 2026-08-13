@@ -2,6 +2,7 @@
 
 import { type DemoLang, t } from "@/features/demo/i18n";
 import { Progress } from "@/features/demo/components/progress";
+import { PhoneIcon, TranslateIcon } from "@/features/demo/components/app-icons";
 
 interface SosScreenProps {
 	active: boolean;
@@ -12,7 +13,7 @@ interface SosScreenProps {
 
 /**
  * SOS card: shown when the user is trapped or cannot move. The 119 button is a
- * real tel: link (the only place in the demo that dials).
+ * real tel: link and the secondary action reuses the existing communication flow.
  */
 export function SosScreen({ active, lang, onShowCommunication }: SosScreenProps) {
 	return (
@@ -36,10 +37,12 @@ export function SosScreen({ active, lang, onShowCommunication }: SosScreenProps)
 			</div>
 			<div className="actions">
 				<a className="btn emergency sos-call" href="tel:119">
-					📞 {t(lang, "拨打 119")}
+					<PhoneIcon className="btn-icon" />
+					{t(lang, "拨打 119")}
 				</a>
-				<button type="button" className="btn secondary" onClick={onShowCommunication}>
-					{t(lang, "有人靠近时，展示沟通卡")}
+				<button type="button" className="btn translation" onClick={onShowCommunication}>
+					<TranslateIcon className="btn-icon" />
+					{t(lang, "打开翻译沟通")}
 				</button>
 			</div>
 		</section>

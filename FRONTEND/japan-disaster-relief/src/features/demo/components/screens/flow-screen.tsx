@@ -3,6 +3,7 @@
 import type { FlowNode } from "@/features/demo/flows";
 import { type DemoLang, t } from "@/features/demo/i18n";
 import { Progress } from "@/features/demo/components/progress";
+import { PhoneIcon, TranslateIcon } from "@/features/demo/components/app-icons";
 
 interface FlowScreenProps {
 	active: boolean;
@@ -14,6 +15,7 @@ interface FlowScreenProps {
 	cardIndex: number;
 	onAnswer: (value: string) => void;
 	onNextActionCard: () => void;
+	onEmergency: () => void;
 	onOpenCommunication: () => void;
 }
 
@@ -26,6 +28,7 @@ export function FlowScreen({
 	cardIndex,
 	onAnswer,
 	onNextActionCard,
+	onEmergency,
 	onOpenCommunication,
 }: FlowScreenProps) {
 	const actionCard = node?.type === "action" ? node.cards[cardIndex] : null;
@@ -54,8 +57,9 @@ export function FlowScreen({
 						))}
 					</div>
 					<div className="actions">
-						<button type="button" className="btn secondary" onClick={onOpenCommunication}>
-							{t(lang, "我做不到 / 需要帮助")}
+						<button type="button" className="btn emergency-link" onClick={onEmergency}>
+							<PhoneIcon className="btn-icon" />
+							{t(lang, "紧急求助")}
 						</button>
 					</div>
 				</>
@@ -88,18 +92,29 @@ export function FlowScreen({
 						{t(lang, "规则来源：东京都防灾相关官方资料｜规则版本 v1.0｜非专业建筑或医疗判断")}
 					</div>
 					<div className="actions">
-						{actionCard.tel && (
-							// 目前唯一的 tel 值就是 119，按钮文案沿用固定词条。
-							<a className="btn emergency" href={`tel:${actionCard.tel}`}>
-								📞 {t(lang, "拨打 119")}
-							</a>
+						{actionCard.tel ? (
+							<>
+								{/* 目前唯一的 tel 值就是 119，号码继续来自既有流程配置。 */}
+								<a className="btn emergency action-call" href={`tel:${actionCard.tel}`}>
+									<PhoneIcon className="btn-icon" />
+									{t(lang, "拨打 119")}
+								</a>
+								<button type="button" className="btn translation" onClick={onOpenCommunication}>
+									<TranslateIcon className="btn-icon" />
+									{t(lang, "打开翻译沟通")}
+								</button>
+							</>
+						) : (
+							<>
+								<button type="button" className="btn primary" onClick={onNextActionCard}>
+									{t(lang, isLastCard && node.nextLabel ? node.nextLabel : "下一步")}
+								</button>
+								<button type="button" className="btn emergency-link" onClick={onEmergency}>
+									<PhoneIcon className="btn-icon" />
+									{t(lang, "紧急求助")}
+								</button>
+							</>
 						)}
-						<button type="button" className="btn primary" onClick={onNextActionCard}>
-							{t(lang, isLastCard && node.nextLabel ? node.nextLabel : "下一步")}
-						</button>
-						<button type="button" className="btn secondary" onClick={onOpenCommunication}>
-							{t(lang, "我做不到")}
-						</button>
 					</div>
 				</>
 			)}

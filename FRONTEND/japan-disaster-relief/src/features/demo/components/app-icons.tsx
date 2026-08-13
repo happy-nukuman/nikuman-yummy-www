@@ -70,11 +70,10 @@ export function SirenIcon(props: IconProps) {
 	);
 }
 
-export function ShelterIcon(props: IconProps) {
+export function PhoneIcon(props: IconProps) {
 	return (
 		<IconBase {...props}>
-			<circle cx="12" cy="5" r="2" />
-			<path d="m9 21 1.5-7-3-2 2-4 4 1 2 4M10.5 14l4 3.5M6 21h12" />
+			<path d="M8.2 3.8 10 8.2 7.8 9.7a14.8 14.8 0 0 0 6.5 6.5l1.5-2.2 4.4 1.8v3.4c0 1-1 1.8-2 1.7A17.1 17.1 0 0 1 3.1 5.8c-.1-1 .7-2 1.7-2h3.4Z" />
 		</IconBase>
 	);
 }

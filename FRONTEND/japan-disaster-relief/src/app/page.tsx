@@ -8,8 +8,8 @@ export const metadata: Metadata = {
 };
 
 export const viewport: Viewport = {
-	// 浅色主题色与毛玻璃顶栏（aurora 渐变上端）保持一致。
-	themeColor: "#eef5ff",
+	// 与独立的浅蓝 Header 背景保持一致。
+	themeColor: "#f1f7fb",
 	width: "device-width",
 	initialScale: 1,
 	// 全屏铺满刘海屏，配合 demo.css 中的 env(safe-area-inset-*)。
