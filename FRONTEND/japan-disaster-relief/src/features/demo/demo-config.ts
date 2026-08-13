@@ -9,6 +9,6 @@ export const DEMO_SYNC_STATUS = {
 } as const;
 
 /** 团队名与服务名 Tokyo Safe First 分开维护。 */
-export const DEMO_TEAM_NAME = "水煎包";
+export const DEMO_TEAM_NAME = "水煎包 Team";
 
 export type DemoSyncStatus = typeof DEMO_SYNC_STATUS;

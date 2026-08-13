@@ -35,7 +35,7 @@ export function AppFooter({
 			</div>
 			{isHome ? (
 				<div className="app-footer-home-meta">
-					<span className="app-footer-team">{t(lang, teamName)}</span>
+					<span className="app-footer-team">{teamName}</span>
 					<button type="button" className="app-footer-support" onClick={onSupport}>
 						{t(lang, "Support")}
 					</button>

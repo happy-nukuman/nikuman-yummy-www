@@ -1,3 +1,7 @@
+import { readdirSync, readFileSync } from "node:fs";
+import { extname, join } from "node:path";
+import { fileURLToPath } from "node:url";
+import ts from "typescript";
 import { describe, expect, it } from "vitest";
 import {
 	EARTHQUAKE_FLOW,
@@ -11,6 +15,60 @@ import {
 } from "./flows";
 import { DISASTER_INFO_ITEMS } from "./disaster-info";
 import { FULL_I18N, PHRASES, PHRASE_TEXT } from "./i18n";
+
+const SOURCE_ROOT = fileURLToPath(new URL("../../", import.meta.url));
+
+function sourceFiles(directory: string): string[] {
+	return readdirSync(directory, { withFileTypes: true }).flatMap((entry) => {
+		const path = join(directory, entry.name);
+		if (entry.isDirectory()) return sourceFiles(path);
+		if (!entry.isFile() || ![".ts", ".tsx"].includes(extname(entry.name))) return [];
+		if (entry.name.includes(".test.") || entry.name.endsWith(".d.ts")) return [];
+		return [path];
+	});
+}
+
+function collectTranslationArgumentLiterals(node: ts.Expression, keys: Set<string>) {
+	if (ts.isStringLiteralLike(node)) {
+		keys.add(node.text);
+		return;
+	}
+	if (ts.isConditionalExpression(node)) {
+		collectTranslationArgumentLiterals(node.whenTrue, keys);
+		collectTranslationArgumentLiterals(node.whenFalse, keys);
+		return;
+	}
+	if (ts.isParenthesizedExpression(node)) {
+		collectTranslationArgumentLiterals(node.expression, keys);
+	}
+}
+
+/** Static source audit: a new t(lang, "中文 key") must be translated in both dictionaries. */
+function literalKeysPassedToT(): string[] {
+	const keys = new Set<string>();
+	for (const path of sourceFiles(SOURCE_ROOT)) {
+		const source = ts.createSourceFile(
+			path,
+			readFileSync(path, "utf8"),
+			ts.ScriptTarget.Latest,
+			true,
+			extname(path) === ".tsx" ? ts.ScriptKind.TSX : ts.ScriptKind.TS,
+		);
+		function visit(node: ts.Node) {
+			if (
+				ts.isCallExpression(node) &&
+				ts.isIdentifier(node.expression) &&
+				node.expression.text === "t" &&
+				node.arguments[1]
+			) {
+				collectTranslationArgumentLiterals(node.arguments[1], keys);
+			}
+			ts.forEachChild(node, visit);
+		}
+		visit(source);
+	}
+	return [...keys];
+}
 
 function question(flow: Flow, id: string) {
 	const node = getNode(flow, id);
@@ -276,7 +334,6 @@ const STATIC_SCREEN_KEYS = [
 	"数据时点",
 	"Demo 模拟同步",
 	"流程进度",
-	"水煎包",
 	"Support",
 	"联系我们",
 	"Tokyo Safe First 是面向东京外国居民和游客的灾害行动 Demo。",
@@ -298,6 +355,7 @@ const STATIC_SCREEN_KEYS = [
 
 describe("flow i18n coverage", () => {
 	const strings = new Set<string>(STATIC_SCREEN_KEYS);
+	for (const key of literalKeysPassedToT()) strings.add(key);
 	// 灾害信息 demo 数据的所有文案同样以中文为键，一并检查覆盖。
 	for (const item of DISASTER_INFO_ITEMS) {
 		strings.add(item.category);
@@ -327,6 +385,10 @@ describe("flow i18n coverage", () => {
 			}
 		}
 	}
+
+	it("keeps the English and Japanese dictionaries aligned", () => {
+		expect(Object.keys(FULL_I18N.en).sort()).toEqual(Object.keys(FULL_I18N.ja).sort());
+	});
 
 	it.each([...strings].map((s) => [s]))("%s has en and ja translations", (s) => {
 		expect(FULL_I18N.en[s], `missing en translation for "${s}"`).toBeDefined();

@@ -7,7 +7,7 @@ describe("demo presentation config", () => {
 	});
 
 	it("keeps the team name separate from the service name", () => {
-		expect(DEMO_TEAM_NAME).toBe("水煎包");
+		expect(DEMO_TEAM_NAME).toBe("水煎包 Team");
 		expect(DEMO_TEAM_NAME).not.toBe("Tokyo Safe First");
 	});
 });

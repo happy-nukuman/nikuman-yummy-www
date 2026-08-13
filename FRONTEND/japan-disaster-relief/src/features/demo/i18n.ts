@@ -78,13 +78,13 @@ export const WELCOME_COPY: Record<DemoLang, WelcomeCopy> = {
 	},
 	en: {
 		title: "In an emergency, start with the right next step",
-		lead: "Disaster action guidance in your own language, for foreign residents and visitors in Tokyo.",
+		lead: "Disaster-response guidance in your own language for international residents and visitors in Tokyo.",
 		prompt: "Choose your interface language",
 		toast: "Language changed to English",
 	},
 	ja: {
 		title: "緊急時は、正しい次の一歩から",
-		lead: "東京で暮らす・滞在する外国人に、母語での災害行動ガイドを提供します。",
+		lead: "東京で暮らす・滞在する外国人に、母語で災害時の行動を案内します。",
 		prompt: "表示言語を選択してください",
 		toast: "日本語に切り替えました",
 	},
@@ -202,26 +202,25 @@ export const FULL_I18N: Record<"en" | "ja", Record<string, string>> = {
 		"地震、火灾、水灾发生后，不知道下一步怎么办。":
 			"Use this after an earthquake, fire, or flood when you are unsure what to do next.",
 		进入灾害模式: "Enter disaster mode",
-		日常应急: "Everyday emergency",
+		日常应急: "Everyday emergencies",
 		"系统根据公开信息推荐“地震”，请你确认。":
-			"Based on public information, the system suggests “Earthquake.” Please confirm.",
+			"Public information indicates a possible earthquake. Please confirm against what is happening around you.",
 		// Event-confirmation data-source card (DOCS/new-ui.png ③)
-		"根据公开信息，可能发生了地震": "Based on public information, an earthquake may have occurred",
+		"根据公开信息，可能发生了地震": "Public information indicates a possible earthquake",
 		"以下是系统根据公开灾害信息的建议，请结合现场情况确认。":
-			"The suggestion below is based on public disaster information. Please confirm it against the actual situation on site.",
+			"Please confirm against what is happening around you.",
 		数据来源: "Data sources",
 		"日本气象厅、东京都防灾信息、内阁府防灾信息 等":
 			"Japan Meteorological Agency, Tokyo Metropolitan disaster information, Cabinet Office disaster information, etc.",
 		"Demo 数据快照": "Demo data snapshot",
 		数据时点: "Data snapshot",
-		"Demo 模拟同步": "Demo simulated sync",
+		"Demo 模拟同步": "Demo sync (simulated)",
 		流程进度: "Flow progress",
-		水煎包: "水煎包",
 		Support: "Support",
 		联系我们: "Contact",
 		"Tokyo Safe First 是面向东京外国居民和游客的灾害行动 Demo。":
-			"Tokyo Safe First is a disaster-action demo for international residents and visitors in Tokyo.",
-		"如发生真实紧急情况：": "In a real emergency:",
+			"Tokyo Safe First is a disaster-response guidance demo for international residents and visitors in Tokyo.",
+		"如发生真实紧急情况：": "Emergency contacts",
 		"消防 / 救护": "Fire / Ambulance",
 		警察: "Police",
 		"本 Demo 信息仅供辅助参考，请同时确认现场人员及官方发布。":
@@ -232,7 +231,7 @@ export const FULL_I18N: Record<"en" | "ja", Record<string, string>> = {
 			"This information is for reference only. Follow the actual situation on site.",
 		确认并继续: "Confirm and continue",
 		地震: "Earthquake",
-		"系统推荐 · 请确认": "Suggested by system · Please confirm",
+		"系统推荐 · 请确认": "Based on public data · Please confirm",
 		火灾: "Fire",
 		"水灾 / 海啸": "Flood / Tsunami",
 		不确定: "Not sure",
@@ -257,7 +256,7 @@ export const FULL_I18N: Record<"en" | "ja", Record<string, string>> = {
 		"東京都新宿区西新宿六丁目8番附近 · 仅本次使用":
 			"Near Nishi-Shinjuku 6-8, Shinjuku City, Tokyo · Used only for this session",
 		暂时不需要: "Not now",
-		附近设施候选: "Nearby facility candidates",
+		附近设施候选: "Nearby evacuation facilities",
 		打开沟通卡: "Open communication card",
 		请把屏幕给对方看: "Show this screen to the other person",
 		"🔊 朗读日语": "🔊 Speak Japanese",
@@ -267,7 +266,7 @@ export const FULL_I18N: Record<"en" | "ja", Record<string, string>> = {
 		常用沟通卡: "Common phrases",
 		"输入想说的话，翻译成日语": "Type what you want to say…",
 		发送: "Send",
-		我说: "Me",
+		我说: "I speak",
 		语音输入: "Voice input",
 		键盘输入: "Keyboard input",
 		"按住 说话": "Hold to Talk",
@@ -289,8 +288,8 @@ export const FULL_I18N: Record<"en" | "ja", Record<string, string>> = {
 		重新尝试: "Try again",
 		// Flow copy from DOCS/卡片・灾害定义.xlsm
 		"煤气泄漏、迷路、身体不适等紧急状况。":
-			"Emergencies such as a gas leak, getting lost, or feeling unwell.",
-		进入日常应急: "Enter everyday emergency",
+			"For situations such as gas leaks, getting lost, or feeling unwell.",
+		进入日常应急: "Start everyday emergency guide",
 		事象确认: "Event check",
 		"现在发生了什么？": "What is happening now?",
 		"请手动选择日常应急类型。": "Please choose the type of everyday emergency.",
@@ -330,13 +329,13 @@ export const FULL_I18N: Record<"en" | "ja", Record<string, string>> = {
 		"摇晃停止了，继续": "The shaking has stopped — continue",
 		用敲击代替呼喊: "Knock instead of shouting",
 		"有规律地敲击墙壁或管道。节省体力，避免吸入粉尘。":
-			"Tap on a wall or pipe in a steady rhythm. It saves your strength and keeps you from breathing in dust.",
+			"Tap on a wall or pipe in a steady rhythm. Save your strength and avoid breathing in dust.",
 		穿上鞋保护双脚: "Put on shoes to protect your feet",
 		"避免踩到玻璃和碎片。": "Avoid stepping on glass and debris.",
 		"不取行李，不乘电梯": "Do not take luggage or use elevators",
 		"沿安全出口向开阔处移动，途中不要点火、不开关电器。":
 			"Move toward an open area via a safety exit. Do not light flames or switch electrical devices on the way.",
-		听从工作人员指示: "Follow the staff instructions",
+		听从工作人员指示: "Follow staff instructions",
 		"按现场引导行动，不要擅自返回建筑内。":
 			"Act as directed on site and do not go back into the building on your own.",
 		从安全出口离开: "Leave through a safety exit",
@@ -349,7 +348,7 @@ export const FULL_I18N: Record<"en" | "ja", Record<string, string>> = {
 		"留意 NHK、气象厅和自治体的官方发布。":
 			"Follow announcements from NHK, the Japan Meteorological Agency, and your local government.",
 		立刻停止使用燃气: "Stop using gas immediately",
-		"关火并停止使用所有燃气器具。": "Turn off the flame and stop using every gas appliance.",
+		"关火并停止使用所有燃气器具。": "Turn off all flames and stop using gas appliances.",
 		不要使用明火和电器开关: "Do not use open flames or electrical switches",
 		"不点火、不抽烟；不开关灯和排风扇，避免产生火花。":
 			"Do not light flames or smoke. Do not switch lights or exhaust fans either; they can create sparks.",
@@ -368,7 +367,7 @@ export const FULL_I18N: Record<"en" | "ja", Record<string, string>> = {
 		"说明燃气泄漏情况和身体不适症状。": "Explain the gas leak and the symptoms people have.",
 		联系燃气公司抢修电话: "Call the gas company's emergency repair line",
 		"到室外安全处再拨打；抢修人员确认安全前，不要返回使用火和电器。":
-			"Call from a safe place outside. Do not go back to use flames or electricity until repair staff confirm it is safe.",
+			"Call from a safe place outside. Do not return or use flames or electricity until repair staff confirm it is safe.",
 		// SOS card and route-page helper text
 		紧急求助: "Emergency help",
 		"如手机有信号，立即拨打 119": "If your phone has signal, call 119 now",
@@ -413,15 +412,15 @@ export const FULL_I18N: Record<"en" | "ja", Record<string, string>> = {
 		发表时间: "Issued at",
 		发表机关: "Issued by",
 		对象地域: "Target area",
-		// Heatstroke Warning Alert (issued for Tokyo on Aug 7, 2026)
+		// Heat Stroke Alert (issued for Tokyo on Aug 7, 2026)
 		高温: "Heat",
-		"中暑警戒警报（东京地方）": "Heatstroke Warning Alert (Tokyo area)",
+		"中暑警戒警报（东京地方）": "Heat Stroke Alert (Tokyo area)",
 		"2026年8月7日 05:00 发表": "Issued Aug 7, 2026, 05:00",
 		"环境省・气象厅": "Ministry of the Environment / Japan Meteorological Agency",
 		"预计将出现危害健康的显著高温，请注意防暑降温、及时补水。":
 			"Dangerously high temperatures are expected. Guard against heatstroke and stay hydrated.",
 		"环境省和气象厅向东京都发布了中暑警戒警报。气温将显著升高，可能对健康造成危害，请采取防暑措施。":
-			"The Ministry of the Environment and the Japan Meteorological Agency have issued a Heatstroke Warning Alert for Tokyo. Temperatures will be significantly high and may harm your health. Take precautions against the heat.",
+			"The Ministry of the Environment and the Japan Meteorological Agency have issued a Heat Stroke Alert for Tokyo. Temperatures will be significantly high and may harm your health. Take precautions against the heat.",
 		"东京地方（含新宿区）": "Tokyo area (including Shinjuku City)",
 		"2026年8月7日 05:00": "Aug 7, 2026, 05:00",
 		"在室内适当使用空调，保持凉爽环境。":
@@ -438,7 +437,7 @@ export const FULL_I18N: Record<"en" | "ja", Record<string, string>> = {
 		"东京都23区发生 M3.5 地震，最大震度1，无海啸风险。":
 			"An M3.5 earthquake occurred in Tokyo's 23 wards. Maximum intensity 1; no tsunami risk.",
 		"气象厅发布的震源・震度信息：8月5日傍晚，东京都23区发生了 M3.5 的地震。此次地震震度较小，无海啸风险。":
-			"Epicenter and intensity information from the JMA: on the evening of August 5, an M3.5 earthquake occurred in Tokyo's 23 wards. The shaking was minor and there is no tsunami risk.",
+			"Epicenter and intensity information from the Japan Meteorological Agency: on the evening of August 5, an M3.5 earthquake occurred in Tokyo's 23 wards. The shaking was minor and there is no tsunami risk.",
 		发生时刻: "Time of occurrence",
 		"2026年8月5日 18:06 左右": "Around 18:06, Aug 5, 2026",
 		震源地: "Epicenter",
@@ -455,7 +454,8 @@ export const FULL_I18N: Record<"en" | "ja", Record<string, string>> = {
 			"The shaking was minor; usually no special action is needed.",
 		"如再次感到摇晃，先保护头部，远离可能坠落的物品。":
 			"If you feel shaking again, protect your head first and stay away from objects that could fall.",
-		"留意气象厅的后续发布。": "Keep an eye on further announcements from the JMA.",
+		"留意气象厅的后续发布。":
+			"Keep an eye on further announcements from the Japan Meteorological Agency.",
 		// Thunderstorm advisory (Western Tama, issued Aug 8, 2026)
 		气象: "Weather",
 		"雷注意报（东京都多摩西部）": "Thunderstorm advisory (Western Tama, Tokyo)",
@@ -463,7 +463,7 @@ export const FULL_I18N: Record<"en" | "ja", Record<string, string>> = {
 		"多摩西部发布了雷注意报；东京23区（含新宿区）目前没有警报・注意报。":
 			"A thunderstorm advisory is in effect for Western Tama. No warnings or advisories for Tokyo's 23 wards (including Shinjuku).",
 		"气象厅向东京都多摩西部（青梅市、あきる野市等）发布了雷注意报。您所在的东京23区（含新宿区）目前没有生效的警报・注意报，但天气可能突变，请留意天空变化。":
-			"The JMA has issued a thunderstorm advisory for Western Tama in Tokyo (Ome, Akiruno, and nearby cities). No warnings or advisories are in effect for Tokyo's 23 wards (including Shinjuku), but the weather can change suddenly — keep an eye on the sky.",
+			"The Japan Meteorological Agency has issued a thunderstorm advisory for Western Tama in Tokyo (Ome, Akiruno, and nearby cities). No warnings or advisories are in effect for Tokyo's 23 wards (including Shinjuku), but the weather can change suddenly — keep an eye on the sky.",
 		东京都多摩西部: "Western Tama, Tokyo",
 		"23区（含新宿区）": "Tokyo 23 wards (incl. Shinjuku)",
 		"无警报・注意报": "No warnings or advisories",
@@ -478,10 +478,11 @@ export const FULL_I18N: Record<"en" | "ja", Record<string, string>> = {
 			"Searching a snapshot of official open data using your current session location.",
 		避难所: "Shelter",
 		候选: "Candidate",
-		"当前开放状态：无法确认": "Current open status: cannot be confirmed",
+		"当前开放状态：无法确认": "Opening status: unconfirmed",
 		选择并查看路线: "Select and view route",
 		"在 Google 地图中查看位置": "View location on Google Maps",
-		"附近 3 公里内暂无可显示的候选设施": "No candidate facilities within 3 km",
+		"附近 3 公里内暂无可显示的候选设施":
+			"No evacuation facilities found within 3 km",
 		"请确认现场广播、工作人员和官方信息，不要依赖本页面。":
 			"Check on-site announcements, staff instructions, and official information. Do not rely on this page.",
 		数据出典: "Data source",
@@ -489,7 +490,7 @@ export const FULL_I18N: Record<"en" | "ja", Record<string, string>> = {
 		数据源更新: "Source data updated",
 		"非实时信息。附近设施不代表安全或已开放。直线距离不代表路线可通行。":
 			"Not real-time information. A nearby facility is not necessarily safe or open. Straight-line distance does not mean the route is passable.",
-		前往设施的路线参考: "Route reference to the facility",
+		前往设施的路线参考: "Route to this facility (reference only)",
 		"路线仅供参考，是否可通行需要现场确认。无法确认设施当前是否开放。":
 			"The route is for reference only; check on site whether it is passable. Whether the facility is currently open cannot be confirmed.",
 		路线参考地图: "Route reference map",
@@ -548,26 +549,25 @@ export const FULL_I18N: Record<"en" | "ja", Record<string, string>> = {
 		"地震、火灾、水灾发生后，不知道下一步怎么办。":
 			"地震・火災・水害の後、次に何をすべきか分からないときに使います。",
 		进入灾害模式: "災害モードを開始",
-		日常应急: "日常の緊急時",
+		日常应急: "日常の緊急対応",
 		"系统根据公开信息推荐“地震”，请你确认。":
-			"公開情報に基づき「地震」が候補です。確認してください。",
+			"公開情報では地震の可能性があります。現場の状況と合わせて確認してください。",
 		// Event-confirmation data-source card (DOCS/new-ui.png ③)
-		"根据公开信息，可能发生了地震": "公開情報によると、地震が発生した可能性があります",
+		"根据公开信息，可能发生了地震": "公開情報では地震の可能性があります",
 		"以下是系统根据公开灾害信息的建议，请结合现场情况确认。":
-			"以下は公開されている災害情報に基づく候補です。現場の状況と合わせて確認してください。",
+			"現場の状況と合わせて確認してください。",
 		数据来源: "データ出典",
 		"日本气象厅、东京都防灾信息、内阁府防灾信息 等":
 			"気象庁、東京都防災情報、内閣府防災情報 など",
 		"Demo 数据快照": "デモデータのスナップショット",
 		数据时点: "データ時点",
-		"Demo 模拟同步": "Demo 模擬同期",
+		"Demo 模拟同步": "デモ同期（模擬）",
 		流程进度: "フローの進行状況",
-		水煎包: "水煎包",
 		Support: "サポート",
 		联系我们: "お問い合わせ",
 		"Tokyo Safe First 是面向东京外国居民和游客的灾害行动 Demo。":
-			"Tokyo Safe First は、東京の外国人住民・旅行者向けの災害行動デモです。",
-		"如发生真实紧急情况：": "実際の緊急時：",
+			"Tokyo Safe First は、東京で暮らす・滞在する外国人向けの災害時行動支援デモです。",
+		"如发生真实紧急情况：": "緊急時の連絡先",
 		"消防 / 救护": "消防 / 救急",
 		警察: "警察",
 		"本 Demo 信息仅供辅助参考，请同时确认现场人员及官方发布。":
@@ -576,9 +576,9 @@ export const FULL_I18N: Record<"en" | "ja", Record<string, string>> = {
 			"リアルタイム情報ではありません。公式発表を優先してください。",
 		"此信息仅供参考，请以实际情况为准。":
 			"この情報は参考情報です。実際の状況を優先してください。",
-		确认并继续: "確認して続行",
+		确认并继续: "確認して次へ",
 		地震: "地震",
-		"系统推荐 · 请确认": "システム候補 · 確認してください",
+		"系统推荐 · 请确认": "公開情報から推定 · 要確認",
 		火灾: "火災",
 		"水灾 / 海啸": "水害 / 津波",
 		不确定: "分からない",
@@ -601,7 +601,7 @@ export const FULL_I18N: Record<"en" | "ja", Record<string, string>> = {
 		当前位置: "現在地",
 		"東京都新宿区西新宿六丁目8番附近 · 仅本次使用": "東京都新宿区西新宿六丁目8番付近 · 今回のみ使用",
 		暂时不需要: "今は必要ありません",
-		附近设施候选: "近くの施設候補",
+		附近设施候选: "近くの避難施設",
 		打开沟通卡: "コミュニケーションカードを開く",
 		请把屏幕给对方看: "相手にこの画面を見せてください",
 		"🔊 朗读日语": "🔊 日本語を読み上げる",
@@ -611,7 +611,7 @@ export const FULL_I18N: Record<"en" | "ja", Record<string, string>> = {
 		常用沟通卡: "よく使うフレーズ",
 		"输入想说的话，翻译成日语": "伝えたいことを入力…",
 		发送: "送信",
-		我说: "自分",
+		我说: "自分が話す",
 		语音输入: "音声入力",
 		键盘输入: "キーボード入力",
 		"按住 说话": "長押しして 話す",
@@ -627,17 +627,17 @@ export const FULL_I18N: Record<"en" | "ja", Record<string, string>> = {
 		返回上一步: "前に戻る",
 		返回主页: "ホームに戻る",
 		返回首页: "ホーム",
-		当前服务受限: "現在サービスが制限されています",
+		当前服务受限: "現在、この機能を利用できません",
 		"无法读取 Demo 设施快照。请确认现场广播、工作人员和官方信息。":
-			"デモ施設スナップショットを読み込めません。現場放送、係員、公式情報を確認してください。",
+			"避難施設のデモデータを読み込めません。現場放送、係員、公式情報を確認してください。",
 		重新尝试: "再試行",
 		// Flow copy from DOCS/卡片・灾害定义.xlsm
 		"煤气泄漏、迷路、身体不适等紧急状况。":
-			"ガス漏れ、道に迷った、体調不良などの緊急時。",
-		进入日常应急: "日常の緊急時を開始",
+			"ガス漏れ、道に迷ったとき、体調不良などの日常の緊急時に使います。",
+		进入日常应急: "日常の緊急対応を開始",
 		事象确认: "事象確認",
 		"现在发生了什么？": "今、何が起きていますか？",
-		"请手动选择日常应急类型。": "日常の緊急時の種類を選んでください。",
+		"请手动选择日常应急类型。": "日常の緊急対応の種類を選んでください。",
 		煤气泄漏: "ガス漏れ",
 		迷路: "道に迷った",
 		身体不适: "体調不良",
@@ -647,7 +647,7 @@ export const FULL_I18N: Record<"en" | "ja", Record<string, string>> = {
 		现在应该做: "今すること",
 		"我做不到 / 需要帮助": "できません / 助けが必要です",
 		"是否需要避难？": "避難が必要ですか？",
-		"需要，导航到避难地点": "必要。避難場所へ案内する",
+		"需要，导航到避难地点": "はい、避難場所を探す",
 		"摇晃停止了吗？": "揺れは止まりましたか？",
 		"先确认身边的晃动情况，再进行下一步。":
 			"まず周囲の揺れが止まったか確認してから、次に進みます。",
@@ -663,18 +663,18 @@ export const FULL_I18N: Record<"en" | "ja", Record<string, string>> = {
 		"公司、学校、商场等建筑内": "会社・学校・商業施設などの建物内",
 		其他: "その他",
 		"是否寻找到工作人员？": "係員は見つかりましたか？",
-		"优先听从现场工作人员的指示。": "現場の係員の指示に従うことを優先してください。",
+		"优先听从现场工作人员的指示。": "まず現場の係員の指示に従ってください。",
 		找到了: "見つかった",
 		没有找到: "見つからない",
 		"低下身体，保护头颈": "姿勢を低くして頭と首を守る",
 		"就近进入较安全空间，远离玻璃、高柜、吊物和围墙。等待摇晃停止。":
-			"近くの安全な場所に移動し、ガラス・背の高い棚・吊り下げ物・塀から離れてください。揺れが止まるまで待ちます。",
+			"近くの安全な場所に移動し、ガラス・背の高い棚・吊り下げ物・塀から離れてください。揺れが止まるまで待ってください。",
 		不要强行挣脱: "無理に抜け出そうとしない",
 		"避免二次受伤。": "二次的なけがを避けるためです。",
 		"摇晃停止了，继续": "揺れが止まりました。次へ",
 		用敲击代替呼喊: "叫ばずに音を出して知らせる",
 		"有规律地敲击墙壁或管道。节省体力，避免吸入粉尘。":
-			"壁や配管を規則的に叩いてください。体力を温存し、粉じんを吸い込まないようにします。",
+			"壁や配管を規則的に叩いてください。体力を温存し、粉じんを吸い込まないでください。",
 		穿上鞋保护双脚: "靴を履いて足を守る",
 		"避免踩到玻璃和碎片。": "ガラスや破片を踏まないようにしてください。",
 		"不取行李，不乘电梯": "荷物を取らず、エレベーターを使わない",
@@ -714,11 +714,11 @@ export const FULL_I18N: Record<"en" | "ja", Record<string, string>> = {
 		"到室外安全处再拨打；抢修人员确认安全前，不要返回使用火和电器。":
 			"屋外の安全な場所から電話してください。作業員が安全を確認するまで、火や電気を使いに戻らないでください。",
 		// SOS card and route-page helper text
-		紧急求助: "緊急の救助要請",
+		紧急求助: "救助を要請",
 		"如手机有信号，立即拨打 119": "電話がつながる場合は、すぐに119番へ",
 		等待救援时: "救助を待つあいだ",
 		"保存体力，保持手机电量。有规律地敲击墙壁或管道，让救援人员发现你。":
-			"体力とバッテリーを温存してください。壁や配管を規則的に叩いて、救助隊に居場所を知らせます。",
+			"体力とバッテリーを温存してください。壁や配管を規則的に叩いて、救助隊に居場所を知らせてください。",
 		"有人靠近时，展示沟通卡": "人が近づいたらコミュニケーションカードを見せる",
 		"到达后或需要求助时，向身边的人展示。":
 			"到着したときや助けが必要なときに、周囲の人に見せてください。",
@@ -756,7 +756,7 @@ export const FULL_I18N: Record<"en" | "ja", Record<string, string>> = {
 		发表时间: "発表時刻",
 		发表机关: "発表機関",
 		对象地域: "対象地域",
-		// Heatstroke Warning Alert (issued for Tokyo on Aug 7, 2026)
+		// Heat Stroke Alert (issued for Tokyo on Aug 7, 2026)
 		高温: "高温",
 		"中暑警戒警报（东京地方）": "熱中症警戒アラート（東京地方）",
 		"2026年8月7日 05:00 发表": "2026年8月7日 05:00 発表",
