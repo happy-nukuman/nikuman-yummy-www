@@ -6,7 +6,6 @@ import {
 	ChevronRightIcon,
 	CommunicationIcon,
 	DisasterIcon,
-	LocationIcon,
 	ShelterIcon,
 	ShieldIcon,
 	SirenIcon,
@@ -15,9 +14,9 @@ import {
 interface WelcomeScreenProps {
 	active: boolean;
 	lang: DemoLang;
-	/** 进入首页前询问的定位许可结果，决定位置卡片内容和功能是否可用。 */
+	/** 位置许可结果，仅影响附近设施与灾害信息。 */
 	locPermission: "unknown" | "granted" | "denied";
-	/** 主 CTA「查看现在应该做什么」：进入模式选择（需要定位许可）。 */
+	/** 主 CTA「查看现在应该做什么」：始终可进入模式选择。 */
 	onStart: () => void;
 	/** 「紧急求助」：进入 119 / 110 紧急求助画面（不依赖位置）。 */
 	onEmergency: () => void;
@@ -27,8 +26,6 @@ interface WelcomeScreenProps {
 	onOpenDisasterInfo: () => void;
 	/** 「多语言沟通卡」磁贴：打开沟通卡（不依赖位置）。 */
 	onOpenCommunication: () => void;
-	/** 拒绝后重新弹出定位许可弹窗。 */
-	onRequestLocation: () => void;
 }
 
 export function WelcomeScreen({
@@ -40,35 +37,27 @@ export function WelcomeScreen({
 	onOpenFacilities,
 	onOpenDisasterInfo,
 	onOpenCommunication,
-	onRequestLocation,
 }: WelcomeScreenProps) {
 	const welcome = WELCOME_COPY[lang];
-	// 未获许可（含未作答）时，位置相关功能不可用。
-	const locked = locPermission !== "granted";
+	const locationDenied = locPermission === "denied";
 	return (
 		<section className={`screen${active ? " active" : ""}`} data-screen="welcome">
 			{locPermission === "denied" && (
-				// 拒绝定位：不显示地址，说明位置相关功能不可用，并提供重新授权入口。
+				// 拒绝定位只影响两个位置功能；主判断流程继续可用。
 				<div className="panel amber">
 					<div className="panel-row">
 						<div className="panel-icon">📍</div>
 						<div>
 							<div className="panel-title">{t(lang, "未获得定位权限")}</div>
-							<div className="panel-copy">{t(lang, "允许定位后才能使用位置相关功能。")}</div>
+							<div className="panel-copy">{t(lang, "附近避难设施和灾害信息暂不可用，其他功能仍可使用。")}</div>
 						</div>
 					</div>
-					<button type="button" className="btn secondary loc-retry" onClick={onRequestLocation}>
-						{t(lang, "允许获取位置")}
-					</button>
 				</div>
-			)}
-			{locPermission === "unknown" && (
-				<div className="loc-bar"><LocationIcon aria-hidden /><span>{t(lang, "正在获取当前位置…")}</span></div>
 			)}
 			<h1 className="hero-title">{welcome.title}</h1>
 			<p className="lead">{welcome.lead}</p>
 			<div className="home-actions">
-				<button type="button" className="home-cta go" onClick={onStart} disabled={locked}>
+				<button type="button" className="home-cta go" onClick={onStart}>
 					<span className="cta-icon" aria-hidden><ChecklistIcon /></span>
 					<span className="cta-text">
 						<span className="cta-title">{t(lang, "查看现在应该做什么")}</span>
@@ -86,19 +75,31 @@ export function WelcomeScreen({
 				</button>
 			</div>
 			<div className="tile-grid">
-				<button type="button" className="tile" onClick={onOpenFacilities} disabled={locked}>
+				<button
+					type="button"
+					className={`tile${locationDenied ? " location-locked" : ""}`}
+					onClick={onOpenFacilities}
+					disabled={locationDenied}
+				>
 					<span className="tile-icon shelter" aria-hidden><ShelterIcon /></span>
 					<span className="tile-title">{t(lang, "附近避难设施")}</span>
 					<span className="tile-copy">{t(lang, "查看最近的避难设施")}</span>
+					{locationDenied && <span className="tile-status">{t(lang, "需要位置权限")}</span>}
 					<ChevronRightIcon className="tile-chevron" />
 				</button>
-				<button type="button" className="tile" onClick={onOpenDisasterInfo} disabled={locked}>
+				<button
+					type="button"
+					className={`tile${locationDenied ? " location-locked" : ""}`}
+					onClick={onOpenDisasterInfo}
+					disabled={locationDenied}
+				>
 					<span className="tile-icon disaster" aria-hidden><DisasterIcon /></span>
 					<span className="tile-title">{t(lang, "灾害信息")}</span>
-					<span className="tile-copy">{t(lang, "获取最新灾害通知")}</span>
+					<span className="tile-copy">{t(lang, "公开灾害信息")}</span>
+					{locationDenied && <span className="tile-status">{t(lang, "需要位置权限")}</span>}
 					<ChevronRightIcon className="tile-chevron" />
 				</button>
-				<button type="button" className="tile" onClick={onOpenCommunication}>
+				<button type="button" className="tile communication-tile" onClick={onOpenCommunication}>
 					<span className="tile-icon communication" aria-hidden><CommunicationIcon /></span>
 					<span className="tile-title">{t(lang, "多语言沟通卡")}</span>
 					<span className="tile-copy">{t(lang, "用日语短句与周围的人沟通")}</span>

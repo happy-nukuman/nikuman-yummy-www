@@ -1,7 +1,7 @@
 "use client";
 
 import type { DemoShelterCandidate, DemoShelterNearbyResponse } from "@nikuman-yummy/shared";
-import { type DemoLang, t } from "@/features/demo/i18n";
+import { formatDemoSnapshotDate, type DemoLang, t } from "@/features/demo/i18n";
 import { ShelterCandidateCard } from "./shelter-candidate-card";
 
 interface ShelterCandidateListProps {
@@ -34,7 +34,7 @@ export function ShelterCandidateList({ response, lang, onNavigate }: ShelterCand
 			<div className="source">
 				{`${t(lang, "数据出典")}：`}
 				<span lang="ja">{response.source.name}</span>
-				{` ｜ ${t(lang, "更新日")}：${response.source.updatedAt}`}
+				{` ｜ ${t(lang, "数据源更新")}：${formatDemoSnapshotDate(lang, response.source.updatedAt)}`}
 				<br />
 				{t(lang, "非实时信息。附近设施不代表安全或已开放。直线距离不代表路线可通行。")}
 			</div>

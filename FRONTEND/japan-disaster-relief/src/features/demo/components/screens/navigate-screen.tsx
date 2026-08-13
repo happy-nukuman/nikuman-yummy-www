@@ -13,11 +13,8 @@ interface NavigateScreenProps {
 	lang: DemoLang;
 	origin: GeoPoint;
 	shelter: DemoShelterCandidate | null;
-	/** Location line shown in the current-location panel. */
-	locationLabel: string;
 	/** Continues the flow to the communication card. */
 	onOpenCommunication: () => void;
-	onBack: () => void;
 }
 
 /** Route reference from the demo origin to the selected shelter. */
@@ -26,27 +23,18 @@ export function NavigateScreen({
 	lang,
 	origin,
 	shelter,
-	locationLabel,
 	onOpenCommunication,
-	onBack,
 }: NavigateScreenProps) {
 	const name = shelter ? shelterDisplayName(lang, shelter) : null;
 	const address = shelter ? shelterDisplayAddress(lang, shelter) : null;
 
 	return (
 		<section className={`screen${active ? " active" : ""}`} data-screen="navigate">
-			<Progress on={5} />
+			<Progress on={5} label={t(lang, "流程进度")} />
 			<h1 className="hero-title">{t(lang, "前往设施的路线参考")}</h1>
 			{shelter && name && address && (
 				<>
 					<div className="panel">
-						<div className="panel-row">
-							<div className="panel-icon">📍</div>
-							<div>
-								<div className="panel-title">{t(lang, "当前位置")}</div>
-								<div className="panel-copy">{locationLabel}</div>
-							</div>
-						</div>
 						<div className="panel-row">
 							<div className="panel-icon">🏫</div>
 							<div>
@@ -73,9 +61,6 @@ export function NavigateScreen({
 			<div className="actions">
 				<button type="button" className="btn secondary" onClick={onOpenCommunication}>
 					{t(lang, "打开沟通卡")}
-				</button>
-				<button type="button" className="btn ghost" onClick={onBack}>
-					← {t(lang, "返回上一步")}
 				</button>
 			</div>
 		</section>

@@ -15,8 +15,6 @@ interface FlowScreenProps {
 	onAnswer: (value: string) => void;
 	onNextActionCard: () => void;
 	onOpenCommunication: () => void;
-	onBack: () => void;
-	onBackFromAction: () => void;
 }
 
 /** Renders question and action nodes; other node types have dedicated screens. */
@@ -29,8 +27,6 @@ export function FlowScreen({
 	onAnswer,
 	onNextActionCard,
 	onOpenCommunication,
-	onBack,
-	onBackFromAction,
 }: FlowScreenProps) {
 	const actionCard = node?.type === "action" ? node.cards[cardIndex] : null;
 	// 最后一张行动卡的主按钮可由节点自定义文案（如“摇晃停止了，继续”）。
@@ -40,7 +36,7 @@ export function FlowScreen({
 		<section className={`screen${active ? " active" : ""}`} data-screen="flow">
 			{node?.type === "question" && (
 				<>
-					<Progress on={node.stage ?? 2} />
+					<Progress on={node.stage ?? 2} label={t(lang, "流程进度")} />
 					<div className="question-count">{t(lang, "状态确认")}</div>
 					<h1 className="hero-title">{t(lang, node.title)}</h1>
 					<p className="lead">{t(lang, node.lead)}</p>
@@ -61,15 +57,12 @@ export function FlowScreen({
 						<button type="button" className="btn secondary" onClick={onOpenCommunication}>
 							{t(lang, "我做不到 / 需要帮助")}
 						</button>
-						<button type="button" className="btn ghost" onClick={onBack}>
-							← {t(lang, "返回上一步")}
-						</button>
 					</div>
 				</>
 			)}
 			{node?.type === "action" && actionCard && (
 				<>
-					<Progress on={node.stage ?? 3} />
+					<Progress on={node.stage ?? 3} label={t(lang, "流程进度")} />
 					<div className="question-count">
 						{`${t(lang, "行动")} ${cardIndex + 1} / ${node.cards.length}`}
 					</div>
@@ -106,9 +99,6 @@ export function FlowScreen({
 						</button>
 						<button type="button" className="btn secondary" onClick={onOpenCommunication}>
 							{t(lang, "我做不到")}
-						</button>
-						<button type="button" className="btn ghost" onClick={onBackFromAction}>
-							← {t(lang, "返回上一步")}
 						</button>
 					</div>
 				</>

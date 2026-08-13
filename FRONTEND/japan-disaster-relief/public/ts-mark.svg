@@ -1,4 +1,6 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" role="img" aria-label="Tokyo Safe First TS mark">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" role="img" aria-labelledby="title desc">
+  <title id="title">Tokyo Safe First TS mark</title>
+  <desc id="desc">A compact blue and green TS symbol with a location pin and safe-route arrow.</desc>
   <defs>
     <linearGradient id="t" x1="8" y1="7" x2="47" y2="42" gradientUnits="userSpaceOnUse">
       <stop stop-color="#0879f9"/>

@@ -7,7 +7,6 @@ import { CloseIcon, GlobeIcon, TranslateIcon } from "@/features/demo/components/
 
 interface TopBarProps {
 	lang: DemoLang;
-	isHome: boolean;
 	/** 点击左上角 logo：回到首页（欢迎页）。 */
 	onHome: () => void;
 	onOpenCommunication: () => void;
@@ -32,7 +31,6 @@ const OTHER_LANGUAGES = [
 
 export function TopBar({
 	lang,
-	isHome,
 	onHome,
 	onOpenCommunication,
 	onSwitchLanguage,
@@ -58,7 +56,7 @@ export function TopBar({
 
 	return (
 		<>
-			<header className={`topbar${isHome ? " home" : " compact"}`}>
+			<header className="topbar home">
 				<button type="button" className="brand-logo" aria-label={t(lang, "返回主页")} onClick={onHome}>
 					<Image
 						src="/logo-tokyo-safe-first.png"
@@ -73,10 +71,11 @@ export function TopBar({
 					<button
 						type="button"
 						className="top-action communication-action"
+						aria-label={t(lang, "翻译沟通")}
 						onClick={onOpenCommunication}
 					>
 						<TranslateIcon className="top-action-icon" />
-						<span>{t(lang, "翻译沟通")}</span>
+						<span className="communication-action-label">{t(lang, "翻译沟通")}</span>
 					</button>
 					<div className="language-control">
 						<button

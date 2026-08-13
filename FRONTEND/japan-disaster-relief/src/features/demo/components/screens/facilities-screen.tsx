@@ -11,7 +11,6 @@ interface FacilitiesScreenProps {
 	shelters: ReturnType<typeof useDemoShelters>;
 	onRetry: () => void;
 	onNavigate: (facility: DemoShelterCandidate) => void;
-	onBack: () => void;
 }
 
 /** Nearby shelter candidates: loading / error / result states of the demo query. */
@@ -21,7 +20,6 @@ export function FacilitiesScreen({
 	shelters,
 	onRetry,
 	onNavigate,
-	onBack,
 }: FacilitiesScreenProps) {
 	return (
 		<section className={`screen${active ? " active" : ""}`} data-screen="facilities">
@@ -42,11 +40,11 @@ export function FacilitiesScreen({
 					<div className="panel amber">
 						<div className="panel-title">{t(lang, "当前服务受限")}</div>
 						<div className="panel-copy">
-							{t(lang, "无法获取最新设施数据。请确认现场广播、工作人员和官方信息。")}
+							{t(lang, "无法读取 Demo 设施快照。请确认现场广播、工作人员和官方信息。")}
 						</div>
 					</div>
 					<div className="actions">
-						<button type="button" className="btn primary" onClick={onRetry}>
+						<button type="button" className="btn secondary" onClick={onRetry}>
 							{t(lang, "重新尝试")}
 						</button>
 					</div>
@@ -55,11 +53,6 @@ export function FacilitiesScreen({
 			{shelters.isSuccess && (
 				<ShelterCandidateList response={shelters.data} lang={lang} onNavigate={onNavigate} />
 			)}
-			<div className="actions">
-				<button type="button" className="btn ghost" onClick={onBack}>
-					← {t(lang, "返回上一步")}
-				</button>
-			</div>
 		</section>
 	);
 }

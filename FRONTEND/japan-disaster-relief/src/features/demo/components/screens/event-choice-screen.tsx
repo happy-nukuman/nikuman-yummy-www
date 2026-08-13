@@ -1,6 +1,7 @@
 "use client";
 
-import { type DemoLang, t } from "@/features/demo/i18n";
+import { DISASTER_SNAPSHOT_DATE } from "@/features/demo/disaster-info";
+import { dataSnapshotTimeText, type DemoLang, t } from "@/features/demo/i18n";
 import { Progress } from "@/features/demo/components/progress";
 
 export interface EventChoice {
@@ -10,6 +11,8 @@ export interface EventChoice {
 	label: string;
 	/** Optional Chinese source sub-label (e.g. "系统推荐 · 请确认"). */
 	meta?: string;
+	/** False marks an intentionally unavailable flow; the option remains visible but cannot be selected. */
+	available?: boolean;
 }
 
 interface EventChoiceScreenProps {
@@ -21,14 +24,13 @@ interface EventChoiceScreenProps {
 	title?: string;
 	/** Chinese source lead text. */
 	lead: string;
-	/** 显示“数据来源 / 更新时间”卡（DOCS/new-ui.png ③，仅灾害模式）。 */
+	/** 显示 Demo 快照的数据来源卡（仅灾害模式）。 */
 	showDataSources?: boolean;
 	choices: readonly EventChoice[];
 	selected: string | null;
 	onSelect: (value: string) => void;
 	/** 「确认并继续」：以当前选中项继续（new-ui ③ 的确认式交互）。 */
 	onConfirm: (value: string) => void;
-	onBack: () => void;
 }
 
 /** Event-confirmation card: a radio-style single-choice list shared by the disaster and daily modes. */
@@ -43,11 +45,10 @@ export function EventChoiceScreen({
 	selected,
 	onSelect,
 	onConfirm,
-	onBack,
 }: EventChoiceScreenProps) {
 	return (
 		<section className={`screen${active ? " active" : ""}`} data-screen={name}>
-			<Progress on={1} />
+			<Progress on={1} label={t(lang, "流程进度")} />
 			<h1 className="title-sm">{t(lang, title)}</h1>
 			<p className="lead-sm">{t(lang, lead)}</p>
 			{showDataSources && (
@@ -56,9 +57,11 @@ export function EventChoiceScreen({
 					<div className="source-value">
 						{t(lang, "日本气象厅、东京都防灾信息、内阁府防灾信息 等")}
 					</div>
-					<div className="source-label">{t(lang, "更新时间")}</div>
-					<div className="source-value">2025/08/06 19:42</div>
-					<div className="source-note">{t(lang, "此信息仅供参考，请以实际情况为准。")}</div>
+					<div className="source-label">{t(lang, "Demo 数据快照")}</div>
+					<div className="source-value">
+						{dataSnapshotTimeText(lang, DISASTER_SNAPSHOT_DATE)}
+					</div>
+					<div className="source-note">{t(lang, "非实时信息，请以官方发布为准")}</div>
 				</div>
 			)}
 			<div className="choice-list" role="radiogroup" aria-label={t(lang, title)}>
@@ -68,7 +71,9 @@ export function EventChoiceScreen({
 						type="button"
 						role="radio"
 						aria-checked={selected === choice.value}
-						className={`choice${selected === choice.value ? " selected" : ""}`}
+						aria-disabled={choice.available === false}
+						disabled={choice.available === false}
+						className={`choice${selected === choice.value ? " selected" : ""}${choice.available === false ? " coming-soon" : ""}`}
 						onClick={() => onSelect(choice.value)}
 					>
 						<span className="choice-icon">{choice.icon}</span>
@@ -78,6 +83,9 @@ export function EventChoiceScreen({
 								<div className="choice-meta">{t(lang, choice.meta)}</div>
 							)}
 						</span>
+						{choice.available === false && (
+							<span className="coming-badge choice-coming-badge">{t(lang, "准备中")}</span>
+						)}
 					</button>
 				))}
 			</div>
@@ -89,9 +97,6 @@ export function EventChoiceScreen({
 					onClick={() => selected !== null && onConfirm(selected)}
 				>
 					{t(lang, "确认并继续")}
-				</button>
-				<button type="button" className="btn ghost" onClick={onBack}>
-					← {t(lang, "返回上一步")}
 				</button>
 			</div>
 		</section>

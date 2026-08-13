@@ -1,6 +1,9 @@
-// 首页「灾害信息」页的 demo 数据快照：内容取自 2026-08-08 时点真实的公开发布
+// 首页「灾害信息」页的 demo 数据快照：内容取自下方统一时点的真实公开发布
 // （環境省・気象庁の熱中症警戒アラート、気象庁の震源・震度情報と警報・注意報）。
 // demo 版不做实时拉取；所有文案与其他画面一样以中文为键走 i18n。
+
+/** 灾害判断、列表、详情和 Footer 共用的 Demo 快照时点。 */
+export const DISASTER_SNAPSHOT_DATE = "2026-08-08";
 
 export type DisasterLevel = "warning" | "advisory" | "info";
 

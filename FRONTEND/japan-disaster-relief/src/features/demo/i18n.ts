@@ -3,6 +3,40 @@
 
 export type DemoLang = "zh" | "en" | "ja";
 
+const ENGLISH_MONTHS = [
+	"Jan",
+	"Feb",
+	"Mar",
+	"Apr",
+	"May",
+	"Jun",
+	"Jul",
+	"Aug",
+	"Sep",
+	"Oct",
+	"Nov",
+	"Dec",
+] as const;
+
+/** 将接口的 ISO 日期统一为 Footer 与数据来源卡所用的本地化短日期。 */
+export function formatDemoSnapshotDate(lang: DemoLang, value: string): string {
+	const match = /^(\d{4})[-/](\d{2})[-/](\d{2})/.exec(value);
+	if (!match) return value;
+	const [, year, month, day] = match;
+	if (lang === "en") {
+		const monthName = ENGLISH_MONTHS[Number(month) - 1];
+		if (!monthName) return value;
+		return `${monthName} ${Number(day)}, ${year}`;
+	}
+	return `${year}/${month}/${day}`;
+}
+
+/** 生成与现有来源卡文案一致的“数据时点”文本。 */
+export function dataSnapshotTimeText(lang: DemoLang, value: string): string {
+	const separator = lang === "en" ? ": " : "：";
+	return `${t(lang, "数据时点")}${separator}${formatDemoSnapshotDate(lang, value)}`;
+}
+
 // 按浏览器语言偏好顺序匹配 demo 支持的语言；中日英之外默认英语。
 export function detectDemoLang(languages: readonly string[]): DemoLang {
 	for (const tag of languages) {
@@ -138,7 +172,10 @@ export const FULL_I18N: Record<"en" | "ja", Record<string, string>> = {
 		附近避难设施: "Nearby shelters",
 		查看最近的避难设施: "Find the closest evacuation facilities",
 		灾害信息: "Disaster info",
-		获取最新灾害通知: "Get the latest disaster notices",
+		公开灾害信息: "Public disaster information",
+		需要位置权限: "Location required",
+		"附近避难设施和灾害信息暂不可用，其他功能仍可使用。":
+			"Nearby shelters and disaster information are unavailable without location access. Other features still work.",
 		多语言沟通卡: "Multilingual communication card",
 		用日语短句与周围的人沟通: "Talk to people nearby with Japanese phrases",
 		"无需注册 · 不收集个人信息": "No registration · No personal data collected",
@@ -175,7 +212,22 @@ export const FULL_I18N: Record<"en" | "ja", Record<string, string>> = {
 		数据来源: "Data sources",
 		"日本气象厅、东京都防灾信息、内阁府防灾信息 等":
 			"Japan Meteorological Agency, Tokyo Metropolitan disaster information, Cabinet Office disaster information, etc.",
-		更新时间: "Updated",
+		"Demo 数据快照": "Demo data snapshot",
+		数据时点: "Data snapshot",
+		"Demo 模拟同步": "Demo simulated sync",
+		流程进度: "Flow progress",
+		水煎包: "水煎包",
+		Support: "Support",
+		联系我们: "Contact",
+		"Tokyo Safe First 是面向东京外国居民和游客的灾害行动 Demo。":
+			"Tokyo Safe First is a disaster-action demo for international residents and visitors in Tokyo.",
+		"如发生真实紧急情况：": "In a real emergency:",
+		"消防 / 救护": "Fire / Ambulance",
+		警察: "Police",
+		"本 Demo 信息仅供辅助参考，请同时确认现场人员及官方发布。":
+			"This demo is for guidance only. Also follow on-site staff and official announcements.",
+		"非实时信息，请以官方发布为准":
+			"Not real-time information. Follow official announcements.",
 		"此信息仅供参考，请以实际情况为准。":
 			"This information is for reference only. Follow the actual situation on site.",
 		确认并继续: "Confirm and continue",
@@ -196,6 +248,8 @@ export const FULL_I18N: Record<"en" | "ja", Record<string, string>> = {
 		我做不到: "I cannot do this",
 		"系统会根据本次位置和官方开放数据列出候选设施。":
 			"The system will list candidate facilities using your current session location and official open data.",
+		"选择导航到避难地点时，将询问是否使用演示位置。":
+			"If you choose shelter navigation, you will be asked whether to use the demo location.",
 		重要说明: "Important",
 		"“附近”不代表安全；“数据中存在”不代表现在开放；路线是否可通行需要现场确认。":
 			"“Nearby” does not mean safe. Being listed in the data does not mean the facility is currently open. Route accessibility must be checked on site.",
@@ -228,10 +282,10 @@ export const FULL_I18N: Record<"en" | "ja", Record<string, string>> = {
 		返回: "Back",
 		返回上一步: "Back",
 		返回主页: "Back to home",
-		返回首页: "Back to Home",
+		返回首页: "Home",
 		当前服务受限: "Service currently limited",
-		"无法获取最新设施数据。请确认现场广播、工作人员和官方信息。":
-			"The latest facility data could not be retrieved. Check on-site announcements, staff instructions, and official information.",
+		"无法读取 Demo 设施快照。请确认现场广播、工作人员和官方信息。":
+			"The demo facility snapshot could not be loaded. Check on-site announcements, staff instructions, and official information.",
 		重新尝试: "Try again",
 		// Flow copy from DOCS/卡片・灾害定义.xlsm
 		"煤气泄漏、迷路、身体不适等紧急状况。":
@@ -340,6 +394,12 @@ export const FULL_I18N: Record<"en" | "ja", Record<string, string>> = {
 		仅本次使用: "This session only",
 		// Disaster info list & detail (home tile → nearby disaster info snapshot)
 		当前位置附近的灾害信息: "Disaster information near your location",
+		"以下为当前位置附近可参考的公开防灾信息，点击查看详情。":
+			"Public disaster-prevention information near your location is shown below for reference. Tap an item for details.",
+		"以下为当前位置附近可参考的公开防灾信息":
+			"The information below is public disaster-prevention information near your location for reference.",
+		"新宿区当前没有生效中的气象警报・注意报":
+			"No weather warnings or advisories are currently in effect for Shinjuku City",
 		"以下是根据本次位置整理的公开灾害信息，点击查看详情。":
 			"Public disaster information for this session's location. Tap an item for details.",
 		"新宿区当前没有生效的警报・注意报":
@@ -426,6 +486,7 @@ export const FULL_I18N: Record<"en" | "ja", Record<string, string>> = {
 			"Check on-site announcements, staff instructions, and official information. Do not rely on this page.",
 		数据出典: "Data source",
 		更新日: "Updated",
+		数据源更新: "Source data updated",
 		"非实时信息。附近设施不代表安全或已开放。直线距离不代表路线可通行。":
 			"Not real-time information. A nearby facility is not necessarily safe or open. Straight-line distance does not mean the route is passable.",
 		前往设施的路线参考: "Route reference to the facility",
@@ -458,7 +519,10 @@ export const FULL_I18N: Record<"en" | "ja", Record<string, string>> = {
 		附近避难设施: "近くの避難施設",
 		查看最近的避难设施: "最寄りの避難施設を確認",
 		灾害信息: "災害情報",
-		获取最新灾害通知: "最新の災害情報を取得",
+		公开灾害信息: "公開災害情報",
+		需要位置权限: "位置情報が必要",
+		"附近避难设施和灾害信息暂不可用，其他功能仍可使用。":
+			"付近の避難施設と災害情報は現在利用できません。その他の機能は引き続き利用できます。",
 		多语言沟通卡: "多言語コミュニケーションカード",
 		用日语短句与周围的人沟通: "日本語フレーズで周囲の人に伝える",
 		"无需注册 · 不收集个人信息": "登録不要 · 個人情報は収集しません",
@@ -494,7 +558,22 @@ export const FULL_I18N: Record<"en" | "ja", Record<string, string>> = {
 		数据来源: "データ出典",
 		"日本气象厅、东京都防灾信息、内阁府防灾信息 等":
 			"気象庁、東京都防災情報、内閣府防災情報 など",
-		更新时间: "更新時刻",
+		"Demo 数据快照": "デモデータのスナップショット",
+		数据时点: "データ時点",
+		"Demo 模拟同步": "Demo 模擬同期",
+		流程进度: "フローの進行状況",
+		水煎包: "水煎包",
+		Support: "サポート",
+		联系我们: "お問い合わせ",
+		"Tokyo Safe First 是面向东京外国居民和游客的灾害行动 Demo。":
+			"Tokyo Safe First は、東京の外国人住民・旅行者向けの災害行動デモです。",
+		"如发生真实紧急情况：": "実際の緊急時：",
+		"消防 / 救护": "消防 / 救急",
+		警察: "警察",
+		"本 Demo 信息仅供辅助参考，请同时确认现场人员及官方发布。":
+			"本デモは補助的な参考情報です。現場の係員や公式発表も確認してください。",
+		"非实时信息，请以官方发布为准":
+			"リアルタイム情報ではありません。公式発表を優先してください。",
 		"此信息仅供参考，请以实际情况为准。":
 			"この情報は参考情報です。実際の状況を優先してください。",
 		确认并继续: "確認して続行",
@@ -514,6 +593,8 @@ export const FULL_I18N: Record<"en" | "ja", Record<string, string>> = {
 		我做不到: "できません",
 		"系统会根据本次位置和官方开放数据列出候选设施。":
 			"今回の位置情報と公式オープンデータから候補施設を表示します。",
+		"选择导航到避难地点时，将询问是否使用演示位置。":
+			"避難先へのナビを選ぶと、デモ位置を使用するか確認します。",
 		重要说明: "重要",
 		"“附近”不代表安全；“数据中存在”不代表现在开放；路线是否可通行需要现场确认。":
 			"「近い」ことは安全を意味しません。データに載っていても現在開設中とは限りません。経路が通行可能かは現場で確認してください。",
@@ -545,10 +626,10 @@ export const FULL_I18N: Record<"en" | "ja", Record<string, string>> = {
 		返回: "戻る",
 		返回上一步: "前に戻る",
 		返回主页: "ホームに戻る",
-		返回首页: "ホームへ戻る",
+		返回首页: "ホーム",
 		当前服务受限: "現在サービスが制限されています",
-		"无法获取最新设施数据。请确认现场广播、工作人员和官方信息。":
-			"最新の施設データを取得できません。現場放送、係員、公式情報を確認してください。",
+		"无法读取 Demo 设施快照。请确认现场广播、工作人员和官方信息。":
+			"デモ施設スナップショットを読み込めません。現場放送、係員、公式情報を確認してください。",
 		重新尝试: "再試行",
 		// Flow copy from DOCS/卡片・灾害定义.xlsm
 		"煤气泄漏、迷路、身体不适等紧急状况。":
@@ -658,6 +739,12 @@ export const FULL_I18N: Record<"en" | "ja", Record<string, string>> = {
 		仅本次使用: "今回のみ使用",
 		// Disaster info list & detail (home tile → nearby disaster info snapshot)
 		当前位置附近的灾害信息: "現在地周辺の災害情報",
+		"以下为当前位置附近可参考的公开防灾信息，点击查看详情。":
+			"現在地周辺の参考となる公開防災情報です。タップすると詳細を表示します。",
+		"以下为当前位置附近可参考的公开防灾信息":
+			"以下は現在地周辺で参考にできる公開防災情報です。",
+		"新宿区当前没有生效中的气象警报・注意报":
+			"新宿区には現在、有効な気象警報・注意報はありません",
 		"以下是根据本次位置整理的公开灾害信息，点击查看详情。":
 			"今回の位置情報をもとに整理した公開災害情報です。タップすると詳細を表示します。",
 		"新宿区当前没有生效的警报・注意报": "新宿区には現在、警報・注意報は発表されていません",
@@ -742,6 +829,7 @@ export const FULL_I18N: Record<"en" | "ja", Record<string, string>> = {
 			"現場放送、係員、公式情報を確認してください。このページだけに頼らないでください。",
 		数据出典: "データ出典",
 		更新日: "更新日",
+		数据源更新: "データソース更新日",
 		"非实时信息。附近设施不代表安全或已开放。直线距离不代表路线可通行。":
 			"リアルタイム情報ではありません。近い施設が安全または開設中とは限りません。直線距離は経路の通行可能性を示しません。",
 		前往设施的路线参考: "施設までの経路の参考",

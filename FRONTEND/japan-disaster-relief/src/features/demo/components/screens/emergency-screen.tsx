@@ -5,8 +5,6 @@ import { type DemoLang, t } from "@/features/demo/i18n";
 interface EmergencyScreenProps {
 	active: boolean;
 	lang: DemoLang;
-	/** 返回首页：清空状态回到欢迎页。 */
-	onHome: () => void;
 }
 
 /**
@@ -14,7 +12,7 @@ interface EmergencyScreenProps {
  * 与流程内的 SOS 卡（被困场景）不同，这里不属于任何流程节点。
  * 已获取位置时顶部由 demo-app 的 loc-bar 显示当前位置。
  */
-export function EmergencyScreen({ active, lang, onHome }: EmergencyScreenProps) {
+export function EmergencyScreen({ active, lang }: EmergencyScreenProps) {
 	return (
 		<section className={`screen${active ? " active" : ""}`} data-screen="emergency">
 			<div className="question-count">{t(lang, "紧急求助")}</div>
@@ -36,11 +34,6 @@ export function EmergencyScreen({ active, lang, onHome }: EmergencyScreenProps) 
 						</div>
 					</div>
 				</div>
-			</div>
-			<div className="actions">
-				<button type="button" className="btn ghost" onClick={onHome}>
-					🏠 {t(lang, "返回首页")}
-				</button>
 			</div>
 		</section>
 	);

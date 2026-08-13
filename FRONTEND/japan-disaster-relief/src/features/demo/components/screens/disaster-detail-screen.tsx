@@ -1,18 +1,20 @@
 "use client";
 
-import type { DisasterInfoItem } from "@/features/demo/disaster-info";
-import { type DemoLang, t } from "@/features/demo/i18n";
+import {
+	DISASTER_SNAPSHOT_DATE,
+	type DisasterInfoItem,
+} from "@/features/demo/disaster-info";
+import { dataSnapshotTimeText, type DemoLang, t } from "@/features/demo/i18n";
 
 interface DisasterDetailScreenProps {
 	active: boolean;
 	lang: DemoLang;
 	/** 列表页选中的那条灾害信息；未选中时本画面不渲染内容。 */
 	item: DisasterInfoItem | null;
-	onBack: () => void;
 }
 
 /** 灾害信息详情页：单条信息的概述、关键数据（发表时间・震源等）和建议行动。 */
-export function DisasterDetailScreen({ active, lang, item, onBack }: DisasterDetailScreenProps) {
+export function DisasterDetailScreen({ active, lang, item }: DisasterDetailScreenProps) {
 	return (
 		<section className={`screen${active ? " active" : ""}`} data-screen="disaster-detail">
 			{item && (
@@ -49,17 +51,16 @@ export function DisasterDetailScreen({ active, lang, item, onBack }: DisasterDet
 						</ul>
 					</div>
 					<div className="panel source-panel">
-						<div className="source-label">{t(lang, "发表机关")}</div>
+						<div className="source-label">{t(lang, "Demo 数据快照")}</div>
+						<div className="source-value">
+							{dataSnapshotTimeText(lang, DISASTER_SNAPSHOT_DATE)}
+						</div>
+						<div className="source-label">{t(lang, "数据来源")}</div>
 						<div className="source-value">{t(lang, item.source)}</div>
-						<div className="source-note">{t(lang, "此信息仅供参考，请以实际情况为准。")}</div>
+						<div className="source-note">{t(lang, "非实时信息，请以官方发布为准")}</div>
 					</div>
 				</>
 			)}
-			<div className="actions">
-				<button type="button" className="btn ghost" onClick={onBack}>
-					← {t(lang, "返回上一步")}
-				</button>
-			</div>
 		</section>
 	);
 }

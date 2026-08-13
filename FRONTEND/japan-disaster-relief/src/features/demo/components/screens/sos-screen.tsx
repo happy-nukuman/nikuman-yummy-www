@@ -8,17 +8,16 @@ interface SosScreenProps {
 	lang: DemoLang;
 	/** Continues the flow to the communication card (someone came close). */
 	onShowCommunication: () => void;
-	onBack: () => void;
 }
 
 /**
  * SOS card: shown when the user is trapped or cannot move. The 119 button is a
  * real tel: link (the only place in the demo that dials).
  */
-export function SosScreen({ active, lang, onShowCommunication, onBack }: SosScreenProps) {
+export function SosScreen({ active, lang, onShowCommunication }: SosScreenProps) {
 	return (
 		<section className={`screen${active ? " active" : ""}`} data-screen="sos">
-			<Progress on={4} />
+			<Progress on={4} label={t(lang, "流程进度")} />
 			<div className="question-count">{t(lang, "紧急求助")}</div>
 			<h1 className="hero-title">{t(lang, "如手机有信号，立即拨打 119")}</h1>
 			<div className="panel green">
@@ -41,9 +40,6 @@ export function SosScreen({ active, lang, onShowCommunication, onBack }: SosScre
 				</a>
 				<button type="button" className="btn secondary" onClick={onShowCommunication}>
 					{t(lang, "有人靠近时，展示沟通卡")}
-				</button>
-				<button type="button" className="btn ghost" onClick={onBack}>
-					← {t(lang, "返回上一步")}
 				</button>
 			</div>
 		</section>

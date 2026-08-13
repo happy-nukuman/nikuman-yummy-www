@@ -7,10 +7,9 @@ interface ModeScreenProps {
 	lang: DemoLang;
 	onEnterDisaster: () => void;
 	onEnterDaily: () => void;
-	onBack: () => void;
 }
 
-export function ModeScreen({ active, lang, onEnterDisaster, onEnterDaily, onBack }: ModeScreenProps) {
+export function ModeScreen({ active, lang, onEnterDisaster, onEnterDaily }: ModeScreenProps) {
 	return (
 		<section className={`screen${active ? " active" : ""}`} data-screen="mode">
 			<div className="eyebrow">{t(lang, "选择模式")}</div>
@@ -44,11 +43,6 @@ export function ModeScreen({ active, lang, onEnterDisaster, onEnterDaily, onBack
 			</div>
 			<div className="safe-banner">
 				⚠️ {t(lang, "若仍处于建筑倒塌、火灾或其他直接危险中，请立即撤离并听从现场人员指示。")}
-			</div>
-			<div className="actions">
-				<button type="button" className="btn ghost" onClick={onBack}>
-					← {t(lang, "返回上一步")}
-				</button>
 			</div>
 		</section>
 	);

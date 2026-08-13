@@ -90,12 +90,8 @@ function KeyboardIcon() {
 interface CommunicationScreenProps {
 	active: boolean;
 	lang: DemoLang;
-	/** 上一页不是主页时才显示「返回」按钮（主页去处已由「返回主页」覆盖）。 */
-	canReturn: boolean;
 	/** 朗读不可用等提示走全局 toast。 */
 	onToast: (message: string) => void;
-	onReturn: () => void;
-	onHome: () => void;
 }
 
 /** 沟通卡：聊天式双向翻译。固定短句直接出卡，自由输入调用翻译接口；
@@ -103,10 +99,7 @@ interface CommunicationScreenProps {
 export function CommunicationScreen({
 	active,
 	lang,
-	canReturn,
 	onToast,
-	onReturn,
-	onHome,
 }: CommunicationScreenProps) {
 	const [messages, setMessages] = useState<ChatMessage[]>([]);
 	const [input, setInput] = useState("");
@@ -410,16 +403,6 @@ export function CommunicationScreen({
 						</>
 					)}
 				</form>
-				<div className={`comm-nav${canReturn ? "" : " single"}`}>
-					{canReturn && (
-						<button type="button" className="btn ghost" onClick={onReturn}>
-							← {t(lang, "返回上一步")}
-						</button>
-					)}
-					<button type="button" className="btn ghost" onClick={onHome}>
-						{t(lang, "返回首页")}
-					</button>
-				</div>
 			</div>
 		</section>
 	);

@@ -37,7 +37,7 @@ export function ShelterCandidateCard({
 			</div>
 			<div className="facility-meta" lang={address.lang}>{address.text}</div>
 			<div className="facility-actions">
-				<button type="button" className="btn secondary" onClick={() => onNavigate(facility)}>
+				<button type="button" className="btn primary" onClick={() => onNavigate(facility)}>
 					{t(lang, "选择并查看路线")}
 				</button>
 			</div>
