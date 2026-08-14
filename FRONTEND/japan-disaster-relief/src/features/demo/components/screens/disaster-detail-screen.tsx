@@ -5,6 +5,7 @@ import {
 	type DisasterInfoItem,
 } from "@/features/demo/disaster-info";
 import { dataSnapshotTimeText, type DemoLang, t } from "@/features/demo/i18n";
+import { OptionGlyph } from "@/features/demo/components/app-icons";
 
 interface DisasterDetailScreenProps {
 	active: boolean;
@@ -21,9 +22,7 @@ export function DisasterDetailScreen({ active, lang, item }: DisasterDetailScree
 				<>
 					<div className="question-count">{t(lang, "灾害信息")}</div>
 					<div className="info-head">
-						<span className="info-icon" aria-hidden>
-							{item.icon}
-						</span>
+						<OptionGlyph className="info-icon" name={item.icon} />
 						<span className={`info-tag ${item.level}`}>{t(lang, item.category)}</span>
 					</div>
 					<h1 className="title-sm">{t(lang, item.title)}</h1>

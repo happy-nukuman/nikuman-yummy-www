@@ -6,6 +6,7 @@ import {
 	type DisasterInfoItem,
 } from "@/features/demo/disaster-info";
 import { dataSnapshotTimeText, type DemoLang, t } from "@/features/demo/i18n";
+import { CheckIcon, OptionGlyph } from "@/features/demo/components/app-icons";
 
 interface DisasterListScreenProps {
 	active: boolean;
@@ -26,7 +27,9 @@ export function DisasterListScreen({ active, lang, onOpenDetail }: DisasterListS
 			<p className="lead-sm">{t(lang, "以下为当前位置附近可参考的公开防灾信息，点击查看详情。")}</p>
 			<div className="panel green">
 				<div className="panel-row">
-					<div className="panel-icon">✅</div>
+					<div className="panel-icon">
+						<CheckIcon />
+					</div>
 					<div>
 						<div className="panel-title">{t(lang, "新宿区当前没有生效中的气象警报・注意报")}</div>
 						<div className="panel-copy">{t(lang, "以下为当前位置附近可参考的公开防灾信息")}</div>
@@ -42,9 +45,7 @@ export function DisasterListScreen({ active, lang, onOpenDetail }: DisasterListS
 						onClick={() => onOpenDetail(item)}
 					>
 						<span className="info-head">
-							<span className="info-icon" aria-hidden>
-								{item.icon}
-							</span>
+							<OptionGlyph className="info-icon" name={item.icon} />
 							<span className="info-title">{t(lang, item.title)}</span>
 							<span className={`info-tag ${item.level}`}>{t(lang, item.category)}</span>
 						</span>

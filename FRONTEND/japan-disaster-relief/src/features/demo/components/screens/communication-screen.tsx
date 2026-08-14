@@ -13,6 +13,7 @@ import {
 	t,
 } from "@/features/demo/i18n";
 import { postTranslation } from "@/features/translation/api/post-translation";
+import { SpeakerIcon, StopIcon } from "@/features/demo/components/app-icons";
 
 // demo 界面语言 → 翻译接口的语言代码（双向共用）。
 const APP_LANGUAGE: Record<DemoLang, TranslationLanguage> = {
@@ -291,7 +292,12 @@ export function CommunicationScreen({
 													}`}
 													onClick={() => speak(message.id, translated)}
 												>
-													{t(lang, speech.speakingId === message.id ? "⏹ 停止" : "🔊 朗读日语")}
+													{speech.speakingId === message.id ? (
+													<StopIcon className="bubble-speak-icon" />
+												) : (
+													<SpeakerIcon className="bubble-speak-icon" />
+												)}
+												{t(lang, speech.speakingId === message.id ? "停止" : "朗读日语")}
 												</button>
 											)}
 										</div>

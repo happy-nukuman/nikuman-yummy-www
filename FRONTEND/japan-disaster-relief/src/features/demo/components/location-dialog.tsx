@@ -1,6 +1,7 @@
 "use client";
 
 import { type DemoLang, t } from "@/features/demo/i18n";
+import { LocationIcon } from "@/features/demo/components/app-icons";
 
 interface LocationDialogProps {
 	lang: DemoLang;
@@ -17,7 +18,9 @@ export function LocationDialog({ lang, onDecide }: LocationDialogProps) {
 				aria-modal="true"
 				aria-label={t(lang, "是否允许使用演示位置？")}
 			>
-				<div className="modal-icon">📍</div>
+				<div className="modal-icon">
+					<LocationIcon />
+				</div>
 				<h2 className="modal-title">{t(lang, "是否允许使用演示位置？")}</h2>
 				<p className="modal-copy">
 					{t(lang, "本 Demo 使用固定的新宿位置，仅用于本次查询，不会读取或保存实时 GPS。")}

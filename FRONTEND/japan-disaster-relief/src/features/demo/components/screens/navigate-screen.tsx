@@ -3,6 +3,7 @@
 import type { DemoShelterCandidate } from "@nikuman-yummy/shared";
 import { type DemoLang, t } from "@/features/demo/i18n";
 import { Progress } from "@/features/demo/components/progress";
+import { BuildingIcon } from "@/features/demo/components/app-icons";
 import { formatApproxDistance } from "@/features/shelter/format";
 import { shelterDisplayAddress, shelterDisplayName } from "@/features/shelter/localization";
 import { ShelterRouteMap } from "@/features/shelter/components/shelter-route-map";
@@ -36,7 +37,9 @@ export function NavigateScreen({
 				<>
 					<div className="panel">
 						<div className="panel-row">
-							<div className="panel-icon">🏫</div>
+							<div className="panel-icon">
+								<BuildingIcon />
+							</div>
 							<div>
 								<div className="panel-title" lang={name.lang}>
 									{name.text}

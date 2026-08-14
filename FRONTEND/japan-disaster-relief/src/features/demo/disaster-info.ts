@@ -9,6 +9,7 @@ export type DisasterLevel = "warning" | "advisory" | "info";
 
 export interface DisasterInfoItem {
 	id: string;
+	/** Icon key resolved by OptionGlyph (app-icons.tsx). */
 	icon: string;
 	/** 分类角标（如「高温」「地震」），同时决定角标配色的 level。 */
 	category: string;
@@ -29,7 +30,7 @@ export interface DisasterInfoItem {
 export const DISASTER_INFO_ITEMS: readonly DisasterInfoItem[] = [
 	{
 		id: "heatstroke-alert",
-		icon: "🌡️",
+		icon: "thermometer",
 		category: "高温",
 		level: "warning",
 		title: "中暑警戒警报（东京地方）",
@@ -51,7 +52,7 @@ export const DISASTER_INFO_ITEMS: readonly DisasterInfoItem[] = [
 	},
 	{
 		id: "quake-20260805",
-		icon: "🌎",
+		icon: "quake",
 		category: "地震",
 		level: "info",
 		title: "震源・震度信息：东京都23区",
@@ -75,7 +76,7 @@ export const DISASTER_INFO_ITEMS: readonly DisasterInfoItem[] = [
 	},
 	{
 		id: "thunder-advisory",
-		icon: "⛈️",
+		icon: "storm",
 		category: "气象",
 		level: "advisory",
 		title: "雷注意报（东京都多摩西部）",

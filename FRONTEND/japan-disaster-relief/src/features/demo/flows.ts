@@ -16,6 +16,7 @@ export interface FlowOption {
 	value: string;
 	/** Chinese source label; translated through the demo i18n table. */
 	label: string;
+	/** Icon key resolved by OptionGlyph (app-icons.tsx); unknown keys render as raw text. */
 	icon: string;
 	next: string;
 }
@@ -102,8 +103,8 @@ export const EARTHQUAKE_FLOW: Flow = {
 			title: "摇晃停止了吗？",
 			lead: "先确认身边的晃动情况，再进行下一步。",
 			options: [
-				{ value: "stopped", label: "停止了", icon: "✅", next: "q-injury" },
-				{ value: "shaking", label: "还在摇晃", icon: "⚠️", next: "act-protect" },
+				{ value: "stopped", label: "停止了", icon: "check", next: "q-injury" },
+				{ value: "shaking", label: "还在摇晃", icon: "warning", next: "act-protect" },
 			],
 		},
 		// 摇晃中的防护卡结束后直接进入受伤确认，不回到 q-shaking（避免流程成环）。
@@ -127,12 +128,12 @@ export const EARTHQUAKE_FLOW: Flow = {
 			title: "你现在是否受伤？",
 			lead: "根据受伤情况，系统会给出不同的行动指引。",
 			options: [
-				{ value: "none", label: "没有受伤", icon: "✅", next: "q-location" },
-				{ value: "minor", label: "受轻伤，可以移动", icon: "🩹", next: "q-location" },
+				{ value: "none", label: "没有受伤", icon: "check", next: "q-location" },
+				{ value: "minor", label: "受轻伤，可以移动", icon: "bandage", next: "q-location" },
 				{
 					value: "trapped",
 					label: "被困住或无法移动（被压 / 重伤）",
-					icon: "🆘",
+					icon: "sos",
 					next: "act-trapped",
 				},
 			],
@@ -158,14 +159,14 @@ export const EARTHQUAKE_FLOW: Flow = {
 			title: "你现在在哪里？",
 			lead: "选择最接近的环境，用于匹配固定行动规则。",
 			options: [
-				{ value: "home", label: "自宅", icon: "🏠", next: "act-home" },
+				{ value: "home", label: "自宅", icon: "home", next: "act-home" },
 				{
 					value: "building",
 					label: "公司、学校、商场等建筑内",
-					icon: "🏢",
+					icon: "building",
 					next: "q-staff",
 				},
-				{ value: "other", label: "其他", icon: "❔", next: "evac" },
+				{ value: "other", label: "其他", icon: "help", next: "evac" },
 			],
 		},
 		"act-home": {
@@ -187,8 +188,8 @@ export const EARTHQUAKE_FLOW: Flow = {
 			title: "是否寻找到工作人员？",
 			lead: "优先听从现场工作人员的指示。",
 			options: [
-				{ value: "yes", label: "找到了", icon: "✅", next: "act-follow" },
-				{ value: "no", label: "没有找到", icon: "❌", next: "act-building" },
+				{ value: "yes", label: "找到了", icon: "check", next: "act-follow" },
+				{ value: "no", label: "没有找到", icon: "no", next: "act-building" },
 			],
 		},
 		"act-follow": {
@@ -262,8 +263,8 @@ export const GAS_LEAK_FLOW: Flow = {
 			title: "是否有人感到头晕、恶心或不适？",
 			lead: "吸入燃气可能引起不适，请先确认现场所有人的状态。",
 			options: [
-				{ value: "yes", label: "有人不适", icon: "🤢", next: "act-gas-med" },
-				{ value: "no", label: "没有人不适", icon: "✅", next: "act-gas-report" },
+				{ value: "yes", label: "有人不适", icon: "nausea", next: "act-gas-med" },
+				{ value: "no", label: "没有人不适", icon: "check", next: "act-gas-report" },
 			],
 			stage: 3,
 		},

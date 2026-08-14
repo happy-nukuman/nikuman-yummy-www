@@ -3,6 +3,7 @@
 import { DISASTER_SNAPSHOT_DATE } from "@/features/demo/disaster-info";
 import { dataSnapshotTimeText, type DemoLang, t } from "@/features/demo/i18n";
 import { Progress } from "@/features/demo/components/progress";
+import { OptionGlyph } from "@/features/demo/components/app-icons";
 
 export interface EventChoice {
 	value: string;
@@ -76,7 +77,7 @@ export function EventChoiceScreen({
 						className={`choice${selected === choice.value ? " selected" : ""}${choice.available === false ? " coming-soon" : ""}`}
 						onClick={() => onSelect(choice.value)}
 					>
-						<span className="choice-icon">{choice.icon}</span>
+						<OptionGlyph className="choice-icon" name={choice.icon} />
 						<span>
 							{t(lang, choice.label)}
 							{choice.meta !== undefined && (
