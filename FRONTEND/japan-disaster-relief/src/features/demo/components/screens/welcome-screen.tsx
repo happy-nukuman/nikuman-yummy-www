@@ -2,7 +2,7 @@
 
 import Image from "next/image";
 import { type DemoLang, t, WELCOME_COPY } from "@/features/demo/i18n";
-import { ChevronRightIcon } from "@/features/demo/components/app-icons";
+import { ChevronRightIcon, LocationIcon } from "@/features/demo/components/app-icons";
 
 interface WelcomeScreenProps {
 	active: boolean;
@@ -40,7 +40,9 @@ export function WelcomeScreen({
 				// 拒绝定位只影响两个位置功能；模式入口与紧急求助继续可用。
 				<div className="panel amber location-warning">
 					<div className="panel-row">
-						<div className="panel-icon">📍</div>
+						<div className="panel-icon">
+							<LocationIcon />
+						</div>
 						<div>
 							<div className="panel-title">{t(lang, "未获得定位权限")}</div>
 							<div className="panel-copy">

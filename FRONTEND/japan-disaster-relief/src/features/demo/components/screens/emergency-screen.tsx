@@ -1,7 +1,11 @@
 "use client";
 
 import { type DemoLang, t } from "@/features/demo/i18n";
-import { PhoneIcon } from "@/features/demo/components/app-icons";
+import {
+	AlertTriangleIcon,
+	PhoneIcon,
+	SirenIcon,
+} from "@/features/demo/components/app-icons";
 
 interface EmergencyScreenProps {
 	active: boolean;
@@ -17,7 +21,10 @@ export function EmergencyScreen({ active, lang }: EmergencyScreenProps) {
 	return (
 		<section className={`screen${active ? " active" : ""}`} data-screen="emergency">
 			<div className="question-count">{t(lang, "紧急求助")}</div>
-			<div className="sos-banner">🚨 {t(lang, "如果遇到危险，请立即求助")}</div>
+			<div className="sos-banner">
+				<SirenIcon className="btn-icon" />
+				{t(lang, "如果遇到危险，请立即求助")}
+			</div>
 			<a className="btn stacked call-119" href="tel:119">
 				<span className="btn-main"><PhoneIcon className="btn-icon" />{t(lang, "拨打 119")}</span>
 				<span className="btn-sub">{t(lang, "火灾・救护・急病")}</span>
@@ -28,7 +35,9 @@ export function EmergencyScreen({ active, lang }: EmergencyScreenProps) {
 			</a>
 			<div className="panel amber">
 				<div className="panel-row">
-					<div className="panel-icon">⚠️</div>
+					<div className="panel-icon">
+						<AlertTriangleIcon />
+					</div>
 					<div>
 						<div className="panel-copy">
 							{t(lang, "确保自身安全后再拨打电话。尽量在安全地点使用。")}

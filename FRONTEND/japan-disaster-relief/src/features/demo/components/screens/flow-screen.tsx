@@ -3,7 +3,12 @@
 import type { FlowNode } from "@/features/demo/flows";
 import { type DemoLang, t } from "@/features/demo/i18n";
 import { Progress } from "@/features/demo/components/progress";
-import { PhoneIcon, TranslateIcon } from "@/features/demo/components/app-icons";
+import {
+	MegaphoneIcon,
+	OptionGlyph,
+	PhoneIcon,
+	TranslateIcon,
+} from "@/features/demo/components/app-icons";
 
 interface FlowScreenProps {
 	active: boolean;
@@ -51,7 +56,7 @@ export function FlowScreen({
 								className={`choice${answers[node.id] === option.value ? " selected" : ""}`}
 								onClick={() => onAnswer(option.value)}
 							>
-								<span className="choice-icon">{option.icon}</span>
+								<OptionGlyph className="choice-icon" name={option.icon} />
 								<span>{t(lang, option.label)}</span>
 							</button>
 						))}
@@ -79,7 +84,9 @@ export function FlowScreen({
 					</div>
 					<div className="panel green">
 						<div className="panel-row">
-							<div className="panel-icon">👂</div>
+							<div className="panel-icon">
+								<MegaphoneIcon />
+							</div>
 							<div>
 								<div className="panel-title">{t(lang, "同时确认现场信息")}</div>
 								<div className="panel-copy">

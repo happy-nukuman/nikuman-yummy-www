@@ -2,7 +2,7 @@
 
 import { type DemoLang, t } from "@/features/demo/i18n";
 import { Progress } from "@/features/demo/components/progress";
-import { PhoneIcon, TranslateIcon } from "@/features/demo/components/app-icons";
+import { HardHatIcon, PhoneIcon, TranslateIcon } from "@/features/demo/components/app-icons";
 
 interface SosScreenProps {
 	active: boolean;
@@ -23,7 +23,9 @@ export function SosScreen({ active, lang, onShowCommunication }: SosScreenProps)
 			<h1 className="hero-title">{t(lang, "如手机有信号，立即拨打 119")}</h1>
 			<div className="panel green">
 				<div className="panel-row">
-					<div className="panel-icon">⛑️</div>
+					<div className="panel-icon">
+						<HardHatIcon />
+					</div>
 					<div>
 						<div className="panel-title">{t(lang, "等待救援时")}</div>
 						<div className="panel-copy">

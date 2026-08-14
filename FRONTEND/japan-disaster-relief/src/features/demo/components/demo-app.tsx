@@ -51,16 +51,21 @@ const DEMO_ORIGIN: GeoPoint = { latitude: 35.6931, longitude: 139.6887 };
 const DEMO_SHELTER_LIMIT = 5;
 
 const EVENT_CHOICES: readonly EventChoice[] = [
-	{ value: "earthquake", icon: "🌎", label: "地震", meta: "系统推荐 · 请确认" },
-	{ value: "fire", icon: "🔥", label: "火灾", available: false },
-	{ value: "flood", icon: "🌊", label: "水灾 / 海啸", available: false },
-	{ value: "unknown", icon: "❓", label: "不确定", available: false },
+	{ value: "earthquake", icon: "quake", label: "地震", meta: "系统推荐 · 请确认" },
+	{ value: "fire", icon: "flame", label: "火灾", available: false },
+	{ value: "flood", icon: "wave", label: "水灾 / 海啸", available: false },
+	{ value: "typhoon", icon: "typhoon", label: "台风", available: false },
+	{ value: "unknown", icon: "help", label: "不确定", available: false },
 ];
 
 const DAILY_CHOICES: readonly EventChoice[] = [
-	{ value: "gas", icon: "🔥", label: "煤气泄漏" },
-	{ value: "lost", icon: "🧭", label: "迷路", available: false },
-	{ value: "unwell", icon: "🤒", label: "身体不适", available: false },
+	{ value: "gas", icon: "flame", label: "煤气泄漏" },
+	{ value: "lost", icon: "compass", label: "迷路", available: false },
+	{ value: "unwell", icon: "thermometer", label: "身体不适", available: false },
+	{ value: "lost-item", icon: "wallet", label: "丢失财物 / 护照", available: false },
+	{ value: "traffic-accident", icon: "car", label: "交通事故", available: false },
+	{ value: "heatstroke", icon: "sun", label: "中暑", available: false },
+	{ value: "elevator", icon: "elevator", label: "被困电梯", available: false },
 ];
 
 const DOCUMENT_LANG: Record<DemoLang, string> = { zh: "zh-CN", en: "en", ja: "ja" };
