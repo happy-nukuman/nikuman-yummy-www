@@ -198,6 +198,12 @@ export function DemoApp({ initialLang }: DemoAppProps) {
 		requestLocationFor({ type: "disasters" });
 	}
 
+	// 首页「获得定位」：拒绝后重新弹出许可询问，同意后不跳转任何位置功能。
+	function retryLocation() {
+		setLocationIntent(null);
+		setLocDialogOpen(true);
+	}
+
 	// 列表中点击某条信息：进入该条灾害信息的详情页。
 	function openDisasterDetail(item: DisasterInfoItem) {
 		pushHistory();
@@ -339,7 +345,7 @@ export function DemoApp({ initialLang }: DemoAppProps) {
 		advanceTo(flowPos.flowId, nodeId);
 	}
 
-	// 路线页“打开沟通卡”：沿导航节点的 next 前进，让流程真正走完。
+	// 路线页“翻译沟通”：沿导航节点的 next 前进，让流程真正走完。
 	// 从首页磁贴进入时没有流程上下文，直接打开沟通卡。
 	function proceedFromNavigate() {
 		if (flowPos && flowNode?.type === "navigation") advanceTo(flowPos.flowId, flowNode.next);
@@ -375,6 +381,7 @@ export function DemoApp({ initialLang }: DemoAppProps) {
 						onEmergency={openEmergency}
 						onOpenFacilities={openFacilities}
 						onOpenDisasterInfo={openDisasterInfo}
+						onRequestLocation={retryLocation}
 					/>
 					<EventChoiceScreen
 						active={screen === "event"}

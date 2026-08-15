@@ -63,7 +63,7 @@ export function NavigateScreen({
 			<div className="source">{t(lang, "到达后或需要求助时，向身边的人展示。")}</div>
 			<div className="actions">
 				<button type="button" className="btn secondary" onClick={onOpenCommunication}>
-					{t(lang, "打开沟通卡")}
+					{t(lang, "翻译沟通")}
 				</button>
 			</div>
 		</section>
