@@ -90,14 +90,12 @@ html:lang(en) .hero-title,html:lang(en) .action-hero h2{letter-spacing:-.01em}
 .bubble.error .bubble-status{color:var(--amber-ink)}
 .bubble-retry{border:1px solid var(--glass-line);background:var(--glass);border-radius:999px;padding:6px 14px;font-size:13px;font-weight:700;color:var(--blue-deep);white-space:nowrap}
 /* 输入方向切换：左=用户语言，右=日语（供日本人回应，标签固定日语）。 */
-.chat-langs{display:grid;grid-template-columns:auto minmax(0,1fr) auto;grid-template-rows:auto auto;gap:6px 8px;align-items:center}
-.chat-lang-label{font-size:11px;font-weight:800;letter-spacing:.04em;color:var(--muted);white-space:nowrap}
-.chat-lang-group{display:flex;gap:4px;min-width:0;padding:3px;border:1px solid var(--glass-line);background:var(--glass);-webkit-backdrop-filter:blur(18px);backdrop-filter:blur(18px);border-radius:12px}
-.chat-lang-btn{flex:1;min-width:0;min-height:32px;border:0;border-radius:9px;background:transparent;padding:4px 6px;font-size:13px;font-weight:700;color:var(--muted);white-space:nowrap;transition:background .12s ease,color .12s ease}
-.chat-lang-btn.active{background:var(--grad-sel);color:#fff;box-shadow:0 4px 10px rgba(10,108,255,.28)}
-.chat-lang-swap{grid-column:3;grid-row:1/span 2;align-self:stretch;width:38px;display:grid;place-items:center;border:1px solid var(--glass-line);border-radius:12px;background:var(--glass);color:var(--blue-deep)}
+.chat-langs{display:flex;align-items:stretch;gap:6px}
+.chat-lang{flex:1;min-width:0;display:flex;flex-direction:column;gap:2px;border:1px solid var(--glass-line);background:var(--glass);-webkit-backdrop-filter:blur(18px);backdrop-filter:blur(18px);border-radius:12px;padding:5px 10px 4px}
+.chat-lang-label{font-size:10.5px;font-weight:800;letter-spacing:.06em;color:var(--muted)}
+.chat-lang-select{appearance:none;-webkit-appearance:none;width:100%;border:0;background:transparent;padding:0 18px 0 0;font:inherit;font-size:14px;font-weight:800;color:var(--ink);background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%2373859a' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right center;background-size:14px}
+.chat-lang-swap{flex:0 0 40px;display:grid;place-items:center;border:1px solid transparent;border-radius:12px;background:var(--grad-sel);color:#fff;box-shadow:0 6px 14px rgba(10,108,255,.3)}
 .chat-lang-swap:active{transform:scale(.96)}
-
 
 .chat-phrases-label{font-size:12px;font-weight:800;color:var(--blue-deep);letter-spacing:.08em;margin:0 2px 6px}
 .chat-chips{display:flex;gap:8px;overflow-x:auto;padding-bottom:4px;-webkit-overflow-scrolling:touch}

@@ -378,22 +378,20 @@ export function CommunicationScreen({
 					})}
 				</div>
 				<div className="chat-langs">
-					<span className="chat-lang-label">{t(lang, "源语言")}</span>
-					<div className="chat-lang-group" role="radiogroup" aria-label={t(lang, "源语言")}>
-						{LANGUAGE_OPTIONS.map((option) => (
-							<button
-								key={option.value}
-								type="button"
-								role="radio"
-								aria-checked={option.value === source}
-								className={`chat-lang-btn${option.value === source ? " active" : ""}`}
-								lang={option.demo}
-								onClick={() => changeSource(option.value)}
-							>
-								{option.label}
-							</button>
-						))}
-					</div>
+					<label className="chat-lang">
+						<span className="chat-lang-label">{t(lang, "源语言")}</span>
+						<select
+							className="chat-lang-select"
+							value={source}
+							onChange={(event) => changeSource(event.target.value as TranslationLanguage)}
+						>
+							{LANGUAGE_OPTIONS.map((option) => (
+								<option key={option.value} value={option.value} lang={option.demo}>
+									{option.label}
+								</option>
+							))}
+						</select>
+					</label>
 					<button
 						type="button"
 						className="chat-lang-swap"
@@ -403,22 +401,20 @@ export function CommunicationScreen({
 					>
 						<SwapIcon />
 					</button>
-					<span className="chat-lang-label">{t(lang, "目标语言")}</span>
-					<div className="chat-lang-group" role="radiogroup" aria-label={t(lang, "目标语言")}>
-						{LANGUAGE_OPTIONS.map((option) => (
-							<button
-								key={option.value}
-								type="button"
-								role="radio"
-								aria-checked={option.value === target}
-								className={`chat-lang-btn${option.value === target ? " active" : ""}`}
-								lang={option.demo}
-								onClick={() => changeTarget(option.value)}
-							>
-								{option.label}
-							</button>
-						))}
-					</div>
+					<label className="chat-lang">
+						<span className="chat-lang-label">{t(lang, "目标语言")}</span>
+						<select
+							className="chat-lang-select"
+							value={target}
+							onChange={(event) => changeTarget(event.target.value as TranslationLanguage)}
+						>
+							{LANGUAGE_OPTIONS.map((option) => (
+								<option key={option.value} value={option.value} lang={option.demo}>
+									{option.label}
+								</option>
+							))}
+						</select>
+					</label>
 				</div>
 				<div className="chat-phrases">
 					<div className="chat-phrases-label" lang={inputLang}>
