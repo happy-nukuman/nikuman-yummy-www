@@ -320,8 +320,9 @@ export function CommunicationScreen({
 					</div>
 					{messages.map((message) => {
 						const translated = message.translatedText;
-						// 原文不是界面语言 → 由对方输入，显示为对方气泡。
-						const incoming = message.sourceLanguage !== APP_LANGUAGE[lang];
+						// 用当前源语言发出的消息靠右；其他语言（当前目标语言）发出的消息靠左（对方气泡）。
+						// 交换语言方向后气泡两侧随之翻转，与把手机递给对方的场景一致。
+						const incoming = message.sourceLanguage !== source;
 						const sourceHtmlLang = languageOption(message.sourceLanguage).demo;
 						const targetHtmlLang = languageOption(message.targetLanguage).demo;
 						return (
