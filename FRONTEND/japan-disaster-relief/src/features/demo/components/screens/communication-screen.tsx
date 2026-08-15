@@ -24,7 +24,7 @@ const APP_LANGUAGE: Record<DemoLang, TranslationLanguage> = {
 
 interface LanguageOption {
 	value: TranslationLanguage;
-	/** 用该语言自身书写的名称，不随界面语言变化，方便对方辨认。 */
+	/** 语言名称的中文文案键，经 t() 翻译为当前界面语言显示。 */
 	label: string;
 	/** 对应的 demo 界面语言，用于取该语言的输入区提示文案与固定短句。 */
 	demo: DemoLang;
@@ -35,8 +35,8 @@ interface LanguageOption {
 // 可选的源语言 / 目标语言（与翻译接口支持的语言一致）。
 const LANGUAGE_OPTIONS: readonly LanguageOption[] = [
 	{ value: "zh-Hans", label: "中文", demo: "zh", speech: "zh-CN" },
-	{ value: "en", label: "English", demo: "en", speech: "en-US" },
-	{ value: "ja", label: "日本語", demo: "ja", speech: "ja-JP" },
+	{ value: "en", label: "英语", demo: "en", speech: "en-US" },
+	{ value: "ja", label: "日语", demo: "ja", speech: "ja-JP" },
 ];
 
 function languageOption(value: TranslationLanguage): LanguageOption {
@@ -386,8 +386,8 @@ export function CommunicationScreen({
 							onChange={(event) => changeSource(event.target.value as TranslationLanguage)}
 						>
 							{LANGUAGE_OPTIONS.map((option) => (
-								<option key={option.value} value={option.value} lang={option.demo}>
-									{option.label}
+								<option key={option.value} value={option.value}>
+									{t(lang, option.label)}
 								</option>
 							))}
 						</select>
@@ -409,8 +409,8 @@ export function CommunicationScreen({
 							onChange={(event) => changeTarget(event.target.value as TranslationLanguage)}
 						>
 							{LANGUAGE_OPTIONS.map((option) => (
-								<option key={option.value} value={option.value} lang={option.demo}>
-									{option.label}
+								<option key={option.value} value={option.value}>
+									{t(lang, option.label)}
 								</option>
 							))}
 						</select>
