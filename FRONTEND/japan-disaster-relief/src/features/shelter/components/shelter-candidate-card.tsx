@@ -31,10 +31,6 @@ export function ShelterCandidateCard({
 				</div>
 				<span className="tag">{`${t(lang, "候选")} ${index + 1}`}</span>
 			</div>
-			<div className="facility-status">
-				<span aria-hidden>!</span>
-				{t(lang, "当前开放状态：无法确认")}
-			</div>
 			<div className="facility-meta" lang={address.lang}>{address.text}</div>
 			<div className="facility-actions">
 				<button type="button" className="btn primary" onClick={() => onNavigate(facility)}>
