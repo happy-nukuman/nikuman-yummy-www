@@ -24,7 +24,7 @@ const APP_LANGUAGE: Record<DemoLang, TranslationLanguage> = {
 
 interface LanguageOption {
 	value: TranslationLanguage;
-	/** 用该语言自身书写的名称，不随界面语言变化，方便对方辨认。 */
+	/** 语言名称的中文文案键，经 t() 翻译为当前界面语言显示。 */
 	label: string;
 	/** 对应的 demo 界面语言，用于取该语言的输入区提示文案与固定短句。 */
 	demo: DemoLang;
@@ -35,8 +35,8 @@ interface LanguageOption {
 // 可选的源语言 / 目标语言（与翻译接口支持的语言一致）。
 const LANGUAGE_OPTIONS: readonly LanguageOption[] = [
 	{ value: "zh-Hans", label: "中文", demo: "zh", speech: "zh-CN" },
-	{ value: "en", label: "English", demo: "en", speech: "en-US" },
-	{ value: "ja", label: "日本語", demo: "ja", speech: "ja-JP" },
+	{ value: "en", label: "英语", demo: "en", speech: "en-US" },
+	{ value: "ja", label: "日语", demo: "ja", speech: "ja-JP" },
 ];
 
 function languageOption(value: TranslationLanguage): LanguageOption {
@@ -53,6 +53,8 @@ interface ChatMessage {
 	sourceLanguage: TranslationLanguage;
 	targetLanguage: TranslationLanguage;
 	sourceText: string;
+	/** 发出方：mine = 用源语言一侧（靠右）；theirs = 用目标语言一侧（靠左）。发送时确定，之后不变。 */
+	side: "mine" | "theirs";
 	/** 译文；翻译完成前为 null。 */
 	translatedText: string | null;
 	/** fixed = 固定审核翻译（不走接口）；ai = 调用翻译接口。 */
@@ -143,13 +145,17 @@ export function CommunicationScreen({
 	const [messages, setMessages] = useState<ChatMessage[]>([]);
 	const [input, setInput] = useState("");
 	// 用户手动选择的语言对；记录选择时的界面语言，切换界面语言后回到默认组合。
+	// primary = 通过下拉框选定的源语言（「我方」语言）；点交换按钮只互换方向，不改变 primary，
+	// 因此我方消息始终靠右、对方消息始终靠左。
 	const [chosen, setChosen] = useState<{
 		forLang: DemoLang;
 		source: TranslationLanguage;
 		target: TranslationLanguage;
+		primary: TranslationLanguage;
 	} | null>(null);
 	const source = chosen?.forLang === lang ? chosen.source : APP_LANGUAGE[lang];
 	const target = chosen?.forLang === lang ? chosen.target : defaultTarget(lang);
+	const primary = chosen?.forLang === lang ? chosen.primary : APP_LANGUAGE[lang];
 	// true = 语音输入模式：输入框替换为微信式「按住 说话」长条按钮。
 	const [voiceMode, setVoiceMode] = useState(false);
 	const nextIdRef = useRef(0);
@@ -222,6 +228,7 @@ export function CommunicationScreen({
 			sourceLanguage: source,
 			targetLanguage: target,
 			sourceText: phrase.text,
+			side: source === primary ? "mine" : "theirs",
 			translatedText: phrase.translated,
 			kind: "fixed",
 			status: "done",
@@ -236,6 +243,7 @@ export function CommunicationScreen({
 			sourceLanguage: source,
 			targetLanguage: target,
 			sourceText: text,
+			side: source === primary ? "mine" : "theirs",
 			translatedText: null,
 			kind: "ai",
 			status: "loading",
@@ -249,8 +257,12 @@ export function CommunicationScreen({
 	}
 
 	// 改变语言方向时清空未发送的草稿并停止录音（通常伴随把手机递给对方）。
-	function setLanguages(nextSource: TranslationLanguage, nextTarget: TranslationLanguage) {
-		setChosen({ forLang: lang, source: nextSource, target: nextTarget });
+	function setLanguages(
+		nextSource: TranslationLanguage,
+		nextTarget: TranslationLanguage,
+		nextPrimary: TranslationLanguage,
+	) {
+		setChosen({ forLang: lang, source: nextSource, target: nextTarget, primary: nextPrimary });
 		recognition.stop();
 		setInput("");
 	}
@@ -258,16 +270,17 @@ export function CommunicationScreen({
 	// 选源语言：与目标语言相同则自动交换，保证两侧始终不同。
 	function changeSource(next: TranslationLanguage) {
 		if (next === source) return;
-		setLanguages(next, next === target ? source : target);
+		setLanguages(next, next === target ? source : target, next);
 	}
 
 	function changeTarget(next: TranslationLanguage) {
 		if (next === target) return;
-		setLanguages(next === source ? target : source, next);
+		const nextSource = next === source ? target : source;
+		setLanguages(nextSource, next, nextSource);
 	}
 
 	function swapLanguages() {
-		setLanguages(target, source);
+		setLanguages(target, source, primary);
 	}
 
 	function speak(messageId: number, japanese: string) {
@@ -320,8 +333,8 @@ export function CommunicationScreen({
 					</div>
 					{messages.map((message) => {
 						const translated = message.translatedText;
-						// 原文不是界面语言 → 由对方输入，显示为对方气泡。
-						const incoming = message.sourceLanguage !== APP_LANGUAGE[lang];
+						// 我方（源语言）消息靠右，对方（目标语言）消息靠左；发送时已定，交换语言不翻转。
+						const incoming = message.side === "theirs";
 						const sourceHtmlLang = languageOption(message.sourceLanguage).demo;
 						const targetHtmlLang = languageOption(message.targetLanguage).demo;
 						return (
@@ -386,8 +399,8 @@ export function CommunicationScreen({
 							onChange={(event) => changeSource(event.target.value as TranslationLanguage)}
 						>
 							{LANGUAGE_OPTIONS.map((option) => (
-								<option key={option.value} value={option.value} lang={option.demo}>
-									{option.label}
+								<option key={option.value} value={option.value}>
+									{t(lang, option.label)}
 								</option>
 							))}
 						</select>
@@ -409,8 +422,8 @@ export function CommunicationScreen({
 							onChange={(event) => changeTarget(event.target.value as TranslationLanguage)}
 						>
 							{LANGUAGE_OPTIONS.map((option) => (
-								<option key={option.value} value={option.value} lang={option.demo}>
-									{option.label}
+								<option key={option.value} value={option.value}>
+									{t(lang, option.label)}
 								</option>
 							))}
 						</select>
