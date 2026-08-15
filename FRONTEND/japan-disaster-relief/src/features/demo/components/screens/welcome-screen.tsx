@@ -19,6 +19,8 @@ interface WelcomeScreenProps {
 	onOpenFacilities: () => void;
 	/** 「灾害信息」：进入附近灾害信息列表（需要定位许可）。 */
 	onOpenDisasterInfo: () => void;
+	/** 拒绝定位后的「获得定位」：重新弹出位置许可询问。 */
+	onRequestLocation: () => void;
 }
 
 export function WelcomeScreen({
@@ -30,6 +32,7 @@ export function WelcomeScreen({
 	onEmergency,
 	onOpenFacilities,
 	onOpenDisasterInfo,
+	onRequestLocation,
 }: WelcomeScreenProps) {
 	const welcome = WELCOME_COPY[lang];
 	const locationDenied = locPermission === "denied";
@@ -50,6 +53,13 @@ export function WelcomeScreen({
 							</div>
 						</div>
 					</div>
+					<button
+						type="button"
+						className="btn secondary loc-retry"
+						onClick={onRequestLocation}
+					>
+						{t(lang, "获得定位")}
+					</button>
 				</div>
 			)}
 

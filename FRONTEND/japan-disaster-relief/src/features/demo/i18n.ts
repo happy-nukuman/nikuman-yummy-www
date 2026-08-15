@@ -252,7 +252,6 @@ export const FULL_I18N: Record<"en" | "ja", Record<string, string>> = {
 			"Near Nishi-Shinjuku 6-8, Shinjuku City, Tokyo · Used only for this session",
 		暂时不需要: "Not now",
 		附近设施候选: "Nearby evacuation facilities",
-		打开沟通卡: "Open communication card",
 		打开翻译沟通: "Open translation support",
 		请把屏幕给对方看: "Show this screen to the other person",
 		朗读日语: "Speak Japanese",
@@ -387,6 +386,7 @@ export const FULL_I18N: Record<"en" | "ja", Record<string, string>> = {
 		"未获得定位权限，位置相关功能不可用":
 			"Location permission was not granted. Location-based features are unavailable.",
 		未获得定位权限: "Location permission not granted",
+		获得定位: "Enable location",
 		"允许定位后才能使用位置相关功能。": "Allow location access to use location-based features.",
 		东京都新宿区西新宿六丁目8番: "Nishi-Shinjuku 6-8, Shinjuku City, Tokyo",
 		仅本次使用: "This session only",
@@ -595,7 +595,6 @@ export const FULL_I18N: Record<"en" | "ja", Record<string, string>> = {
 		"東京都新宿区西新宿六丁目8番附近 · 仅本次使用": "東京都新宿区西新宿六丁目8番付近 · 今回のみ使用",
 		暂时不需要: "今は必要ありません",
 		附近设施候选: "近くの避難施設",
-		打开沟通卡: "コミュニケーションカードを開く",
 		打开翻译沟通: "翻訳・会話を開く",
 		请把屏幕给对方看: "相手にこの画面を見せてください",
 		朗读日语: "日本語を読み上げる",
@@ -730,6 +729,7 @@ export const FULL_I18N: Record<"en" | "ja", Record<string, string>> = {
 		"未获得定位权限，位置相关功能不可用":
 			"位置情報の許可がないため、位置情報を利用する機能は使用できません。",
 		未获得定位权限: "位置情報が許可されていません",
+		获得定位: "位置情報を許可する",
 		"允许定位后才能使用位置相关功能。":
 			"位置情報を許可すると、位置情報を利用する機能が使えます。",
 		东京都新宿区西新宿六丁目8番: "東京都新宿区西新宿六丁目8番",
