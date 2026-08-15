@@ -15,33 +15,71 @@ import {
 import { postTranslation } from "@/features/translation/api/post-translation";
 import { SpeakerIcon, StopIcon } from "@/features/demo/components/app-icons";
 
-// demo 界面语言 → 翻译接口的语言代码（双向共用）。
+// demo 界面语言 → 翻译接口的语言代码（用于默认源语言）。
 const APP_LANGUAGE: Record<DemoLang, TranslationLanguage> = {
 	zh: "zh-Hans",
 	en: "en",
 	ja: "ja",
 };
 
-// demo 界面语言 → 语音识别的 BCP 47 语言标签。
-const SPEECH_LANGUAGE: Record<DemoLang, string> = {
-	zh: "zh-CN",
-	en: "en-US",
-	ja: "ja-JP",
-};
+interface LanguageOption {
+	value: TranslationLanguage;
+	/** 用该语言自身书写的名称，不随界面语言变化，方便对方辨认。 */
+	label: string;
+	/** 对应的 demo 界面语言，用于取该语言的输入区提示文案与固定短句。 */
+	demo: DemoLang;
+	/** 语音识别的 BCP 47 语言标签。 */
+	speech: string;
+}
 
-/** toJapanese = 用户 → 日本人；fromJapanese = 日本人回应用户。 */
-type Direction = "toJapanese" | "fromJapanese";
+// 可选的源语言 / 目标语言（与翻译接口支持的语言一致）。
+const LANGUAGE_OPTIONS: readonly LanguageOption[] = [
+	{ value: "zh-Hans", label: "中文", demo: "zh", speech: "zh-CN" },
+	{ value: "en", label: "English", demo: "en", speech: "en-US" },
+	{ value: "ja", label: "日本語", demo: "ja", speech: "ja-JP" },
+];
+
+function languageOption(value: TranslationLanguage): LanguageOption {
+	return LANGUAGE_OPTIONS.find((option) => option.value === value) ?? LANGUAGE_OPTIONS[0];
+}
+
+/** 默认目标语言：界面语言不是日语时译成日语；日语界面则默认译成英语。 */
+function defaultTarget(lang: DemoLang): TranslationLanguage {
+	return lang === "ja" ? "en" : "ja";
+}
 
 interface ChatMessage {
 	id: number;
-	direction: Direction;
-	/** 原文：toJapanese 为用户语言，fromJapanese 为日语。 */
+	sourceLanguage: TranslationLanguage;
+	targetLanguage: TranslationLanguage;
 	sourceText: string;
-	/** 译文：toJapanese 为日语，fromJapanese 为用户语言；翻译完成前为 null。 */
+	/** 译文；翻译完成前为 null。 */
 	translatedText: string | null;
 	/** fixed = 固定审核翻译（不走接口）；ai = 调用翻译接口。 */
 	kind: "fixed" | "ai";
 	status: "loading" | "done" | "error";
+}
+
+// 线条风格的左右交换箭头（源语言 ⇄ 目标语言）。
+function SwapIcon() {
+	return (
+		<svg
+			viewBox="0 0 24 24"
+			width="20"
+			height="20"
+			fill="none"
+			stroke="currentColor"
+			strokeWidth="1.8"
+			strokeLinecap="round"
+			strokeLinejoin="round"
+			aria-hidden="true"
+		>
+			<path d="M4 8h14" />
+			<path d="M15 5l3 3-3 3" />
+			<path d="M20 16H6" />
+			<path d="M9 13l-3 3 3 3" />
+		</svg>
+	);
 }
 
 // 微信同款线条麦克风图标（胶囊话筒 + 拾音弧 + 支杆）。
@@ -96,7 +134,7 @@ interface CommunicationScreenProps {
 }
 
 /** 沟通卡：聊天式双向翻译。固定短句直接出卡，自由输入调用翻译接口；
- *  「日本語で返信」模式供日本人回应，界面提示固定为日语。 */
+ *  源语言 / 目标语言可自由选择，输入区提示跟随源语言（由说该语言的人操作）。 */
 export function CommunicationScreen({
 	active,
 	lang,
@@ -104,8 +142,14 @@ export function CommunicationScreen({
 }: CommunicationScreenProps) {
 	const [messages, setMessages] = useState<ChatMessage[]>([]);
 	const [input, setInput] = useState("");
-	// true = 日本人回应模式（输入区切换为日语界面）。
-	const [replyMode, setReplyMode] = useState(false);
+	// 用户手动选择的语言对；记录选择时的界面语言，切换界面语言后回到默认组合。
+	const [chosen, setChosen] = useState<{
+		forLang: DemoLang;
+		source: TranslationLanguage;
+		target: TranslationLanguage;
+	} | null>(null);
+	const source = chosen?.forLang === lang ? chosen.source : APP_LANGUAGE[lang];
+	const target = chosen?.forLang === lang ? chosen.target : defaultTarget(lang);
 	// true = 语音输入模式：输入框替换为微信式「按住 说话」长条按钮。
 	const [voiceMode, setVoiceMode] = useState(false);
 	const nextIdRef = useRef(0);
@@ -140,36 +184,45 @@ export function CommunicationScreen({
 		return id;
 	}
 
-	async function translate(id: number, text: string, direction: Direction) {
-		const request =
-			direction === "toJapanese"
-				? { text, sourceLanguage: APP_LANGUAGE[lang], targetLanguage: "ja" as const }
-				: { text, sourceLanguage: "ja" as const, targetLanguage: APP_LANGUAGE[lang] };
+	async function translate(
+		id: number,
+		text: string,
+		sourceLanguage: TranslationLanguage,
+		targetLanguage: TranslationLanguage,
+	) {
 		try {
-			const response = await postTranslation(request);
+			const response = await postTranslation({ text, sourceLanguage, targetLanguage });
 			updateMessage(id, { translatedText: response.translatedText, status: "done" });
 		} catch {
 			updateMessage(id, { status: "error" });
 		}
 	}
 
-	// 固定沟通卡（用户 → 日本人）：使用既有的审核译文，不经过翻译接口。
-	function sendFixedPhrase(index: number) {
-		appendMessage({
-			direction: "toJapanese",
-			sourceText: PHRASE_TEXT[lang][index],
-			translatedText: PHRASES[index][2],
-			kind: "fixed",
-			status: "done",
-		});
-	}
+	const sourceOption = languageOption(source);
+	const targetOption = languageOption(target);
+	// 输入区文案用源语言显示（操作输入的人说的是源语言）。
+	const inputLang = sourceOption.demo;
 
-	// 固定回应（日本人 → 用户）：日语原文与译文都是审核文案。
-	function sendFixedReply(index: number) {
+	// 固定短句：源语言为日语时用「日本人回应外国人」的固定回应，否则用「外国人求助」的沟通卡。
+	// 原文和译文都是审核过的固定文案，不经过翻译接口。
+	const fixedPhrases: ReadonlyArray<{ text: string; translated: string }> =
+		source === "ja"
+			? REPLY_PHRASES.map((_, i) => ({
+					text: REPLY_PHRASES[i][0],
+					translated: replyPhraseTranslation(targetOption.demo, i),
+				}))
+			: PHRASE_TEXT[sourceOption.demo].map((text, i) => ({
+					text,
+					translated: target === "ja" ? PHRASES[i][2] : PHRASE_TEXT[targetOption.demo][i],
+				}));
+
+	function sendFixedPhrase(index: number) {
+		const phrase = fixedPhrases[index];
 		appendMessage({
-			direction: "fromJapanese",
-			sourceText: REPLY_PHRASES[index][0],
-			translatedText: replyPhraseTranslation(lang, index),
+			sourceLanguage: source,
+			targetLanguage: target,
+			sourceText: phrase.text,
+			translatedText: phrase.translated,
 			kind: "fixed",
 			status: "done",
 		});
@@ -179,28 +232,42 @@ export function CommunicationScreen({
 		const text = input.trim();
 		if (text.length === 0) return;
 		setInput("");
-		const direction: Direction = replyMode ? "fromJapanese" : "toJapanese";
 		const id = appendMessage({
-			direction,
+			sourceLanguage: source,
+			targetLanguage: target,
 			sourceText: text,
 			translatedText: null,
 			kind: "ai",
 			status: "loading",
 		});
-		void translate(id, text, direction);
+		void translate(id, text, source, target);
 	}
 
 	function retry(message: ChatMessage) {
 		updateMessage(message.id, { status: "loading" });
-		void translate(message.id, message.sourceText, message.direction);
+		void translate(message.id, message.sourceText, message.sourceLanguage, message.targetLanguage);
 	}
 
-	// 切换输入方向时清空未发送的草稿并停止录音（通常伴随把手机递给对方）。
-	function switchMode(nextReplyMode: boolean) {
-		if (nextReplyMode === replyMode) return;
+	// 改变语言方向时清空未发送的草稿并停止录音（通常伴随把手机递给对方）。
+	function setLanguages(nextSource: TranslationLanguage, nextTarget: TranslationLanguage) {
+		setChosen({ forLang: lang, source: nextSource, target: nextTarget });
 		recognition.stop();
-		setReplyMode(nextReplyMode);
 		setInput("");
+	}
+
+	// 选源语言：与目标语言相同则自动交换，保证两侧始终不同。
+	function changeSource(next: TranslationLanguage) {
+		if (next === source) return;
+		setLanguages(next, next === target ? source : target);
+	}
+
+	function changeTarget(next: TranslationLanguage) {
+		if (next === target) return;
+		setLanguages(next === source ? target : source, next);
+	}
+
+	function swapLanguages() {
+		setLanguages(target, source);
 	}
 
 	function speak(messageId: number, japanese: string) {
@@ -223,7 +290,7 @@ export function CommunicationScreen({
 		// 录音与朗读互斥，否则会把播放的声音识别进去。
 		speech.stop();
 		const started = recognition.start({
-			lang: replyMode ? "ja-JP" : SPEECH_LANGUAGE[lang],
+			lang: sourceOption.speech,
 			onText: setInput,
 			onError: (failure) => {
 				if (failure === "not-allowed") onToast(t(lang, "未获得麦克风权限"));
@@ -249,11 +316,14 @@ export function CommunicationScreen({
 				<div className="eyebrow">{t(lang, "请把屏幕给对方看")}</div>
 				<div className="chat-messages" ref={listRef}>
 					<div className="bubble jp intro">
-						{t(lang, "点选下方常用沟通卡，或输入文字，系统会翻译成日语展示给对方。")}
+						{t(lang, "点选下方常用沟通卡，或输入文字，系统会翻译成对方的语言展示给对方。")}
 					</div>
 					{messages.map((message) => {
 						const translated = message.translatedText;
-						const incoming = message.direction === "fromJapanese";
+						// 原文不是界面语言 → 由对方输入，显示为对方气泡。
+						const incoming = message.sourceLanguage !== APP_LANGUAGE[lang];
+						const sourceHtmlLang = languageOption(message.sourceLanguage).demo;
+						const targetHtmlLang = languageOption(message.targetLanguage).demo;
 						return (
 							<div
 								key={message.id}
@@ -261,7 +331,7 @@ export function CommunicationScreen({
 									message.status === "error" ? " error" : ""
 								}`}
 							>
-								<div className="bubble-source" lang={incoming ? "ja" : undefined}>
+								<div className="bubble-source" lang={sourceHtmlLang}>
 									{message.sourceText}
 								</div>
 								{message.status === "loading" && (
@@ -277,14 +347,14 @@ export function CommunicationScreen({
 								)}
 								{message.status === "done" && translated !== null && (
 									<>
-										<div className="bubble-jp-text" lang={incoming ? undefined : "ja"}>
+										<div className="bubble-jp-text" lang={targetHtmlLang}>
 											{translated}
 										</div>
 										<div className="bubble-foot">
 											<span className="bubble-tag">
 												{t(lang, message.kind === "fixed" ? "固定审核翻译" : "AI 翻译 · 仅供参考")}
 											</span>
-											{!incoming && (
+											{message.targetLanguage === "ja" && (
 												<button
 													type="button"
 													className={`bubble-speak${
@@ -307,56 +377,61 @@ export function CommunicationScreen({
 						);
 					})}
 				</div>
-				<div className="chat-mode">
+				<div className="chat-langs">
+					<label className="chat-lang">
+						<span className="chat-lang-label">{t(lang, "源语言")}</span>
+						<select
+							className="chat-lang-select"
+							value={source}
+							onChange={(event) => changeSource(event.target.value as TranslationLanguage)}
+						>
+							{LANGUAGE_OPTIONS.map((option) => (
+								<option key={option.value} value={option.value} lang={option.demo}>
+									{option.label}
+								</option>
+							))}
+						</select>
+					</label>
 					<button
 						type="button"
-						className={`chat-mode-btn${replyMode ? "" : " active"}`}
-						onClick={() => switchMode(false)}
+						className="chat-lang-swap"
+						onClick={swapLanguages}
+						aria-label={t(lang, "交换语言")}
+						title={t(lang, "交换语言")}
 					>
-						{t(lang, "我说")}
+						<SwapIcon />
 					</button>
-					{/* 操作这个模式的人是日本人：标签与输入提示固定用日语，不随界面语言变化。 */}
-					<button
-						type="button"
-						className={`chat-mode-btn${replyMode ? " active" : ""}`}
-						lang="ja"
-						onClick={() => switchMode(true)}
-					>
-						日本語で返信
-					</button>
+					<label className="chat-lang">
+						<span className="chat-lang-label">{t(lang, "目标语言")}</span>
+						<select
+							className="chat-lang-select"
+							value={target}
+							onChange={(event) => changeTarget(event.target.value as TranslationLanguage)}
+						>
+							{LANGUAGE_OPTIONS.map((option) => (
+								<option key={option.value} value={option.value} lang={option.demo}>
+									{option.label}
+								</option>
+							))}
+						</select>
+					</label>
 				</div>
-				{replyMode && (
-					<div className="chat-reply-hint" lang="ja">
-						日本語で入力すると、相手の言語に翻訳して表示されます。
-					</div>
-				)}
 				<div className="chat-phrases">
-					<div className="chat-phrases-label" lang={replyMode ? "ja" : undefined}>
-						{replyMode ? "よく使う返信" : t(lang, "常用沟通卡")}
+					<div className="chat-phrases-label" lang={inputLang}>
+						{t(inputLang, "常用沟通卡")}
 					</div>
 					<div className="chat-chips">
-						{replyMode
-							? REPLY_PHRASES.map(([ja], i) => (
-									<button
-										key={ja}
-										type="button"
-										className="chat-chip"
-										lang="ja"
-										onClick={() => sendFixedReply(i)}
-									>
-										{ja}
-									</button>
-								))
-							: PHRASE_TEXT[lang].map((text, i) => (
-									<button
-										key={text}
-										type="button"
-										className="chat-chip"
-										onClick={() => sendFixedPhrase(i)}
-									>
-										{text}
-									</button>
-								))}
+						{fixedPhrases.map((phrase, i) => (
+							<button
+								key={phrase.text}
+								type="button"
+								className="chat-chip"
+								lang={inputLang}
+								onClick={() => sendFixedPhrase(i)}
+							>
+								{phrase.text}
+							</button>
+						))}
 					</div>
 				</div>
 				<form
@@ -370,7 +445,7 @@ export function CommunicationScreen({
 						type="button"
 						className="chat-mic"
 						onClick={toggleVoiceMode}
-						aria-label={voiceMode ? t(lang, "键盘输入") : t(lang, "语音输入")}
+						aria-label={voiceMode ? t(inputLang, "键盘输入") : t(inputLang, "语音输入")}
 					>
 						{voiceMode ? <KeyboardIcon /> : <MicIcon />}
 					</button>
@@ -379,19 +454,13 @@ export function CommunicationScreen({
 						<button
 							type="button"
 							className={`chat-hold${recognition.listening ? " holding" : ""}`}
-							lang={replyMode ? "ja" : undefined}
+							lang={inputLang}
 							onPointerDown={startHoldToTalk}
 							onPointerUp={endHoldToTalk}
 							onPointerCancel={endHoldToTalk}
 							onContextMenu={(event) => event.preventDefault()}
 						>
-							{recognition.listening
-								? replyMode
-									? "離して 終了"
-									: t(lang, "松开 结束")
-								: replyMode
-									? "長押しして 話す"
-									: t(lang, "按住 说话")}
+							{t(inputLang, recognition.listening ? "松开 结束" : "按住 说话")}
 						</button>
 					) : (
 						<>
@@ -399,12 +468,12 @@ export function CommunicationScreen({
 								className="chat-input"
 								value={input}
 								onChange={(event) => setInput(event.target.value)}
-								lang={replyMode ? "ja" : undefined}
-								placeholder={replyMode ? "日本語で入力…" : t(lang, "输入想说的话，翻译成日语")}
+								lang={inputLang}
+								placeholder={t(inputLang, "输入想说的话…")}
 								enterKeyHint="send"
 							/>
 							<button type="submit" className="chat-send" disabled={input.trim().length === 0}>
-								{replyMode ? "送信" : t(lang, "发送")}
+								{t(inputLang, "发送")}
 							</button>
 						</>
 					)}
