@@ -475,7 +475,6 @@ export const FULL_I18N: Record<"en" | "ja", Record<string, string>> = {
 			"Searching a snapshot of official open data using your current session location.",
 		避难所: "Shelter",
 		候选: "Candidate",
-		"当前开放状态：无法确认": "Opening status: unconfirmed",
 		选择并查看路线: "Select and view route",
 		"在 Google 地图中查看位置": "View location on Google Maps",
 		"附近 3 公里内暂无可显示的候选设施":
@@ -815,7 +814,6 @@ export const FULL_I18N: Record<"en" | "ja", Record<string, string>> = {
 			"今回の位置情報をもとに、公式オープンデータのスナップショットを検索します。",
 		避难所: "避難所",
 		候选: "候補",
-		"当前开放状态：无法确认": "現在の開設状況：確認できません",
 		选择并查看路线: "選択して経路を見る",
 		"在 Google 地图中查看位置": "Google マップで位置を確認",
 		"附近 3 公里内暂无可显示的候选设施": "3km以内に表示できる候補施設がありません",
