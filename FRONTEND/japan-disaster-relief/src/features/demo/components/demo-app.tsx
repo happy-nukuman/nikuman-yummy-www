@@ -13,6 +13,7 @@ import { TopBar } from "@/features/demo/components/top-bar";
 import { AppFooter } from "@/features/demo/components/app-footer";
 import { LocationBar } from "@/features/demo/components/location-bar";
 import { LocationDialog } from "@/features/demo/components/location-dialog";
+import { ShareModal } from "@/features/demo/components/share-modal";
 import { SupportModal } from "@/features/demo/components/support-modal";
 import { WelcomeScreen } from "@/features/demo/components/screens/welcome-screen";
 import {
@@ -107,6 +108,8 @@ export function DemoApp({ initialLang }: DemoAppProps) {
 	// 仅在用户主动进入位置功能时询问；首页与灾害判断主流程不预先请求位置。
 	const [locDialogOpen, setLocDialogOpen] = useState(false);
 	const [supportOpen, setSupportOpen] = useState(false);
+	// 顶栏二维码按钮：任何画面都能一键出示当前 App 地址给旁边的人扫。
+	const [shareOpen, setShareOpen] = useState(false);
 	const [locationIntent, setLocationIntent] = useState<LocationIntent | null>(null);
 	// 事象确认卡：灾害模式自动识别推荐地震并高亮，日常应急为手动选择。
 	const [eventChoice, setEventChoice] = useState("earthquake");
@@ -368,6 +371,7 @@ export function DemoApp({ initialLang }: DemoAppProps) {
 					lang={lang}
 					onHome={goWelcome}
 					onOpenCommunication={openCommunication}
+					onOpenShare={() => setShareOpen(true)}
 					onSwitchLanguage={switchLanguage}
 				/>
 				<main className="main has-footer">
@@ -469,6 +473,9 @@ export function DemoApp({ initialLang }: DemoAppProps) {
 				/>
 				{locDialogOpen && <LocationDialog lang={lang} onDecide={decideLocation} />}
 				{supportOpen && <SupportModal lang={lang} onClose={() => setSupportOpen(false)} />}
+				{shareOpen && (
+					<ShareModal lang={lang} onToast={notify} onClose={() => setShareOpen(false)} />
+				)}
 			</div>
 			<div className={`toast${toast.show ? " show" : ""}`}>{toast.msg}</div>
 		</div>

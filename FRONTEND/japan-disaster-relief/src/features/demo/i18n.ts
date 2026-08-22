@@ -213,6 +213,15 @@ export const FULL_I18N: Record<"en" | "ja", Record<string, string>> = {
 		流程进度: "Flow progress",
 		Support: "Support",
 		联系我们: "Contact",
+		// Share-the-app QR sheet (top bar)
+		"分享这个 App": "Share this app",
+		"让身边的人扫描二维码，立即打开同一个 App。无需安装、无需注册。":
+			"Let someone next to you scan the code to open the same app right away. No install, no sign-up.",
+		"当前 App 访问地址的二维码": "QR code for this app's address",
+		"正在生成二维码…": "Generating QR code…",
+		复制链接: "Copy link",
+		已复制链接: "Link copied",
+		"复制失败，请让对方扫描二维码": "Copy failed. Ask them to scan the QR code instead.",
 		"Tokyo Safe First 是面向东京外国居民和游客的灾害行动 Demo。":
 			"Tokyo Safe First is a disaster-response guidance demo for international residents and visitors in Tokyo.",
 		"如发生真实紧急情况：": "Emergency contacts",
@@ -561,6 +570,16 @@ export const FULL_I18N: Record<"en" | "ja", Record<string, string>> = {
 		流程进度: "フローの進行状況",
 		Support: "サポート",
 		联系我们: "お問い合わせ",
+		// Share-the-app QR sheet (top bar)
+		"分享这个 App": "このアプリを共有",
+		"让身边的人扫描二维码，立即打开同一个 App。无需安装、无需注册。":
+			"近くの人にQRコードを読み取ってもらうと、同じアプリをすぐ開けます。インストールも登録も不要です。",
+		"当前 App 访问地址的二维码": "このアプリのアドレスのQRコード",
+		"正在生成二维码…": "QRコードを生成中…",
+		复制链接: "リンクをコピー",
+		已复制链接: "リンクをコピーしました",
+		"复制失败，请让对方扫描二维码":
+			"コピーできませんでした。QRコードを読み取ってもらってください。",
 		"Tokyo Safe First 是面向东京外国居民和游客的灾害行动 Demo。":
 			"Tokyo Safe First は、東京で暮らす・滞在する外国人向けの災害時行動支援デモです。",
 		"如发生真实紧急情况：": "緊急時の連絡先",
