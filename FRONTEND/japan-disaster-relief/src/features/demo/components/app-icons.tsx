@@ -357,3 +357,12 @@ export function CloseIcon(props: IconProps) {
 		</IconBase>
 	);
 }
+
+export function QrCodeIcon(props: IconProps) {
+	return (
+		<IconBase {...props}>
+			<path d="M4 4h6v6H4zM14 4h6v6h-6zM4 14h6v6H4z" />
+			<path d="M14 14h2.5M20 14v2.5M17.5 17.5h2.5M14 20h3.5" />
+		</IconBase>
+	);
+}

@@ -3,13 +3,20 @@
 import { useEffect, useState } from "react";
 import Image from "next/image";
 import { type DemoLang, t, WELCOME_COPY } from "@/features/demo/i18n";
-import { CloseIcon, GlobeIcon, TranslateIcon } from "@/features/demo/components/app-icons";
+import {
+	CloseIcon,
+	GlobeIcon,
+	QrCodeIcon,
+	TranslateIcon,
+} from "@/features/demo/components/app-icons";
 
 interface TopBarProps {
 	lang: DemoLang;
 	/** 点击左上角 logo：回到首页（欢迎页）。 */
 	onHome: () => void;
 	onOpenCommunication: () => void;
+	/** 出示二维码，把当前 App 地址分享给身边的人。 */
+	onOpenShare: () => void;
 	onSwitchLanguage: (lang: DemoLang) => void;
 }
 
@@ -33,6 +40,7 @@ export function TopBar({
 	lang,
 	onHome,
 	onOpenCommunication,
+	onOpenShare,
 	onSwitchLanguage,
 }: TopBarProps) {
 	const [menuOpen, setMenuOpen] = useState(false);
@@ -68,6 +76,15 @@ export function TopBar({
 					/>
 				</button>
 				<div className="top-actions">
+					<button
+						type="button"
+						className="top-action share-action"
+						aria-label={t(lang, "分享这个 App")}
+						title={t(lang, "分享这个 App")}
+						onClick={onOpenShare}
+					>
+						<QrCodeIcon className="top-action-icon" />
+					</button>
 					<button
 						type="button"
 						className="top-action communication-action"
